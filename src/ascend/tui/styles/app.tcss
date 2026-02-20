@@ -1,0 +1,247 @@
+/* Ascend TUI — global styles */
+
+/* Layout */
+#main-layout {
+    height: 1fr;
+}
+
+/* Sidebar */
+Sidebar {
+    dock: left;
+    width: 22;
+    background: $surface;
+    border-right: tall $primary-background;
+    padding: 1 0;
+}
+
+.sidebar-title {
+    text-align: center;
+    color: $accent;
+    padding: 0 1 1 1;
+    text-style: bold;
+}
+
+.nav-btn {
+    width: 100%;
+    margin: 0 1;
+    min-width: 18;
+}
+
+.nav-btn.-active {
+    background: $accent;
+    color: $text;
+    text-style: bold;
+}
+
+/* Content area */
+#content {
+    width: 1fr;
+    height: 1fr;
+}
+
+/* Panel titles */
+.panel-title {
+    dock: top;
+    padding: 1 2;
+    background: $primary-background;
+    color: $text;
+    text-style: bold;
+    width: 100%;
+}
+
+.section-title {
+    padding: 1 2 0 2;
+    color: $accent;
+    text-style: bold;
+}
+
+/* Stats row */
+.stats-row {
+    height: auto;
+    padding: 1 2;
+    max-height: 5;
+}
+
+.stat-card {
+    width: 1fr;
+    padding: 0 2;
+    text-align: center;
+    border: round $primary-background;
+    margin: 0 1;
+    height: 3;
+    content-align: center middle;
+}
+
+/* Dashboard tables */
+.dashboard-table {
+    height: auto;
+    max-height: 12;
+    margin: 0 2 1 2;
+}
+
+/* Roster layout */
+.roster-layout {
+    height: 1fr;
+}
+
+.roster-left {
+    width: 2fr;
+    height: 1fr;
+}
+
+.roster-right {
+    width: 1fr;
+    height: 1fr;
+    border-left: tall $primary-background;
+    padding: 1;
+}
+
+.roster-table {
+    height: 1fr;
+}
+
+.filter-input {
+    dock: top;
+    margin: 0 0 1 0;
+}
+
+/* Meetings layout */
+.meetings-layout {
+    height: 1fr;
+}
+
+.meetings-top {
+    height: 2fr;
+}
+
+.meetings-bottom {
+    height: 1fr;
+    border-top: tall $primary-background;
+    padding: 1;
+}
+
+.meetings-table {
+    height: 1fr;
+}
+
+/* Reports layout */
+.reports-content {
+    height: 1fr;
+    padding: 1;
+}
+
+/* Coaching layout */
+.coaching-layout {
+    height: 1fr;
+}
+
+.coaching-left {
+    width: 2fr;
+    height: 1fr;
+}
+
+.coaching-right {
+    width: 1fr;
+    height: 1fr;
+    border-left: tall $primary-background;
+    padding: 1;
+}
+
+.coaching-table {
+    height: 1fr;
+}
+
+/* Schedules */
+.schedules-layout {
+    height: 1fr;
+    padding: 1;
+}
+
+.schedules-table {
+    height: 1fr;
+}
+
+.schedule-actions {
+    dock: bottom;
+    height: auto;
+    padding: 1;
+}
+
+/* Member card */
+MemberCard {
+    height: 1fr;
+}
+
+.member-card-content {
+    padding: 1;
+}
+
+.card-field {
+    margin-bottom: 0;
+}
+
+.card-label {
+    color: $accent;
+    text-style: bold;
+}
+
+.card-value {
+    margin-left: 1;
+}
+
+.card-flags {
+    margin-top: 1;
+}
+
+.card-empty {
+    color: $text-muted;
+    text-align: center;
+    padding: 3;
+}
+
+/* Metric bar */
+MetricBar {
+    height: 1;
+    width: 100%;
+}
+
+.bar-track {
+    width: 100%;
+    height: 1;
+}
+
+/* Help dialog */
+#help-dialog {
+    width: 70;
+    height: 30;
+    border: thick $accent;
+    background: $surface;
+    padding: 1 2;
+    margin: 4 8;
+}
+
+.help-footer {
+    text-align: center;
+    margin-top: 1;
+}
+
+/* No data message */
+.no-data {
+    text-align: center;
+    color: $text-muted;
+    padding: 3;
+}
+
+/* Risk score colors */
+.risk-high {
+    color: $error;
+    text-style: bold;
+}
+
+.risk-medium {
+    color: $warning;
+}
+
+.risk-low {
+    color: $success;
+}

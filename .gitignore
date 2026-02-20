@@ -1,0 +1,43 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+*.egg
+dist/
+build/
+*.whl
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Ascend runtime
+*.db
+config.yaml
+.env
+.env.*
+.env.local
+*.pem
+*.key
+.secrets*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Phase build artifacts
+ascend-phase2/
+ascend-phase3/
+
+# Test / coverage
+.pytest_cache/
+htmlcov/
+.coverage

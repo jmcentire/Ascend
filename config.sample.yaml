@@ -1,0 +1,29 @@
+# Ascend configuration — copy to ~/.ascend/config.yaml and customize
+# Or use: ascend config set KEY VALUE
+
+# Paths
+repos_dir: ~/ascend-data/repos
+reports_dir: ~/ascend-data/reports
+config_dir: ~/ascend-data/config
+
+# AI (Claude) — set the env var name that holds your Anthropic API key
+anthropic_api_key_env: ASCEND_ANTHROPIC_API_KEY
+model: claude-sonnet-4-20250514
+
+# Lookback window for sync commands (hours)
+default_lookback_hours: 24
+
+# GitHub
+github_org: ""
+
+# Linear — set env var name and team IDs
+linear_api_key_env: LINEAR_API_KEY
+linear_team_id: ""
+linear_team_ids: []
+
+# Slack — set env var name and channel list
+slack_bot_token_env: SLACK_BOT_TOKEN
+slack_channels: []
+
+# Manager name (used in reports and coaching)
+manager_name: null
