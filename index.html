@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ascend — AI-Powered Engineering Management CLI</title>
+<meta name="description" content="Track your team, analyze performance, prepare for 1:1s, and detect risks — all from the terminal.">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0d1117;--bg-card:#161b22;--bg-card-hover:#1c2333;
+  --border:#30363d;--text:#c9d1d9;--text-muted:#8b949e;
+  --green:#3fb950;--cyan:#58a6ff;--yellow:#d29922;--purple:#bc8cff;
+  --font-mono:'SF Mono','Fira Code','Cascadia Code',Consolas,monospace;
+  --font-sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;
+}
+html{scroll-behavior:smooth;scroll-padding-top:4rem}
+body{font-family:var(--font-sans);background:var(--bg);color:var(--text);line-height:1.6;overflow-x:hidden}
+a{color:var(--cyan);text-decoration:none}
+a:hover{text-decoration:underline}
+
+/* Nav */
+nav{position:sticky;top:0;z-index:100;background:rgba(13,17,23,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:.75rem 0}
+nav .inner{max-width:1100px;margin:0 auto;padding:0 1.5rem;display:flex;align-items:center;gap:2rem}
+nav .logo{font-family:var(--font-mono);font-weight:700;font-size:1.1rem;color:var(--green);letter-spacing:.05em}
+nav .links{display:flex;gap:1.5rem;margin-left:auto;font-size:.875rem}
+nav .links a{color:var(--text-muted);transition:color .2s}
+nav .links a:hover{color:var(--text);text-decoration:none}
+@media(max-width:640px){nav .links{display:none}}
+
+/* Sections */
+section{max-width:1100px;margin:0 auto;padding:4rem 1.5rem}
+.section-title{font-size:1.5rem;font-weight:700;margin-bottom:.5rem;color:#fff}
+.section-subtitle{color:var(--text-muted);margin-bottom:2rem;font-size:1rem}
+
+/* Hero */
+.hero{text-align:center;padding:6rem 1.5rem 4rem}
+.hero h1{font-size:3rem;font-weight:800;color:#fff;margin-bottom:.5rem}
+.hero h1 .accent{color:var(--green)}
+.hero .tagline{font-size:1.2rem;color:var(--text-muted);max-width:600px;margin:0 auto 2.5rem}
+.install-box{display:inline-flex;align-items:center;gap:.75rem;background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:.6rem 1rem;font-family:var(--font-mono);font-size:.95rem;cursor:pointer;transition:border-color .2s}
+.install-box:hover{border-color:var(--green)}
+.install-box .prompt{color:var(--green)}
+.install-box .cmd{color:var(--text)}
+.install-box .copy-btn{background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:1rem;padding:2px 6px;border-radius:4px;transition:color .2s,background .2s}
+.install-box .copy-btn:hover{color:var(--green);background:rgba(63,185,80,.1)}
+.install-box .copy-btn.copied{color:var(--green)}
+
+/* Terminal animation */
+.terminal{background:#010409;border:1px solid var(--border);border-radius:10px;max-width:600px;margin:2.5rem auto 0;text-align:left;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,.4)}
+.terminal-bar{display:flex;align-items:center;gap:6px;padding:10px 14px;background:#161b22;border-bottom:1px solid var(--border)}
+.terminal-dot{width:12px;height:12px;border-radius:50%}
+.terminal-dot.r{background:#ff5f57}.terminal-dot.y{background:#febc2e}.terminal-dot.g{background:#28c840}
+.terminal-bar span{margin-left:auto;font-size:.75rem;color:var(--text-muted);font-family:var(--font-mono)}
+.terminal-body{padding:1rem 1.25rem;font-family:var(--font-mono);font-size:.8rem;line-height:1.8;min-height:200px}
+.terminal-body .line{opacity:0;animation:typeLine .3s ease forwards}
+.terminal-body .prompt-char{color:var(--green)}
+.terminal-body .cmd-text{color:#fff}
+.terminal-body .out{color:var(--text-muted)}
+.terminal-body .out-green{color:var(--green)}
+.terminal-body .out-cyan{color:var(--cyan)}
+.terminal-body .out-yellow{color:var(--yellow)}
+.terminal-body .out-purple{color:var(--purple)}
+@keyframes typeLine{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+
+/* Features */
+.features-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem}
+@media(max-width:768px){.features-grid{grid-template-columns:1fr}}
+@media(min-width:769px) and (max-width:1024px){.features-grid{grid-template-columns:repeat(2,1fr)}}
+.feature-card{background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:1.5rem;transition:border-color .2s,transform .15s}
+.feature-card:hover{border-color:var(--green);transform:translateY(-2px)}
+.feature-card .icon{font-size:1.5rem;margin-bottom:.75rem}
+.feature-card h3{font-size:1rem;color:#fff;margin-bottom:.4rem}
+.feature-card p{font-size:.85rem;color:var(--text-muted);line-height:1.5}
+
+/* Quick Start */
+.steps{counter-reset:step}
+.step{counter-increment:step;display:flex;gap:1.5rem;margin-bottom:2rem;align-items:flex-start}
+.step::before{content:counter(step);flex-shrink:0;width:2rem;height:2rem;background:var(--green);color:var(--bg);font-weight:700;font-size:.9rem;border-radius:50%;display:flex;align-items:center;justify-content:center;margin-top:.25rem}
+.step-content h3{font-size:1rem;color:#fff;margin-bottom:.5rem}
+.step-content p{color:var(--text-muted);font-size:.9rem;margin-bottom:.75rem}
+pre{background:var(--bg-card);border:1px solid var(--border);border-radius:8px;padding:1rem 1.25rem;overflow-x:auto;font-family:var(--font-mono);font-size:.82rem;line-height:1.7;color:var(--text)}
+pre .comment{color:var(--text-muted)}
+pre .cmd-prefix{color:var(--green)}
+
+/* Command Reference */
+details{background:var(--bg-card);border:1px solid var(--border);border-radius:8px;margin-bottom:.75rem;transition:border-color .2s}
+details[open]{border-color:var(--cyan)}
+summary{padding:1rem 1.25rem;cursor:pointer;font-weight:600;font-size:.95rem;color:#fff;list-style:none;display:flex;align-items:center;gap:.75rem}
+summary::before{content:'▸';color:var(--cyan);font-size:1.1rem;transition:transform .2s}
+details[open] summary::before{transform:rotate(90deg)}
+summary::-webkit-details-marker{display:none}
+summary .badge{margin-left:auto;font-size:.75rem;font-weight:400;color:var(--text-muted);background:rgba(88,166,255,.1);padding:2px 8px;border-radius:4px}
+details .cmd-list{padding:0 1.25rem 1rem;font-family:var(--font-mono);font-size:.8rem;line-height:1.9;color:var(--text-muted)}
+details .cmd-list code{color:var(--cyan)}
+details .cmd-list .desc{color:var(--text-muted)}
+
+/* Architecture */
+.arch-tree{background:var(--bg-card);border:1px solid var(--border);border-radius:10px;padding:1.5rem 2rem;font-family:var(--font-mono);font-size:.8rem;line-height:1.8;color:var(--text-muted);overflow-x:auto}
+.arch-tree .dir{color:var(--cyan)}
+.arch-tree .file{color:var(--text)}
+.arch-tree .comment{color:var(--text-muted);font-style:italic}
+
+/* Tech badges */
+.tech-badges{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:1.5rem}
+.badge-tech{font-family:var(--font-mono);font-size:.75rem;padding:4px 10px;border-radius:4px;border:1px solid var(--border);color:var(--text-muted);background:var(--bg-card)}
+
+/* Footer */
+footer{border-top:1px solid var(--border);padding:2rem 1.5rem;text-align:center;color:var(--text-muted);font-size:.85rem}
+footer a{color:var(--cyan)}
+footer .footer-links{display:flex;justify-content:center;gap:1.5rem;margin-bottom:.5rem}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="inner">
+    <div class="logo">ascend</div>
+    <div class="links">
+      <a href="#features">Features</a>
+      <a href="#quickstart">Quick Start</a>
+      <a href="#commands">Commands</a>
+      <a href="#architecture">Architecture</a>
+      <a href="https://github.com/jmcentire/Ascend">GitHub</a>
+    </div>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+  <h1><span class="accent">ascend</span></h1>
+  <p class="tagline">AI-powered engineering management CLI. Track your team, analyze performance, prepare for 1:1s, and detect risks &mdash; all from the terminal.</p>
+
+  <div class="install-box" onclick="copyInstall(this)">
+    <span class="prompt">$</span>
+    <span class="cmd">pip install -e .</span>
+    <button class="copy-btn" aria-label="Copy install command" title="Copy to clipboard">&#x2398;</button>
+  </div>
+
+  <div class="terminal">
+    <div class="terminal-bar">
+      <div class="terminal-dot r"></div>
+      <div class="terminal-dot y"></div>
+      <div class="terminal-dot g"></div>
+      <span>ascend tui</span>
+    </div>
+    <div class="terminal-body" id="term"></div>
+  </div>
+</section>
+
+<!-- Features -->
+<section id="features">
+  <h2 class="section-title">Features</h2>
+  <p class="section-subtitle">Everything you need to lead engineering teams effectively.</p>
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="icon">&#x1F4CB;</div>
+      <h3>Roster Management</h3>
+      <p>Track team members with GitHub, Slack, email, title. Hierarchical teams, bulk CSV import, searchable flags (oncall, PTO, PIP).</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">&#x1F399;</div>
+      <h3>Meeting Intelligence</h3>
+      <p>Ingest transcripts, get AI summaries, extract action items and decisions. Full-text search across all meetings.</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">&#x1F4C8;</div>
+      <h3>Performance Tracking</h3>
+      <p>Aggregate GitHub commits, Linear issues, Slack activity into daily snapshots. Track velocity trends over 30+ days.</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">&#x26A0;</div>
+      <h3>Risk Detection</h3>
+      <p>Algorithmic detection of flight risk, burnout signals, bus factor, and underperformance. Early warning before it's too late.</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">&#x1F9D1;&#x200D;&#x1F3EB;</div>
+      <h3>AI Coaching</h3>
+      <p>STAR behavioral assessments, personalized coaching suggestions, and AI-generated 1:1 prep plans with full context.</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">&#x1F4CA;</div>
+      <h3>Reports</h3>
+      <p>Performance metrics, team health, project progress, git analytics, org dashboard. Free-form AI reports on any question.</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">&#x1F3AF;</div>
+      <h3>Goals &amp; Planning</h3>
+      <p>OKR management, performance improvement plans, career development tracking. Full planning cycle support.</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">&#x23F0;</div>
+      <h3>Scheduling</h3>
+      <p>Automated task scheduling with cron expressions. macOS launchd integration, presets for daily, weekly, monthly.</p>
+    </div>
+    <div class="feature-card">
+      <div class="icon">&#x1F5A5;</div>
+      <h3>Interactive TUI</h3>
+      <p>Full terminal interface with mouse support, keyboard nav, command palette. Six screens: Dashboard, Roster, Meetings, Reports, Coaching, Schedules.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Quick Start -->
+<section id="quickstart">
+  <h2 class="section-title">Quick Start</h2>
+  <p class="section-subtitle">Up and running in under a minute.</p>
+  <div class="steps">
+    <div class="step">
+      <div class="step-content">
+        <h3>Install</h3>
+        <pre><span class="cmd-prefix">$</span> git clone https://github.com/jmcentire/Ascend.git
+<span class="cmd-prefix">$</span> cd Ascend
+<span class="cmd-prefix">$</span> pip install -e .
+<span class="cmd-prefix">$</span> ascend init</pre>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-content">
+        <h3>Configure</h3>
+        <p>Set your API keys for AI features and integrations.</p>
+        <pre><span class="comment"># Required for AI features (summaries, coaching)</span>
+<span class="cmd-prefix">$</span> export ASCEND_ANTHROPIC_API_KEY="sk-ant-..."
+
+<span class="comment"># Optional integrations</span>
+<span class="cmd-prefix">$</span> export LINEAR_API_KEY="lin_api_..."
+<span class="cmd-prefix">$</span> export SLACK_BOT_TOKEN="xoxb-..."
+
+<span class="cmd-prefix">$</span> ascend config set github_org your-org</pre>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-content">
+        <h3>Import your team</h3>
+        <pre><span class="comment"># Bulk import from CSV</span>
+<span class="cmd-prefix">$</span> ascend roster import team.csv
+
+<span class="comment"># Or add one by one</span>
+<span class="cmd-prefix">$</span> ascend roster add "Alice Smith" \
+    --email alice@co.com --github alicesmith --title "Senior Engineer"</pre>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-content">
+        <h3>Sync &amp; analyze</h3>
+        <pre><span class="cmd-prefix">$</span> ascend sync                <span class="comment"># Pull from GitHub, Linear, Slack</span>
+<span class="cmd-prefix">$</span> ascend report dashboard    <span class="comment"># Org-wide summary</span>
+<span class="cmd-prefix">$</span> ascend coach risks         <span class="comment"># Risk detection dashboard</span>
+<span class="cmd-prefix">$</span> ascend tui                 <span class="comment"># Launch interactive UI</span></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Command Reference -->
+<section id="commands">
+  <h2 class="section-title">Command Reference</h2>
+  <p class="section-subtitle">35+ commands across 9 groups. All support <code>--json</code> output.</p>
+
+  <details>
+    <summary>Init &amp; Config <span class="badge">4 commands</span></summary>
+    <div class="cmd-list">
+      <code>ascend init</code> <span class="desc">&mdash; Initialize ~/.ascend workspace</span><br>
+      <code>ascend doctor</code> <span class="desc">&mdash; Check config, database, API keys</span><br>
+      <code>ascend config show</code> <span class="desc">&mdash; Display current configuration</span><br>
+      <code>ascend config set KEY VALUE</code> <span class="desc">&mdash; Update a config value</span>
+    </div>
+  </details>
+
+  <details>
+    <summary>Roster Management <span class="badge">8 commands</span></summary>
+    <div class="cmd-list">
+      <code>ascend roster list</code> <span class="desc">&mdash; List members (filter by --team, --flag, --status)</span><br>
+      <code>ascend roster add NAME</code> <span class="desc">&mdash; Add member (--email, --github, --title, --team)</span><br>
+      <code>ascend roster edit MEMBER</code> <span class="desc">&mdash; Edit member fields</span><br>
+      <code>ascend roster show MEMBER</code> <span class="desc">&mdash; Show member profile (--copy to clipboard)</span><br>
+      <code>ascend roster flag MEMBER FLAG</code> <span class="desc">&mdash; Set flag (oncall, pto, pip, flight_risk)</span><br>
+      <code>ascend roster unflag MEMBER FLAG</code> <span class="desc">&mdash; Remove a flag</span><br>
+      <code>ascend roster search QUERY</code> <span class="desc">&mdash; Search across name, email, github, title</span><br>
+      <code>ascend roster import FILE</code> <span class="desc">&mdash; Bulk import from CSV or team-tracker directory</span>
+    </div>
+  </details>
+
+  <details>
+    <summary>Teams <span class="badge">4 commands</span></summary>
+    <div class="cmd-list">
+      <code>ascend team list</code> <span class="desc">&mdash; List all teams</span><br>
+      <code>ascend team create NAME</code> <span class="desc">&mdash; Create team (--lead, --description, --parent)</span><br>
+      <code>ascend team add TEAM MEMBER</code> <span class="desc">&mdash; Add member to team (--role)</span><br>
+      <code>ascend team show TEAM</code> <span class="desc">&mdash; Show team details (--copy to clipboard)</span>
+    </div>
+  </details>
+
+  <details>
+    <summary>Meetings &amp; Transcripts <span class="badge">7 commands</span></summary>
+    <div class="cmd-list">
+      <code>ascend meeting ingest FILE</code> <span class="desc">&mdash; Parse transcript, AI summarize (--dry-run, --no-llm)</span><br>
+      <code>ascend meeting list</code> <span class="desc">&mdash; List meetings (--member, --from, --to)</span><br>
+      <code>ascend meeting show ID</code> <span class="desc">&mdash; View meeting details and transcript</span><br>
+      <code>ascend meeting search QUERY</code> <span class="desc">&mdash; Full-text search across meetings (FTS5)</span><br>
+      <code>ascend meeting items</code> <span class="desc">&mdash; List action items (--status open/closed)</span><br>
+      <code>ascend meeting item-close ID</code> <span class="desc">&mdash; Close an action item</span><br>
+      <code>ascend meeting prep MEMBER</code> <span class="desc">&mdash; AI-generated 1:1 prep plan</span>
+    </div>
+  </details>
+
+  <details>
+    <summary>Sync Integrations <span class="badge">5 commands</span></summary>
+    <div class="cmd-list">
+      <code>ascend sync</code> <span class="desc">&mdash; Run all integrations (--member, --hours)</span><br>
+      <code>ascend sync github</code> <span class="desc">&mdash; Fetch git commits and PRs</span><br>
+      <code>ascend sync linear</code> <span class="desc">&mdash; Fetch Linear issues via GraphQL</span><br>
+      <code>ascend sync slack</code> <span class="desc">&mdash; Fetch Slack channel activity</span><br>
+      <code>ascend sync snapshot</code> <span class="desc">&mdash; Take performance metric snapshots</span>
+    </div>
+  </details>
+
+  <details>
+    <summary>Reports <span class="badge">6 commands</span></summary>
+    <div class="cmd-list">
+      <code>ascend report performance</code> <span class="desc">&mdash; Individual metrics (--member, --team, --days)</span><br>
+      <code>ascend report team</code> <span class="desc">&mdash; Team health overview</span><br>
+      <code>ascend report progress</code> <span class="desc">&mdash; Snapshot trends over time</span><br>
+      <code>ascend report git</code> <span class="desc">&mdash; Git analytics (commits, lines, authors)</span><br>
+      <code>ascend report dashboard</code> <span class="desc">&mdash; Org-wide dashboard</span><br>
+      <code>ascend report custom PROMPT</code> <span class="desc">&mdash; Free-form AI report ("Who needs attention?")</span>
+    </div>
+  </details>
+
+  <details>
+    <summary>Planning <span class="badge">6 commands</span></summary>
+    <div class="cmd-list">
+      <code>ascend plan cycle</code> <span class="desc">&mdash; Show current planning cycle</span><br>
+      <code>ascend plan goal create TITLE</code> <span class="desc">&mdash; Create OKR/goal (--type, --target)</span><br>
+      <code>ascend plan goal list</code> <span class="desc">&mdash; List goals (--cycle, --status, --member)</span><br>
+      <code>ascend plan goal update ID</code> <span class="desc">&mdash; Update goal progress (--value, --status)</span><br>
+      <code>ascend plan pip create MEMBER</code> <span class="desc">&mdash; Create performance improvement plan</span><br>
+      <code>ascend plan career MEMBER</code> <span class="desc">&mdash; Career development plan (--copy)</span>
+    </div>
+  </details>
+
+  <details>
+    <summary>Coaching &amp; Insights <span class="badge">4 commands</span></summary>
+    <div class="cmd-list">
+      <code>ascend coach analyze MEMBER</code> <span class="desc">&mdash; Comprehensive member analysis</span><br>
+      <code>ascend coach risks</code> <span class="desc">&mdash; Risk dashboard (flight risk, burnout, bus factor)</span><br>
+      <code>ascend coach star MEMBER</code> <span class="desc">&mdash; STAR behavioral assessment</span><br>
+      <code>ascend coach suggest MEMBER</code> <span class="desc">&mdash; AI coaching suggestions</span>
+    </div>
+  </details>
+
+  <details>
+    <summary>Scheduling <span class="badge">6 commands</span></summary>
+    <div class="cmd-list">
+      <code>ascend schedule list</code> <span class="desc">&mdash; List scheduled tasks</span><br>
+      <code>ascend schedule add NAME CMD</code> <span class="desc">&mdash; Add task (--daily, --weekly, --monthly)</span><br>
+      <code>ascend schedule remove NAME</code> <span class="desc">&mdash; Remove a scheduled task</span><br>
+      <code>ascend schedule run NAME</code> <span class="desc">&mdash; Run a task immediately</span><br>
+      <code>ascend schedule enable NAME</code> <span class="desc">&mdash; Enable a task</span><br>
+      <code>ascend schedule disable NAME</code> <span class="desc">&mdash; Disable a task</span>
+    </div>
+  </details>
+</section>
+
+<!-- Architecture -->
+<section id="architecture">
+  <h2 class="section-title">Architecture</h2>
+  <p class="section-subtitle">Clean, modular Python with zero heavy dependencies.</p>
+  <div class="arch-tree">
+<span class="dir">src/ascend/</span>
+  <span class="file">cli.py</span>            <span class="comment"># Entry point &amp; arg parsing</span>
+  <span class="file">config.py</span>         <span class="comment"># Pydantic config model</span>
+  <span class="file">db.py</span>             <span class="comment"># SQLite schema, FTS5, WAL mode</span>
+  <span class="file">output.py</span>         <span class="comment"># ANSI terminal formatting</span>
+  <span class="file">audit.py</span>          <span class="comment"># JSONL operation logging</span>
+  <span class="file">transcript.py</span>     <span class="comment"># Transcript parser</span>
+  <span class="file">summarizer.py</span>     <span class="comment"># Claude AI integration</span>
+  <span class="file">scheduler.py</span>      <span class="comment"># Cron &amp; launchd scheduling</span>
+  <span class="dir">commands/</span>         <span class="comment"># 9 command modules (~3,500 lines)</span>
+    <span class="file">init.py roster.py team.py meeting.py</span>
+    <span class="file">sync.py report.py plan.py coach.py schedule.py</span>
+  <span class="dir">integrations/</span>     <span class="comment"># External API clients</span>
+    <span class="file">github.py linear.py slack.py snapshot.py</span>
+  <span class="dir">models/</span>           <span class="comment"># Pydantic data models</span>
+    <span class="file">member.py</span>
+  <span class="dir">tui/</span>              <span class="comment"># Textual terminal UI</span>
+    <span class="file">app.py</span>            <span class="comment"># Main app, sidebar, palette</span>
+    <span class="dir">screens/</span>          <span class="comment"># 6 screens</span>
+    <span class="dir">widgets/</span>          <span class="comment"># Reusable components</span>
+    <span class="dir">styles/</span>           <span class="comment"># Textual CSS</span>
+  </div>
+
+  <div class="tech-badges">
+    <span class="badge-tech">Python 3.12+</span>
+    <span class="badge-tech">SQLite + FTS5</span>
+    <span class="badge-tech">Pydantic v2</span>
+    <span class="badge-tech">Claude API</span>
+    <span class="badge-tech">Textual TUI</span>
+    <span class="badge-tech">PyYAML</span>
+    <span class="badge-tech">Hatchling</span>
+    <span class="badge-tech">Zero heavy deps</span>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer>
+  <div class="footer-links">
+    <a href="https://github.com/jmcentire/Ascend">GitHub</a>
+    <a href="https://github.com/jmcentire/Ascend/issues">Issues</a>
+    <a href="https://github.com/jmcentire/Ascend/blob/main/README.md">Docs</a>
+  </div>
+  <p>MIT License &middot; Built for engineering leaders who live in the terminal.</p>
+</footer>
+
+<script>
+// Copy install command
+function copyInstall(el){
+  navigator.clipboard.writeText('pip install -e .').then(()=>{
+    const btn=el.querySelector('.copy-btn');
+    btn.textContent='\u2713';btn.classList.add('copied');
+    setTimeout(()=>{btn.textContent='\u2398';btn.classList.remove('copied')},2000);
+  });
+}
+
+// Terminal animation
+(function(){
+  const lines=[
+    {type:'cmd',text:'ascend tui'},
+    {type:'blank'},
+    {type:'out',text:'  \u250C\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2510',cls:'out-cyan'},
+    {type:'out',text:'  \u2502  Ascend Dashboard              v1.0  \u2502',cls:'out-cyan'},
+    {type:'out',text:'  \u2514\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2518',cls:'out-cyan'},
+    {type:'blank'},
+    {type:'out',text:'  Team: 12 members \u00b7 3 teams',cls:'out'},
+    {type:'out',text:'  \u2581\u2582\u2583\u2585\u2587\u2588\u2587\u2585\u2583  velocity (30d)',cls:'out-green'},
+    {type:'blank'},
+    {type:'out',text:'  \u26A0  2 risks detected',cls:'out-yellow'},
+    {type:'out',text:'     \u2022 flight_risk: Devon S.',cls:'out-yellow'},
+    {type:'out',text:'     \u2022 burnout: Alice M.',cls:'out-yellow'},
+    {type:'blank'},
+    {type:'out',text:'  \u2713 3 action items due this week',cls:'out-green'},
+    {type:'out',text:'  \u2713 Next 1:1: Bob K. (tomorrow)',cls:'out-purple'},
+  ];
+  const term=document.getElementById('term');
+  let i=0;
+  function addLine(){
+    if(i>=lines.length)return;
+    const l=lines[i];
+    const div=document.createElement('div');
+    div.className='line';
+    div.style.animationDelay=(i*0.08)+'s';
+    if(l.type==='cmd'){
+      div.innerHTML='<span class="prompt-char">$ </span><span class="cmd-text">'+l.text+'</span>';
+    }else if(l.type==='blank'){
+      div.innerHTML='&nbsp;';
+    }else{
+      div.className='line '+(l.cls||'out');
+      div.textContent=l.text;
+    }
+    term.appendChild(div);
+    i++;
+    setTimeout(addLine,80);
+  }
+  // Start animation when terminal scrolls into view
+  const obs=new IntersectionObserver((entries)=>{
+    if(entries[0].isIntersecting){addLine();obs.disconnect();}
+  },{threshold:0.3});
+  obs.observe(term);
+})();
+</script>
+
+</body>
+</html>
