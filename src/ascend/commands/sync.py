@@ -147,7 +147,7 @@ def cmd_sync_snapshot(args: argparse.Namespace) -> None:
 # -- Internal runners --
 
 def _run_github(member_filter, conn, config, since):
-    from ascend.integrations.github import fetch_member_github
+    from ascend.integrations.github import fetch_member_github, fetch_all_github, clear_pr_cache
     results = []
     if member_filter:
         m = _resolve_member(member_filter, conn)
@@ -160,11 +160,15 @@ def _run_github(member_filter, conn, config, since):
             return {"error": f"member '{member_filter}' not found", "results": []}
     else:
         rows = conn.execute(
-            "SELECT id, name, github FROM members WHERE status = 'active' AND github IS NOT NULL"
+            "SELECT id, name, github FROM members WHERE status = 'active' AND github IS NOT NULL AND github != ''"
         ).fetchall()
-        for row in rows:
-            data = fetch_member_github(row["github"], str(config.repos_dir), config.github_org, since)
-            results.append({"member": row["name"], "github": row["github"], **data})
+        members = [{"name": r["name"], "github": r["github"]} for r in rows]
+        clear_pr_cache()
+        bulk = fetch_all_github(members, str(config.repos_dir), config.github_org, since)
+        for m in members:
+            handle = m["github"]
+            data = bulk.get(handle, {"commits": [], "prs": {"open": [], "merged": []}})
+            results.append({"member": m["name"], "github": handle, **data})
     return {"error": None, "results": results}
 
 
