@@ -1,21 +1,29 @@
 """GitHub fetcher — local git log + gh pr list.
 
 Ported from daily-report, adapted for member-centric queries.
+
+Performance: PR data is fetched once per repo and cached, not once per
+member per repo. With 66 repos × 29 members the naive approach would
+make ~3,800 gh API calls; the cached approach makes ~132 (2 per repo).
 """
 
 from __future__ import annotations
 
 import json
 import subprocess
+import sys
 from datetime import datetime
 from pathlib import Path
 from typing import Any
 
+# Module-level PR cache: repo_slug -> {"open": [...], "merged": [...]}
+_pr_cache: dict[str, dict[str, Any]] = {}
+
 
 def _run_cmd(
-    cmd: list[str], *, timeout: int = 15, max_retries: int = 2
+    cmd: list[str], *, timeout: int = 15, max_retries: int = 1
 ) -> tuple[str, str, int]:
-    """Run a subprocess with retry and timeout."""
+    """Run a subprocess with retry and timeout.  Fail fast on errors."""
     for attempt in range(max_retries + 1):
         try:
             result = subprocess.run(
@@ -87,91 +95,134 @@ def fetch_commits(
 
 
 def fetch_prs(repo_slug: str, since: datetime) -> dict[str, Any]:
-    """Fetch open and recently merged PRs via gh CLI."""
+    """Fetch open and recently merged PRs via gh CLI.  Results are cached."""
+    if repo_slug in _pr_cache:
+        cached = _pr_cache[repo_slug]
+        # Re-filter merged PRs for the current time window
+        merged = [pr for pr in cached.get("all_merged", []) if _is_within_window(pr, since)]
+        return {"error": cached.get("error"), "open": cached.get("open", []), "merged": merged}
+
     fields = "number,title,author,state,createdAt,updatedAt,mergedAt,closedAt,reviewDecision,url"
 
     stdout_open, stderr_open, rc_open = _run_cmd([
         "gh", "pr", "list", "--repo", repo_slug,
-        "--json", fields, "--state", "open",
+        "--json", fields, "--state", "open", "--limit", "100",
     ])
 
     since_str = since.strftime("%Y-%m-%dT%H:%M:%S")
     stdout_merged, stderr_merged, rc_merged = _run_cmd([
         "gh", "pr", "list", "--repo", repo_slug,
         "--json", fields, "--state", "merged",
-        "--search", f"merged:>={since_str}",
+        "--search", f"merged:>={since_str}", "--limit", "100",
     ])
 
     if rc_open != 0 and rc_merged != 0:
-        return {"error": (stderr_open or stderr_merged).strip(), "open": [], "merged": []}
+        err = (stderr_open or stderr_merged).strip()
+        _pr_cache[repo_slug] = {"error": err, "open": [], "all_merged": []}
+        return {"error": err, "open": [], "merged": []}
 
     open_prs = _parse_pr_list(stdout_open) if rc_open == 0 else []
-    merged_prs = _parse_pr_list(stdout_merged) if rc_merged == 0 else []
-    merged_prs = [pr for pr in merged_prs if _is_within_window(pr, since)]
+    all_merged = _parse_pr_list(stdout_merged) if rc_merged == 0 else []
+    merged_prs = [pr for pr in all_merged if _is_within_window(pr, since)]
 
+    _pr_cache[repo_slug] = {"error": None, "open": open_prs, "all_merged": all_merged}
     return {"error": None, "open": open_prs, "merged": merged_prs}
 
 
-def fetch_member_github(
-    github_handle: str, repos_dir: str, github_org: str, since: datetime
-) -> dict[str, Any]:
-    """Fetch all GitHub activity for a member across all repos."""
+def clear_pr_cache() -> None:
+    """Clear the PR cache (call between sync runs if needed)."""
+    _pr_cache.clear()
+
+
+def fetch_all_github(
+    members: list[dict[str, str]], repos_dir: str, github_org: str, since: datetime
+) -> dict[str, dict[str, Any]]:
+    """Fetch GitHub activity for all members efficiently.
+
+    Iterates repos once, collects commits for all members via git log,
+    fetches PRs once per repo (cached), then distributes results.
+    Returns {github_handle: {commits: [...], prs: {open: [...], merged: [...]}}}.
+    """
     repos_path = Path(repos_dir)
     if not repos_path.exists():
-        return {"error": f"repos_dir not found: {repos_dir}", "commits": [], "prs": {"open": [], "merged": []}}
+        return {m["github"]: {"error": f"repos_dir not found", "commits": [], "prs": {"open": [], "merged": []}}
+                for m in members}
 
-    all_commits: list[dict[str, Any]] = []
-    all_open_prs: list[dict[str, Any]] = []
-    all_merged_prs: list[dict[str, Any]] = []
-    seen_hashes: set[str] = set()
-    seen_pr_nums: set[int] = set()
+    handles = {m["github"] for m in members if m.get("github")}
+    result: dict[str, dict[str, Any]] = {
+        h: {"error": None, "commits": [], "prs": {"open": [], "merged": []}}
+        for h in handles
+    }
+    seen_hashes: dict[str, set[str]] = {h: set() for h in handles}
 
-    for entry in sorted(repos_path.iterdir()):
-        if not entry.is_dir() or not (entry / ".git").exists():
-            continue
+    repo_dirs = sorted(
+        e for e in repos_path.iterdir()
+        if e.is_dir() and (e / ".git").exists()
+    )
 
-        # Check for commits by this author
+    for entry in repo_dirs:
+        # Fetch ALL commits for the time window (not per-author)
         since_str = since.strftime("%Y-%m-%dT%H:%M:%S")
-        fmt = "%H|%an|%s|%aI"
+        fmt = "%H|%an|%ae|%s|%aI"
         stdout, _, rc = _run_cmd([
             "git", "-C", str(entry), "log", "--all",
-            f"--author={github_handle}", f"--since={since_str}", f"--format={fmt}",
+            f"--since={since_str}", f"--format={fmt}",
         ])
         if rc == 0:
             for line in stdout.strip().splitlines():
                 if not line:
                     continue
-                parts = line.split("|", 3)
-                if len(parts) == 4:
-                    h = parts[0][:8]
-                    if h not in seen_hashes:
-                        seen_hashes.add(h)
-                        all_commits.append({
-                            "hash": h, "author": parts[1],
-                            "message": parts[2], "date": parts[3],
-                            "repo": entry.name,
-                        })
+                parts = line.split("|", 4)
+                if len(parts) != 5:
+                    continue
+                commit_hash, author_name, author_email, message, date = parts
+                h = commit_hash[:8]
+                # Match by github handle in author name or email
+                for handle in handles:
+                    if handle.lower() in author_name.lower() or handle.lower() in author_email.lower():
+                        if h not in seen_hashes[handle]:
+                            seen_hashes[handle].add(h)
+                            result[handle]["commits"].append({
+                                "hash": h, "author": author_name,
+                                "message": message, "date": date,
+                                "repo": entry.name,
+                            })
 
-        # Fetch PRs for this author
+        # Fetch PRs once per repo (cached)
         repo_slug = f"{github_org}/{entry.name}"
         pr_result = fetch_prs(repo_slug, since)
-        if not pr_result.get("error"):
-            for pr in pr_result.get("open", []):
-                if pr.get("author") == github_handle and pr["number"] not in seen_pr_nums:
-                    seen_pr_nums.add(pr["number"])
-                    pr["repo"] = entry.name
-                    all_open_prs.append(pr)
-            for pr in pr_result.get("merged", []):
-                if pr.get("author") == github_handle and pr["number"] not in seen_pr_nums:
-                    seen_pr_nums.add(pr["number"])
-                    pr["repo"] = entry.name
-                    all_merged_prs.append(pr)
+        if pr_result.get("error"):
+            continue
 
-    return {
-        "error": None,
-        "commits": all_commits,
-        "prs": {"open": all_open_prs, "merged": all_merged_prs},
-    }
+        for pr in pr_result.get("open", []):
+            author = pr.get("author", "")
+            if author in handles:
+                pr_copy = {**pr, "repo": entry.name}
+                result[author]["prs"]["open"].append(pr_copy)
+
+        for pr in pr_result.get("merged", []):
+            author = pr.get("author", "")
+            if author in handles:
+                pr_copy = {**pr, "repo": entry.name}
+                result[author]["prs"]["merged"].append(pr_copy)
+
+    return result
+
+
+def fetch_member_github(
+    github_handle: str, repos_dir: str, github_org: str, since: datetime
+) -> dict[str, Any]:
+    """Fetch all GitHub activity for a single member across all repos.
+
+    For bulk operations, prefer fetch_all_github() which is O(repos)
+    instead of O(members * repos).
+    """
+    results = fetch_all_github(
+        [{"github": github_handle}], repos_dir, github_org, since,
+    )
+    return results.get(github_handle, {
+        "error": None, "commits": [], "prs": {"open": [], "merged": []},
+    })
 
 
 def _parse_pr_list(stdout: str) -> list[dict[str, Any]]:
