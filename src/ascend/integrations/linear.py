@@ -225,6 +225,121 @@ def get_effective_team_ids(config: Any) -> list[str]:
     return ids
 
 
+_STALE_PRIORITY_QUERY = """
+query($teamId: ID!, $first: Int!, $cursor: String) {
+  issues(
+    filter: {
+      team: { id: { eq: $teamId } }
+      state: { type: { nin: ["completed", "canceled", "triage"] } }
+      or: [
+        { priority: { in: [1, 2] } }
+        { labels: { name: { in: ["high-impact", "High Impact", "urgent", "Urgent"] } } }
+      ]
+    }
+    first: $first
+    after: $cursor
+    orderBy: updatedAt
+  ) {
+    nodes {
+      identifier
+      title
+      state { name type }
+      priority
+      assignee { name displayName }
+      labels { nodes { name } }
+      updatedAt
+      createdAt
+      url
+    }
+    pageInfo { hasNextPage endCursor }
+  }
+}
+"""
+
+
+_PRIORITY_NAMES = {0: "None", 1: "Urgent", 2: "High", 3: "Medium", 4: "Low"}
+
+
+def fetch_stale_priority_issues(
+    api_key: str,
+    team_ids: list[str],
+    stale_hours: int = 48,
+) -> list[dict[str, Any]]:
+    """Fetch high-priority/urgent active issues that have gone stale.
+
+    An issue is stale if updatedAt is older than stale_hours ago.
+    """
+    from datetime import timedelta as _td, timezone
+
+    cutoff = datetime.now(timezone.utc) - _td(hours=stale_hours)
+    all_stale: list[dict[str, Any]] = []
+
+    for team_id in team_ids:
+        cursor = None
+        while True:
+            variables: dict[str, Any] = {"teamId": team_id, "first": 50}
+            if cursor:
+                variables["cursor"] = cursor
+            result = _graphql(api_key, _STALE_PRIORITY_QUERY, variables)
+            if result is None:
+                break
+            issues_data = result.get("issues", {})
+            for issue in issues_data.get("nodes", []):
+                updated = issue.get("updatedAt", "")
+                if not updated:
+                    continue
+                try:
+                    updated_dt = datetime.fromisoformat(
+                        updated.replace("Z", "+00:00")
+                    )
+                    if updated_dt < cutoff:
+                        hours_stale = (
+                            datetime.now(timezone.utc) - updated_dt
+                        ).total_seconds() / 3600
+                        assignee = issue.get("assignee") or {}
+                        all_stale.append({
+                            "identifier": issue.get("identifier", ""),
+                            "title": issue.get("title", ""),
+                            "priority": issue.get("priority", 0),
+                            "priority_name": _PRIORITY_NAMES.get(
+                                issue.get("priority", 0), "Unknown"
+                            ),
+                            "state": (issue.get("state") or {}).get("name", ""),
+                            "assignee_name": (
+                                assignee.get("displayName")
+                                or assignee.get("name")
+                                or None
+                            ),
+                            "labels": [
+                                n.get("name", "")
+                                for n in issue.get("labels", {}).get("nodes", [])
+                            ],
+                            "updated_at": updated,
+                            "hours_stale": round(hours_stale, 1),
+                            "url": issue.get("url", ""),
+                        })
+                except (ValueError, TypeError):
+                    continue
+            page_info = issues_data.get("pageInfo", {})
+            if page_info.get("hasNextPage") and page_info.get("endCursor"):
+                cursor = page_info["endCursor"]
+            else:
+                break
+
+    # Deduplicate by identifier (same issue may appear from multiple teams)
+    seen: set[str] = set()
+    deduped: list[dict[str, Any]] = []
+    for item in all_stale:
+        ident = item["identifier"]
+        if ident not in seen:
+            seen.add(ident)
+            deduped.append(item)
+
+    # Sort by staleness descending
+    deduped.sort(key=lambda x: x["hours_stale"], reverse=True)
+    return deduped
+
+
 def _assignee_matches(issue: dict[str, Any], name_lower: str) -> bool:
     """Check if issue assignee matches a member name (case-insensitive)."""
     assignee = issue.get("assignee") or {}

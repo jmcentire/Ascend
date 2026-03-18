@@ -30,6 +30,8 @@ def take_snapshot(
     config: AscendConfig,
     *,
     hours: int = 24,
+    email: Optional[str] = None,
+    personal_email: Optional[str] = None,
 ) -> dict[str, Any]:
     """Take a performance snapshot for a single member."""
     since = datetime.now(timezone.utc) - timedelta(hours=hours)
@@ -48,7 +50,8 @@ def take_snapshot(
         try:
             from ascend.integrations.github import fetch_member_github
             gh_data = fetch_member_github(
-                github_handle, str(config.repos_dir), config.github_org, since
+                github_handle, str(config.repos_dir), config.github_org, since,
+                email=email, personal_email=personal_email,
             )
             if not gh_data.get("error"):
                 metrics["commits_count"] = len(gh_data.get("commits", []))
@@ -105,7 +108,7 @@ def take_all_snapshots(
 ) -> list[dict[str, Any]]:
     """Take snapshots for all active members with github handles."""
     rows = conn.execute(
-        "SELECT id, name, github FROM members WHERE status = 'active'"
+        "SELECT id, name, github, email, personal_email FROM members WHERE status = 'active'"
     ).fetchall()
 
     results = []
@@ -113,7 +116,10 @@ def take_all_snapshots(
         mid = row["id"]
         name = row["name"]
         github = row["github"]
-        result = take_snapshot(mid, name, github, conn, config, hours=hours)
+        result = take_snapshot(
+            mid, name, github, conn, config, hours=hours,
+            email=row["email"], personal_email=row["personal_email"],
+        )
         results.append(result)
 
     return results

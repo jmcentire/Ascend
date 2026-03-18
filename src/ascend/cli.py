@@ -235,6 +235,13 @@ def _build_parser() -> argparse.ArgumentParser:
     p.add_argument("--json", action="store_true", help="JSON output")
     p.add_argument("--copy", action="store_true", help="Copy to clipboard")
 
+    # -- report stale --
+    p = sub.add_parser("report-stale", help="Stale high-priority ticket report")
+    p.add_argument("--all", action="store_true", help="Include old backlog items (default: only active work)")
+    p.add_argument("--json", action="store_true", help="JSON output")
+    p.add_argument("--copy", action="store_true", help="Copy to clipboard")
+    p.add_argument("--save", action="store_true", help="Save to reports directory")
+
     # -- report custom --
     p = sub.add_parser("report-custom", help="Free-form AI report")
     p.add_argument("prompt", help="Report prompt/question")
@@ -396,7 +403,7 @@ def _rewrite_args(argv: list[str]) -> list[str]:
             "meeting-items", "meeting-item-close", "meeting-prep",
             "sync-github", "sync-linear", "sync-slack", "sync-snapshot",
             "report-performance", "report-team", "report-progress",
-            "report-git", "report-dashboard", "report-custom",
+            "report-git", "report-dashboard", "report-stale", "report-custom",
             "plan-cycle", "plan-career",
             "coach-analyze", "coach-risks", "coach-star", "coach-suggest",
             "schedule-list", "schedule-add", "schedule-remove",
@@ -550,6 +557,10 @@ def main(argv: list[str] | None = None) -> None:
     elif args.command == "report-dashboard":
         from ascend.commands.report import cmd_report_dashboard
         cmd_report_dashboard(args)
+
+    elif args.command == "report-stale":
+        from ascend.commands.report import cmd_report_stale
+        cmd_report_stale(args)
 
     elif args.command == "report-custom":
         from ascend.commands.report import cmd_report_custom

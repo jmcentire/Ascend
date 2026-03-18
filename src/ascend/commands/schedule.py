@@ -188,6 +188,9 @@ def cmd_schedule_run(args: argparse.Namespace) -> None:
     from ascend.cli import main as ascend_main
 
     argv = shlex.split(command)
+    # Strip leading 'ascend' from stored command — main() expects args only, not program name
+    if argv and argv[0] == "ascend":
+        argv = argv[1:]
     error = None
     try:
         if json_mode:

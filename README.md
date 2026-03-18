@@ -94,6 +94,11 @@ ascend report performance --member alicesmith
 # Team health
 ascend report team --team Platform
 
+# Stale high-priority tickets (48h weekday / 72h Monday)
+ascend report stale
+ascend report stale --save   # writes to reports directory
+ascend report stale --all    # include old backlog items
+
 # Risk dashboard
 ascend coach risks
 
@@ -167,6 +172,7 @@ Navigate with number keys (1-6), arrow keys, mouse clicks. Press `Ctrl+P` for th
 | `ascend report progress` | Snapshot trends over time |
 | `ascend report git` | Git analytics |
 | `ascend report dashboard` | Org-wide summary |
+| `ascend report stale` | Stale high-priority/urgent tickets (`--save`, `--all`) |
 | `ascend report custom PROMPT` | Free-form AI-powered report |
 
 ### Planning

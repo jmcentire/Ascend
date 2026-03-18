@@ -155,6 +155,19 @@ def fetch_all_github(
     }
     seen_hashes: dict[str, set[str]] = {h: set() for h in handles}
 
+    # Build email-to-handle lookup so commits authored with personal/work
+    # emails are attributed correctly even when the email doesn't contain
+    # the GitHub handle.
+    email_to_handle: dict[str, str] = {}
+    for m in members:
+        gh = m.get("github")
+        if not gh:
+            continue
+        for key in ("email", "personal_email"):
+            addr = m.get(key)
+            if addr:
+                email_to_handle[addr.lower()] = gh
+
     repo_dirs = sorted(
         e for e in repos_path.iterdir()
         if e.is_dir() and (e / ".git").exists()
@@ -177,16 +190,21 @@ def fetch_all_github(
                     continue
                 commit_hash, author_name, author_email, message, date = parts
                 h = commit_hash[:8]
-                # Match by github handle in author name or email
-                for handle in handles:
-                    if handle.lower() in author_name.lower() or handle.lower() in author_email.lower():
-                        if h not in seen_hashes[handle]:
-                            seen_hashes[handle].add(h)
-                            result[handle]["commits"].append({
-                                "hash": h, "author": author_name,
-                                "message": message, "date": date,
-                                "repo": entry.name,
-                            })
+                # Match by github handle in author name/email, or by
+                # known email addresses (work + personal) from roster.
+                matched_handle = email_to_handle.get(author_email.lower())
+                if not matched_handle:
+                    for handle in handles:
+                        if handle.lower() in author_name.lower() or handle.lower() in author_email.lower():
+                            matched_handle = handle
+                            break
+                if matched_handle and h not in seen_hashes[matched_handle]:
+                    seen_hashes[matched_handle].add(h)
+                    result[matched_handle]["commits"].append({
+                        "hash": h, "author": author_name,
+                        "message": message, "date": date,
+                        "repo": entry.name,
+                    })
 
         # Fetch PRs once per repo (cached)
         repo_slug = f"{github_org}/{entry.name}"
@@ -210,15 +228,17 @@ def fetch_all_github(
 
 
 def fetch_member_github(
-    github_handle: str, repos_dir: str, github_org: str, since: datetime
+    github_handle: str, repos_dir: str, github_org: str, since: datetime,
+    *, email: str | None = None, personal_email: str | None = None,
 ) -> dict[str, Any]:
     """Fetch all GitHub activity for a single member across all repos.
 
     For bulk operations, prefer fetch_all_github() which is O(repos)
     instead of O(members * repos).
     """
+    member = {"github": github_handle, "email": email, "personal_email": personal_email}
     results = fetch_all_github(
-        [{"github": github_handle}], repos_dir, github_org, since,
+        [member], repos_dir, github_org, since,
     )
     return results.get(github_handle, {
         "error": None, "commits": [], "prs": {"open": [], "merged": []},
