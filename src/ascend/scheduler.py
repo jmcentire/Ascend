@@ -31,10 +31,10 @@ _PLIST_TEMPLATE = """\
     <string>{label}</string>
     <key>ProgramArguments</key>
     <array>
-        <string>{ascend_path}</string>
-        <string>schedule</string>
-        <string>run</string>
-        <string>{schedule_name}</string>
+        <string>/bin/zsh</string>
+        <string>-l</string>
+        <string>-c</string>
+        <string>{ascend_path} schedule-run {schedule_name}</string>
     </array>
     <key>StartCalendarInterval</key>
 {calendar_intervals}

@@ -1,12 +1,14 @@
-"""Report commands — performance, team, progress, git, dashboard, custom."""
+"""Report commands — performance, team, progress, git, dashboard, stale, custom."""
 
 from __future__ import annotations
 
 import argparse
 import json
+import os
 import sqlite3
 from collections import defaultdict
 from datetime import datetime, timedelta
+from pathlib import Path
 from typing import Any, Optional
 
 from ascend.audit import log_operation
@@ -599,6 +601,148 @@ def cmd_report_dashboard(args: argparse.Namespace) -> None:
             parts.append(format_table(headers, rows))
         parts.append(f"\nGenerated: {datetime.now().strftime('%Y-%m-%d %H:%M')}")
         render_output("\n".join(parts), copy=copy)
+
+
+# ---- Report: Stale Priority Tickets ----
+
+def cmd_report_stale(args: argparse.Namespace) -> None:
+    """Report high-priority/urgent tickets with no recent activity."""
+    config = load_config()
+    conn = _get_conn()
+    json_mode = getattr(args, "json", False)
+    copy = getattr(args, "copy", False)
+    save = getattr(args, "save", False)
+
+    api_key = os.environ.get(config.linear_api_key_env, "")
+    if not api_key:
+        conn.close()
+        render_output(
+            {"error": f"{config.linear_api_key_env} not set"}, json_mode=True
+        )
+        return
+
+    from ascend.integrations.linear import (
+        fetch_stale_priority_issues,
+        get_effective_team_ids,
+    )
+
+    team_ids = get_effective_team_ids(config)
+    if not team_ids:
+        conn.close()
+        render_output({"error": "no linear team IDs configured"}, json_mode=True)
+        return
+
+    # Weekend-aware threshold: 72h on Monday, 48h otherwise
+    today = datetime.now().weekday()  # 0=Monday
+    stale_hours = 72 if today == 0 else 48
+
+    all_stale = fetch_stale_priority_issues(api_key, team_ids, stale_hours)
+
+    # Filter: by default, exclude "Todo" tickets older than 14 days
+    # (those are backlog, not actively stalled work)
+    include_all = getattr(args, "all", False)
+    max_stale_todo_hours = 14 * 24  # 14 days
+    if include_all:
+        stale = all_stale
+    else:
+        stale = [
+            s for s in all_stale
+            if s["state"].lower() not in ("todo", "backlog", "triage")
+            or s["hours_stale"] <= max_stale_todo_hours
+        ]
+
+    # Map Linear assignee names to roster members
+    rows = conn.execute(
+        "SELECT id, name, slack FROM members WHERE status = 'active'"
+    ).fetchall()
+    roster_names = {r["name"].lower(): r["name"] for r in rows}
+    # Also index by first name and slack name for fuzzy matching
+    for r in rows:
+        parts = r["name"].split()
+        if parts:
+            roster_names[parts[0].lower()] = r["name"]
+        if r["slack"]:
+            roster_names[r["slack"].lower()] = r["name"]
+
+    for item in stale:
+        assignee = item.get("assignee_name")
+        item["roster_member"] = None
+        if assignee:
+            key = assignee.lower()
+            if key in roster_names:
+                item["roster_member"] = roster_names[key]
+            else:
+                # Fuzzy: check if any roster name contains the assignee or vice versa
+                for rk, rv in roster_names.items():
+                    if rk in key or key in rk:
+                        item["roster_member"] = rv
+                        break
+
+    conn.close()
+    log_operation(
+        "report stale",
+        args={"stale_hours": stale_hours, "count": len(stale)},
+    )
+
+    if json_mode:
+        render_output(stale, json_mode=True, copy=copy)
+    else:
+        now_str = datetime.now().strftime("%Y-%m-%d %H:%M")
+        day_name = datetime.now().strftime("%A")
+        parts = [
+            f"# Stale High-Priority Tickets — {now_str}",
+            f"**Threshold:** {stale_hours}h ({day_name})",
+            f"**Count:** {len(stale)}",
+            "",
+        ]
+        if not stale:
+            parts.append("No stale high-priority tickets found.")
+        else:
+            headers = [
+                "Ticket", "Priority", "State", "Stale (h)",
+                "Owner", "Title",
+            ]
+            rows_data = []
+            for s in stale:
+                owner = s["roster_member"] or s["assignee_name"] or "—"
+                rows_data.append([
+                    s["identifier"],
+                    s["priority_name"],
+                    s["state"],
+                    str(s["hours_stale"]),
+                    owner,
+                    s["title"][:60] + ("..." if len(s["title"]) > 60 else ""),
+                ])
+            parts.append(format_table(headers, rows_data))
+            parts.append("")
+            # Detail section
+            parts.append("## Details\n")
+            for s in stale:
+                owner = s["roster_member"] or s["assignee_name"] or "Unassigned"
+                labels = ", ".join(s["labels"]) if s["labels"] else "none"
+                parts.append(
+                    f"### {s['identifier']} — {s['title']}\n"
+                    f"- **Priority:** {s['priority_name']}\n"
+                    f"- **State:** {s['state']}\n"
+                    f"- **Owner:** {owner}\n"
+                    f"- **Labels:** {labels}\n"
+                    f"- **Last activity:** {s['updated_at'][:10]} "
+                    f"({s['hours_stale']}h ago)\n"
+                    f"- **URL:** {s['url']}\n"
+                )
+        parts.append(f"\nGenerated: {now_str}")
+        output_text = "\n".join(parts)
+        render_output(output_text, copy=copy)
+
+        if save:
+            reports_dir = Path(config.reports_dir)
+            month_dir = reports_dir / datetime.now().strftime("%Y-%m")
+            project_dir = month_dir / "project"
+            project_dir.mkdir(parents=True, exist_ok=True)
+            filename = datetime.now().strftime("%Y-%m-%d") + "_stale_tickets.md"
+            out_path = project_dir / filename
+            out_path.write_text(output_text + "\n")
+            render_output(f"\nSaved to {out_path}")
 
 
 # ---- Report: Custom ----

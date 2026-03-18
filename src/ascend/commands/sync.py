@@ -21,10 +21,10 @@ def _get_conn() -> sqlite3.Connection:
 def _resolve_member(member: str, conn: sqlite3.Connection) -> Optional[dict]:
     """Resolve member by name, github, or ID. Returns dict or None."""
     if member.isdigit():
-        row = conn.execute("SELECT id, name, github FROM members WHERE id = ?", (int(member),)).fetchone()
+        row = conn.execute("SELECT id, name, github, email, personal_email FROM members WHERE id = ?", (int(member),)).fetchone()
     else:
         row = conn.execute(
-            "SELECT id, name, github FROM members WHERE LOWER(name) = LOWER(?) OR github = ?",
+            "SELECT id, name, github, email, personal_email FROM members WHERE LOWER(name) = LOWER(?) OR github = ?",
             (member, member),
         ).fetchone()
     return dict(row) if row else None
@@ -152,7 +152,10 @@ def _run_github(member_filter, conn, config, since):
     if member_filter:
         m = _resolve_member(member_filter, conn)
         if m and m.get("github"):
-            data = fetch_member_github(m["github"], str(config.repos_dir), config.github_org, since)
+            data = fetch_member_github(
+                m["github"], str(config.repos_dir), config.github_org, since,
+                email=m.get("email"), personal_email=m.get("personal_email"),
+            )
             results.append({"member": m["name"], "github": m["github"], **data})
         elif m:
             results.append({"member": m["name"], "error": "no github handle"})
@@ -160,9 +163,9 @@ def _run_github(member_filter, conn, config, since):
             return {"error": f"member '{member_filter}' not found", "results": []}
     else:
         rows = conn.execute(
-            "SELECT id, name, github FROM members WHERE status = 'active' AND github IS NOT NULL AND github != ''"
+            "SELECT id, name, github, email, personal_email FROM members WHERE status = 'active' AND github IS NOT NULL AND github != ''"
         ).fetchall()
-        members = [{"name": r["name"], "github": r["github"]} for r in rows]
+        members = [{"name": r["name"], "github": r["github"], "email": r["email"], "personal_email": r["personal_email"]} for r in rows]
         clear_pr_cache()
         bulk = fetch_all_github(members, str(config.repos_dir), config.github_org, since)
         for m in members:
@@ -225,7 +228,10 @@ def _run_snapshots(member_filter, conn, config):
     if member_filter:
         m = _resolve_member(member_filter, conn)
         if m:
-            result = take_snapshot(m["id"], m["name"], m.get("github"), conn, config)
+            result = take_snapshot(
+                m["id"], m["name"], m.get("github"), conn, config,
+                email=m.get("email"), personal_email=m.get("personal_email"),
+            )
             return [result]
         return []
     return take_all_snapshots(conn, config)
