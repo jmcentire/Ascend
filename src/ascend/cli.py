@@ -188,6 +188,15 @@ def _build_parser() -> argparse.ArgumentParser:
     # -- sync-snapshot --
     p = sub.add_parser("sync-snapshot", help="Take performance snapshots")
     p.add_argument("--member", help="Filter by member")
+    p.add_argument("--hours", type=int, help="Lookback hours (default: 24)")
+    p.add_argument("--json", action="store_true", help="JSON output")
+
+    # -- sync-backfill --
+    p = sub.add_parser("sync-backfill", help="Backfill historical snapshots from git")
+    p.add_argument("--member", help="Filter by member")
+    p.add_argument("--days", type=int, default=30, help="Days to backfill (default: 30)")
+    p.add_argument("--no-linear", dest="no_linear", action="store_true",
+                   help="Skip Linear data (git only)")
     p.add_argument("--json", action="store_true", help="JSON output")
 
     # -- report performance --
@@ -401,7 +410,7 @@ def _rewrite_args(argv: list[str]) -> list[str]:
             "config-show", "config-set",
             "meeting-ingest", "meeting-list", "meeting-show", "meeting-search",
             "meeting-items", "meeting-item-close", "meeting-prep",
-            "sync-github", "sync-linear", "sync-slack", "sync-snapshot",
+            "sync-github", "sync-linear", "sync-slack", "sync-snapshot", "sync-backfill",
             "report-performance", "report-team", "report-progress",
             "report-git", "report-dashboard", "report-stale", "report-custom",
             "plan-cycle", "plan-career",
@@ -537,6 +546,10 @@ def main(argv: list[str] | None = None) -> None:
     elif args.command == "sync-snapshot":
         from ascend.commands.sync import cmd_sync_snapshot
         cmd_sync_snapshot(args)
+
+    elif args.command == "sync-backfill":
+        from ascend.commands.sync import cmd_sync_backfill
+        cmd_sync_backfill(args)
 
     elif args.command == "report-performance":
         from ascend.commands.report import cmd_report_performance

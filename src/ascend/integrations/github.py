@@ -94,12 +94,15 @@ def fetch_commits(
     return {"error": None, "data": commits, "warning": warning}
 
 
-def fetch_prs(repo_slug: str, since: datetime) -> dict[str, Any]:
+def fetch_prs(
+    repo_slug: str, since: datetime, *, until: datetime | None = None,
+) -> dict[str, Any]:
     """Fetch open and recently merged PRs via gh CLI.  Results are cached."""
     if repo_slug in _pr_cache:
         cached = _pr_cache[repo_slug]
         # Re-filter merged PRs for the current time window
-        merged = [pr for pr in cached.get("all_merged", []) if _is_within_window(pr, since)]
+        merged = [pr for pr in cached.get("all_merged", [])
+                  if _is_within_window(pr, since, until=until)]
         return {"error": cached.get("error"), "open": cached.get("open", []), "merged": merged}
 
     fields = "number,title,author,state,createdAt,updatedAt,mergedAt,closedAt,reviewDecision,url"
@@ -123,7 +126,7 @@ def fetch_prs(repo_slug: str, since: datetime) -> dict[str, Any]:
 
     open_prs = _parse_pr_list(stdout_open) if rc_open == 0 else []
     all_merged = _parse_pr_list(stdout_merged) if rc_merged == 0 else []
-    merged_prs = [pr for pr in all_merged if _is_within_window(pr, since)]
+    merged_prs = [pr for pr in all_merged if _is_within_window(pr, since, until=until)]
 
     _pr_cache[repo_slug] = {"error": None, "open": open_prs, "all_merged": all_merged}
     return {"error": None, "open": open_prs, "merged": merged_prs}
@@ -135,7 +138,8 @@ def clear_pr_cache() -> None:
 
 
 def fetch_all_github(
-    members: list[dict[str, str]], repos_dir: str, github_org: str, since: datetime
+    members: list[dict[str, str]], repos_dir: str, github_org: str, since: datetime,
+    *, until: datetime | None = None,
 ) -> dict[str, dict[str, Any]]:
     """Fetch GitHub activity for all members efficiently.
 
@@ -177,10 +181,13 @@ def fetch_all_github(
         # Fetch ALL commits for the time window (not per-author)
         since_str = since.strftime("%Y-%m-%dT%H:%M:%S")
         fmt = "%H|%an|%ae|%s|%aI"
-        stdout, _, rc = _run_cmd([
+        log_cmd = [
             "git", "-C", str(entry), "log", "--all",
             f"--since={since_str}", f"--format={fmt}",
-        ])
+        ]
+        if until:
+            log_cmd.insert(-1, f"--until={until.strftime('%Y-%m-%dT%H:%M:%S')}")
+        stdout, _, rc = _run_cmd(log_cmd)
         if rc == 0:
             for line in stdout.strip().splitlines():
                 if not line:
@@ -208,7 +215,7 @@ def fetch_all_github(
 
         # Fetch PRs once per repo (cached)
         repo_slug = f"{github_org}/{entry.name}"
-        pr_result = fetch_prs(repo_slug, since)
+        pr_result = fetch_prs(repo_slug, since, until=until)
         if pr_result.get("error"):
             continue
 
@@ -230,6 +237,7 @@ def fetch_all_github(
 def fetch_member_github(
     github_handle: str, repos_dir: str, github_org: str, since: datetime,
     *, email: str | None = None, personal_email: str | None = None,
+    until: datetime | None = None,
 ) -> dict[str, Any]:
     """Fetch all GitHub activity for a single member across all repos.
 
@@ -238,7 +246,7 @@ def fetch_member_github(
     """
     member = {"github": github_handle, "email": email, "personal_email": personal_email}
     results = fetch_all_github(
-        [member], repos_dir, github_org, since,
+        [member], repos_dir, github_org, since, until=until,
     )
     return results.get(github_handle, {
         "error": None, "commits": [], "prs": {"open": [], "merged": []},
@@ -270,14 +278,16 @@ def _parse_pr_list(stdout: str) -> list[dict[str, Any]]:
     return result
 
 
-def _is_within_window(pr: dict[str, Any], since: datetime) -> bool:
-    """Check if a PR was merged or closed within the time window."""
+def _is_within_window(
+    pr: dict[str, Any], since: datetime, *, until: datetime | None = None,
+) -> bool:
+    """Check if a PR was merged within the time window [since, until)."""
     for field in ("merged_at",):
         ts = pr.get(field, "")
         if ts:
             try:
                 dt = datetime.fromisoformat(ts.replace("Z", "+00:00"))
-                if dt >= since:
+                if dt >= since and (until is None or dt < until):
                     return True
             except (ValueError, TypeError):
                 continue

@@ -56,7 +56,8 @@ def cmd_sync(args: argparse.Namespace) -> None:
     results["slack"] = _run_slack(config, since)
 
     # Snapshots
-    results["snapshots"] = _run_snapshots(member_filter, conn, config)
+    hours = getattr(args, "hours", None) or config.default_lookback_hours
+    results["snapshots"] = _run_snapshots(member_filter, conn, config, hours=int(hours))
 
     conn.close()
     log_operation("sync", args={"member": member_filter})
@@ -120,8 +121,9 @@ def cmd_sync_snapshot(args: argparse.Namespace) -> None:
     config = load_config()
     conn = _get_conn()
     member_filter = getattr(args, "member", None)
+    hours = getattr(args, "hours", None) or 24
 
-    result = _run_snapshots(member_filter, conn, config)
+    result = _run_snapshots(member_filter, conn, config, hours=hours)
     conn.close()
     log_operation("sync snapshot", args={"member": member_filter})
 
@@ -142,6 +144,67 @@ def cmd_sync_snapshot(args: argparse.Namespace) -> None:
                 f"errors=[{errors}]"
             )
         render_output(f"\n{len(result)} snapshot(s) taken.")
+
+
+def cmd_sync_backfill(args: argparse.Namespace) -> None:
+    """Backfill historical snapshots from git history, day by day."""
+    config = load_config()
+    conn = _get_conn()
+    member_filter = getattr(args, "member", None)
+    days = getattr(args, "days", 30)
+    skip_linear = getattr(args, "no_linear", False)
+    json_mode = getattr(args, "json", False)
+
+    from ascend.integrations.snapshot import take_snapshot, take_all_snapshots
+    from ascend.integrations.github import clear_pr_cache
+
+    # Clear PR cache once so backfill fetches fresh data; the cache
+    # stores all_merged PRs and _is_within_window re-filters per day.
+    clear_pr_cache()
+
+    today = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
+    all_results = []
+
+    for day_offset in range(days, 0, -1):
+        day_start = today - timedelta(days=day_offset)
+        day_end = day_start + timedelta(days=1)
+        date_str = day_start.strftime("%Y-%m-%d")
+
+        if member_filter:
+            m = _resolve_member(member_filter, conn)
+            if not m:
+                render_output(f"Member '{member_filter}' not found.")
+                conn.close()
+                return
+            result = take_snapshot(
+                m["id"], m["name"], m.get("github"), conn, config,
+                since=day_start, until=day_end, date_str=date_str,
+                skip_linear=skip_linear,
+                email=m.get("email"), personal_email=m.get("personal_email"),
+            )
+            all_results.append(result)
+        else:
+            day_results = take_all_snapshots(
+                conn, config,
+                since=day_start, until=day_end, date_str=date_str,
+                skip_linear=skip_linear,
+            )
+            all_results.extend(day_results)
+
+        # Progress indicator
+        if not json_mode:
+            active = sum(1 for r in all_results if r["score"] > 0 and r["date"] == date_str)
+            render_output(f"  {date_str}: {active} active member(s)")
+
+    conn.close()
+    log_operation("sync backfill", args={"member": member_filter, "days": days})
+
+    if json_mode:
+        render_output(all_results, json_mode=True)
+    else:
+        total_snaps = len(all_results)
+        active_snaps = sum(1 for r in all_results if r["score"] > 0)
+        render_output(f"\nBackfill complete: {total_snaps} snapshots, {active_snaps} with activity.")
 
 
 # -- Internal runners --
@@ -223,18 +286,19 @@ def _run_slack(config, since):
     return {"error": None, "channels": results}
 
 
-def _run_snapshots(member_filter, conn, config):
+def _run_snapshots(member_filter, conn, config, *, hours=24):
     from ascend.integrations.snapshot import take_snapshot, take_all_snapshots
     if member_filter:
         m = _resolve_member(member_filter, conn)
         if m:
             result = take_snapshot(
                 m["id"], m["name"], m.get("github"), conn, config,
+                hours=hours,
                 email=m.get("email"), personal_email=m.get("personal_email"),
             )
             return [result]
         return []
-    return take_all_snapshots(conn, config)
+    return take_all_snapshots(conn, config, hours=hours)
 
 
 # -- Display helpers --

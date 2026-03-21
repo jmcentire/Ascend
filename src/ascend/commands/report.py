@@ -101,7 +101,17 @@ def _get_flags(conn: sqlite3.Connection, member_id: int) -> list[str]:
 
 
 def _aggregate_metrics(snapshots: list[dict]) -> dict[str, int]:
-    """Sum up metrics across snapshots."""
+    """Aggregate metrics across snapshots.
+
+    Event-based metrics (commits, merged PRs, completed issues) are summed.
+    Point-in-time metrics (open PRs, in-progress issues) use max to avoid
+    double-counting items that persist across multiple daily snapshots.
+    """
+    # Metrics that represent cumulative events — sum them
+    _SUM_KEYS = {"commits_count", "prs_merged", "issues_completed"}
+    # Metrics that represent current state — take max
+    _MAX_KEYS = {"prs_opened", "issues_in_progress"}
+
     totals: dict[str, int] = {
         "commits_count": 0,
         "prs_opened": 0,
@@ -111,8 +121,10 @@ def _aggregate_metrics(snapshots: list[dict]) -> dict[str, int]:
     }
     for s in snapshots:
         m = s.get("metrics", {})
-        for k in totals:
+        for k in _SUM_KEYS:
             totals[k] += m.get(k, 0)
+        for k in _MAX_KEYS:
+            totals[k] = max(totals[k], m.get(k, 0))
     return totals
 
 

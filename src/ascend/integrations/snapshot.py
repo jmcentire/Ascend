@@ -32,10 +32,19 @@ def take_snapshot(
     hours: int = 24,
     email: Optional[str] = None,
     personal_email: Optional[str] = None,
+    since: Optional[datetime] = None,
+    until: Optional[datetime] = None,
+    date_str: Optional[str] = None,
+    skip_linear: bool = False,
 ) -> dict[str, Any]:
-    """Take a performance snapshot for a single member."""
-    since = datetime.now(timezone.utc) - timedelta(hours=hours)
-    date_str = datetime.now().strftime("%Y-%m-%d")
+    """Take a performance snapshot for a single member.
+
+    For backfill, pass explicit since/until/date_str to snapshot a specific day.
+    """
+    if since is None:
+        since = datetime.now(timezone.utc) - timedelta(hours=hours)
+    if date_str is None:
+        date_str = datetime.now().strftime("%Y-%m-%d")
     metrics: dict[str, Any] = {
         "commits_count": 0,
         "prs_opened": 0,
@@ -51,7 +60,7 @@ def take_snapshot(
             from ascend.integrations.github import fetch_member_github
             gh_data = fetch_member_github(
                 github_handle, str(config.repos_dir), config.github_org, since,
-                email=email, personal_email=personal_email,
+                email=email, personal_email=personal_email, until=until,
             )
             if not gh_data.get("error"):
                 metrics["commits_count"] = len(gh_data.get("commits", []))
@@ -63,7 +72,7 @@ def take_snapshot(
             errors.append(f"github: {e}")
 
     # Linear data
-    linear_api_key = os.environ.get(config.linear_api_key_env, "")
+    linear_api_key = os.environ.get(config.linear_api_key_env, "") if not skip_linear else ""
     if linear_api_key:
         try:
             from ascend.integrations.linear import fetch_member_issues, get_effective_team_ids
@@ -85,12 +94,22 @@ def take_snapshot(
     raw_score = sum(metrics[k] * _WEIGHTS[k] for k in _WEIGHTS)
     score = min(raw_score, _MAX_SCORE)
 
-    # Store in DB
-    conn.execute(
-        """INSERT INTO performance_snapshots (member_id, date, source, metrics, score)
-           VALUES (?, ?, ?, ?, ?)""",
-        (member_id, date_str, "sync", json.dumps(metrics), score),
-    )
+    # Store in DB (upsert — re-runs on same day replace previous snapshot)
+    existing = conn.execute(
+        "SELECT id FROM performance_snapshots WHERE member_id = ? AND date = ? AND source = ?",
+        (member_id, date_str, "sync"),
+    ).fetchone()
+    if existing:
+        conn.execute(
+            "UPDATE performance_snapshots SET metrics = ?, score = ? WHERE id = ?",
+            (json.dumps(metrics), score, existing["id"]),
+        )
+    else:
+        conn.execute(
+            """INSERT INTO performance_snapshots (member_id, date, source, metrics, score)
+               VALUES (?, ?, ?, ?, ?)""",
+            (member_id, date_str, "sync", json.dumps(metrics), score),
+        )
     conn.commit()
 
     return {
@@ -104,7 +123,9 @@ def take_snapshot(
 
 
 def take_all_snapshots(
-    conn: sqlite3.Connection, config: AscendConfig, *, hours: int = 24
+    conn: sqlite3.Connection, config: AscendConfig, *, hours: int = 24,
+    since: Optional[datetime] = None, until: Optional[datetime] = None,
+    date_str: Optional[str] = None, skip_linear: bool = False,
 ) -> list[dict[str, Any]]:
     """Take snapshots for all active members with github handles."""
     rows = conn.execute(
@@ -119,6 +140,7 @@ def take_all_snapshots(
         result = take_snapshot(
             mid, name, github, conn, config, hours=hours,
             email=row["email"], personal_email=row["personal_email"],
+            since=since, until=until, date_str=date_str, skip_linear=skip_linear,
         )
         results.append(result)
 
