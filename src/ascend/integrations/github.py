@@ -9,6 +9,7 @@ make ~3,800 gh API calls; the cached approach makes ~132 (2 per repo).
 
 from __future__ import annotations
 
+import concurrent.futures
 import json
 import subprocess
 import sys
@@ -139,7 +140,7 @@ def clear_pr_cache() -> None:
 
 def fetch_all_github(
     members: list[dict[str, str]], repos_dir: str, github_org: str, since: datetime,
-    *, until: datetime | None = None,
+    *, until: datetime | None = None, skip_fetch: bool = False,
 ) -> dict[str, dict[str, Any]]:
     """Fetch GitHub activity for all members efficiently.
 
@@ -176,6 +177,14 @@ def fetch_all_github(
         e for e in repos_path.iterdir()
         if e.is_dir() and (e / ".git").exists()
     )
+
+    # Fetch all repos in parallel so git log sees latest remote state
+    if not skip_fetch:
+        def _fetch_repo(repo: Path) -> None:
+            _run_cmd(["git", "-C", str(repo), "fetch", "--all", "-q"], timeout=30)
+
+        with concurrent.futures.ThreadPoolExecutor(max_workers=8) as pool:
+            pool.map(_fetch_repo, repo_dirs)
 
     for entry in repo_dirs:
         # Fetch ALL commits for the time window (not per-author)
@@ -237,7 +246,7 @@ def fetch_all_github(
 def fetch_member_github(
     github_handle: str, repos_dir: str, github_org: str, since: datetime,
     *, email: str | None = None, personal_email: str | None = None,
-    until: datetime | None = None,
+    until: datetime | None = None, skip_fetch: bool = False,
 ) -> dict[str, Any]:
     """Fetch all GitHub activity for a single member across all repos.
 
@@ -246,7 +255,7 @@ def fetch_member_github(
     """
     member = {"github": github_handle, "email": email, "personal_email": personal_email}
     results = fetch_all_github(
-        [member], repos_dir, github_org, since, until=until,
+        [member], repos_dir, github_org, since, until=until, skip_fetch=skip_fetch,
     )
     return results.get(github_handle, {
         "error": None, "commits": [], "prs": {"open": [], "merged": []},

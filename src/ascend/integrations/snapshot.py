@@ -36,6 +36,7 @@ def take_snapshot(
     until: Optional[datetime] = None,
     date_str: Optional[str] = None,
     skip_linear: bool = False,
+    skip_fetch: bool = False,
 ) -> dict[str, Any]:
     """Take a performance snapshot for a single member.
 
@@ -61,6 +62,7 @@ def take_snapshot(
             gh_data = fetch_member_github(
                 github_handle, str(config.repos_dir), config.github_org, since,
                 email=email, personal_email=personal_email, until=until,
+                skip_fetch=skip_fetch,
             )
             if not gh_data.get("error"):
                 metrics["commits_count"] = len(gh_data.get("commits", []))
@@ -126,6 +128,7 @@ def take_all_snapshots(
     conn: sqlite3.Connection, config: AscendConfig, *, hours: int = 24,
     since: Optional[datetime] = None, until: Optional[datetime] = None,
     date_str: Optional[str] = None, skip_linear: bool = False,
+    skip_fetch: bool = False,
 ) -> list[dict[str, Any]]:
     """Take snapshots for all active members with github handles."""
     rows = conn.execute(
@@ -141,6 +144,7 @@ def take_all_snapshots(
             mid, name, github, conn, config, hours=hours,
             email=row["email"], personal_email=row["personal_email"],
             since=since, until=until, date_str=date_str, skip_linear=skip_linear,
+            skip_fetch=skip_fetch,
         )
         results.append(result)
 

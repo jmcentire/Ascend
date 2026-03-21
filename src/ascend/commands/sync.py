@@ -156,11 +156,16 @@ def cmd_sync_backfill(args: argparse.Namespace) -> None:
     json_mode = getattr(args, "json", False)
 
     from ascend.integrations.snapshot import take_snapshot, take_all_snapshots
-    from ascend.integrations.github import clear_pr_cache
+    from ascend.integrations.github import clear_pr_cache, fetch_all_github
 
-    # Clear PR cache once so backfill fetches fresh data; the cache
-    # stores all_merged PRs and _is_within_window re-filters per day.
+    # Clear PR cache and fetch all repos once upfront
     clear_pr_cache()
+    if not json_mode:
+        render_output("  Fetching all repos...")
+    # Trigger a single fetch by calling fetch_all_github with a dummy query;
+    # the parallel git fetch runs once, then per-day iterations skip it.
+    fetch_all_github([], str(config.repos_dir), config.github_org,
+                     datetime.now(timezone.utc))
 
     today = datetime.now(timezone.utc).replace(hour=0, minute=0, second=0, microsecond=0)
     all_results = []
@@ -179,7 +184,7 @@ def cmd_sync_backfill(args: argparse.Namespace) -> None:
             result = take_snapshot(
                 m["id"], m["name"], m.get("github"), conn, config,
                 since=day_start, until=day_end, date_str=date_str,
-                skip_linear=skip_linear,
+                skip_linear=skip_linear, skip_fetch=True,
                 email=m.get("email"), personal_email=m.get("personal_email"),
             )
             all_results.append(result)
@@ -187,7 +192,7 @@ def cmd_sync_backfill(args: argparse.Namespace) -> None:
             day_results = take_all_snapshots(
                 conn, config,
                 since=day_start, until=day_end, date_str=date_str,
-                skip_linear=skip_linear,
+                skip_linear=skip_linear, skip_fetch=True,
             )
             all_results.extend(day_results)
 
