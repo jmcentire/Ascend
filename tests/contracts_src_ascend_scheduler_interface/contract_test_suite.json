@@ -1,0 +1,1115 @@
+{
+  "component_id": "contracts_src_ascend_scheduler_interface",
+  "contract_version": 1,
+  "test_cases": [
+    {
+      "id": "test_schedule_to_cron_daily_happy_path",
+      "description": "Convert daily schedule to cron expression",
+      "function": "schedule_to_cron",
+      "category": "happy_path",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "daily": "True",
+        "weekdays": "False",
+        "weekly": "None",
+        "biweekly": "None",
+        "monthly": "None",
+        "quarterly": "False",
+        "hour": "9",
+        "minute": "30"
+      },
+      "input_description": "",
+      "expected_output_description": "Returns '30 9 * * *' for daily at 9:30",
+      "expected_error": "",
+      "assertions": []
+    },
+    {
+      "id": "test_schedule_to_cron_weekdays_happy_path",
+      "description": "Convert weekdays schedule to cron expression",
+      "function": "schedule_to_cron",
+      "category": "happy_path",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "daily": "False",
+        "weekdays": "True",
+        "weekly": "None",
+        "biweekly": "None",
+        "monthly": "None",
+        "quarterly": "False",
+        "hour": "8",
+        "minute": "0"
+      },
+      "input_description": "",
+      "expected_output_description": "Returns '0 8 * * 1-5' for weekdays at 8:00",
+      "expected_error": "",
+      "assertions": []
+    },
+    {
+      "id": "test_schedule_to_cron_weekly_happy_path",
+      "description": "Convert weekly schedule to cron expression",
+      "function": "schedule_to_cron",
+      "category": "happy_path",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "daily": "False",
+        "weekdays": "False",
+        "weekly": "mon",
+        "biweekly": "None",
+        "monthly": "None",
+        "quarterly": "False",
+        "hour": "10",
+        "minute": "15"
+      },
+      "input_description": "",
+      "expected_output_description": "Returns '15 10 * * 1' for Monday at 10:15",
+      "expected_error": "",
+      "assertions": []
+    },
+    {
+      "id": "test_schedule_to_cron_biweekly_happy_path",
+      "description": "Convert biweekly schedule to cron expression",
+      "function": "schedule_to_cron",
+      "category": "happy_path",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "daily": "False",
+        "weekdays": "False",
+        "weekly": "None",
+        "biweekly": "wednesday",
+        "monthly": "None",
+        "quarterly": "False",
+        "hour": "14",
+        "minute": "30"
+      },
+      "input_description": "",
+      "expected_output_description": "Returns cron targeting 2nd and 4th Wednesday (days 8-14, 22-28)",
+      "expected_error": "",
+      "assertions": []
+    },
+    {
+      "id": "test_schedule_to_cron_monthly_happy_path",
+      "description": "Convert monthly schedule to cron expression",
+      "function": "schedule_to_cron",
+      "category": "happy_path",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "daily": "False",
+        "weekdays": "False",
+        "weekly": "None",
+        "biweekly": "None",
+        "monthly": "15",
+        "quarterly": "False",
+        "hour": "12",
+        "minute": "0"
+      },
+      "input_description": "",
+      "expected_output_description": "Returns '0 12 15 * *' for 15th of each month at 12:00",
+      "expected_error": "",
+      "assertions": []
+    },
+    {
+      "id": "test_schedule_to_cron_quarterly_happy_path",
+      "description": "Convert quarterly schedule to cron expression",
+      "function": "schedule_to_cron",
+      "category": "happy_path",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "daily": "False",
+        "weekdays": "False",
+        "weekly": "None",
+        "biweekly": "None",
+        "monthly": "None",
+        "quarterly": "True",
+        "hour": "6",
+        "minute": "0"
+      },
+      "input_description": "",
+      "expected_output_description": "Returns '0 6 1 1,4,7,10 *' for first day of months 1,4,7,10 at 6:00",
+      "expected_error": "",
+      "assertions": []
+    },
+    {
+      "id": "test_schedule_to_cron_weekly_full_day_name",
+      "description": "Weekly schedule with full day name",
+      "function": "schedule_to_cron",
+      "category": "edge_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "daily": "False",
+        "weekdays": "False",
+        "weekly": "Friday",
+        "biweekly": "None",
+        "monthly": "None",
+        "quarterly": "False",
+        "hour": "17",
+        "minute": "45"
+      },
+      "input_description": "",
+      "expected_output_description": "Returns cron for Friday at 17:45",
+      "expected_error": "",
+      "assertions": []
+    },
+    {
+      "id": "test_schedule_to_cron_weekly_sunday",
+      "description": "Weekly schedule on Sunday (cron value 0)",
+      "function": "schedule_to_cron",
+      "category": "edge_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "daily": "False",
+        "weekdays": "False",
+        "weekly": "sun",
+        "biweekly": "None",
+        "monthly": "None",
+        "quarterly": "False",
+        "hour": "7",
+        "minute": "0"
+      },
+      "input_description": "",
+      "expected_output_description": "Returns cron with dow=0 for Sunday",
+      "expected_error": "",
+      "assertions": []
+    },
+    {
+      "id": "test_schedule_to_cron_unknown_day_error",
+      "description": "Error when weekly day name is invalid",
+      "function": "schedule_to_cron",
+      "category": "error_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "daily": "False",
+        "weekdays": "False",
+        "weekly": "funday",
+        "biweekly": "None",
+        "monthly": "None",
+        "quarterly": "False",
+        "hour": "10",
+        "minute": "0"
+      },
+      "input_description": "",
+      "expected_output_description": "",
+      "expected_error": "unknown_day",
+      "assertions": []
+    },
+    {
+      "id": "test_schedule_to_cron_no_frequency_error",
+      "description": "Error when no schedule frequency is specified",
+      "function": "schedule_to_cron",
+      "category": "error_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "daily": "False",
+        "weekdays": "False",
+        "weekly": "None",
+        "biweekly": "None",
+        "monthly": "None",
+        "quarterly": "False",
+        "hour": "10",
+        "minute": "0"
+      },
+      "input_description": "",
+      "expected_output_description": "",
+      "expected_error": "no_frequency",
+      "assertions": []
+    },
+    {
+      "id": "test_schedule_to_cron_biweekly_invalid_day_error",
+      "description": "Error when biweekly day name is invalid",
+      "function": "schedule_to_cron",
+      "category": "error_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "daily": "False",
+        "weekdays": "False",
+        "weekly": "None",
+        "biweekly": "notaday",
+        "monthly": "None",
+        "quarterly": "False",
+        "hour": "10",
+        "minute": "0"
+      },
+      "input_description": "",
+      "expected_output_description": "",
+      "expected_error": "unknown_day",
+      "assertions": []
+    },
+    {
+      "id": "test_schedule_to_cron_midnight",
+      "description": "Schedule at midnight (hour=0, minute=0)",
+      "function": "schedule_to_cron",
+      "category": "edge_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "daily": "True",
+        "weekdays": "False",
+        "weekly": "None",
+        "biweekly": "None",
+        "monthly": "None",
+        "quarterly": "False",
+        "hour": "0",
+        "minute": "0"
+      },
+      "input_description": "",
+      "expected_output_description": "Returns '0 0 * * *' for midnight",
+      "expected_error": "",
+      "assertions": []
+    },
+    {
+      "id": "test_schedule_to_cron_last_minute_of_day",
+      "description": "Schedule at 23:59",
+      "function": "schedule_to_cron",
+      "category": "edge_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "daily": "True",
+        "weekdays": "False",
+        "weekly": "None",
+        "biweekly": "None",
+        "monthly": "None",
+        "quarterly": "False",
+        "hour": "23",
+        "minute": "59"
+      },
+      "input_description": "",
+      "expected_output_description": "Returns '59 23 * * *' for 23:59",
+      "expected_error": "",
+      "assertions": []
+    },
+    {
+      "id": "test_parse_cron_happy_path",
+      "description": "Parse a standard 5-field cron expression",
+      "function": "parse_cron",
+      "category": "happy_path",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "expr": "30 9 * * 1-5"
+      },
+      "input_description": "",
+      "expected_output_description": "Returns dict with minute='30', hour='9', dom='*', month='*', dow='1-5'",
+      "expected_error": "",
+      "assertions": []
+    },
+    {
+      "id": "test_parse_cron_with_lists",
+      "description": "Parse cron expression with comma-separated lists",
+      "function": "parse_cron",
+      "category": "happy_path",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "expr": "0,15,30,45 8,12,16 1,15 * *"
+      },
+      "input_description": "",
+      "expected_output_description": "Returns dict with all comma-separated values preserved as strings",
+      "expected_error": "",
+      "assertions": []
+    },
+    {
+      "id": "test_parse_cron_all_wildcards",
+      "description": "Parse cron expression with all wildcards",
+      "function": "parse_cron",
+      "category": "edge_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "expr": "* * * * *"
+      },
+      "input_description": "",
+      "expected_output_description": "Returns dict with all fields set to '*'",
+      "expected_error": "",
+      "assertions": []
+    },
+    {
+      "id": "test_parse_cron_invalid_field_count_too_few",
+      "description": "Error when cron expression has too few fields",
+      "function": "parse_cron",
+      "category": "error_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "expr": "30 9 * *"
+      },
+      "input_description": "",
+      "expected_output_description": "",
+      "expected_error": "invalid_field_count",
+      "assertions": []
+    },
+    {
+      "id": "test_parse_cron_invalid_field_count_too_many",
+      "description": "Error when cron expression has too many fields",
+      "function": "parse_cron",
+      "category": "error_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "expr": "30 9 * * * * extra"
+      },
+      "input_description": "",
+      "expected_output_description": "",
+      "expected_error": "invalid_field_count",
+      "assertions": []
+    },
+    {
+      "id": "test_parse_cron_empty_string",
+      "description": "Error when cron expression is empty",
+      "function": "parse_cron",
+      "category": "error_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "expr": ""
+      },
+      "input_description": "",
+      "expected_output_description": "",
+      "expected_error": "invalid_field_count",
+      "assertions": []
+    },
+    {
+      "id": "test_expand_field_wildcard",
+      "description": "Expand wildcard to full range",
+      "function": "_expand_field",
+      "category": "happy_path",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "field": "*",
+        "min_val": "0",
+        "max_val": "23"
+      },
+      "input_description": "",
+      "expected_output_description": "Returns set {0,1,2,...,23}",
+      "expected_error": "",
+      "assertions": []
+    },
+    {
+      "id": "test_expand_field_single_value",
+      "description": "Expand single integer value",
+      "function": "_expand_field",
+      "category": "happy_path",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "field": "15",
+        "min_val": "0",
+        "max_val": "59"
+      },
+      "input_description": "",
+      "expected_output_description": "Returns set {15}",
+      "expected_error": "",
+      "assertions": []
+    },
+    {
+      "id": "test_expand_field_range",
+      "description": "Expand range notation",
+      "function": "_expand_field",
+      "category": "happy_path",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "field": "1-5",
+        "min_val": "0",
+        "max_val": "6"
+      },
+      "input_description": "",
+      "expected_output_description": "Returns set {1,2,3,4,5}",
+      "expected_error": "",
+      "assertions": []
+    },
+    {
+      "id": "test_expand_field_comma_list",
+      "description": "Expand comma-separated list",
+      "function": "_expand_field",
+      "category": "happy_path",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "field": "1,3,5,7",
+        "min_val": "0",
+        "max_val": "10"
+      },
+      "input_description": "",
+      "expected_output_description": "Returns set {1,3,5,7}",
+      "expected_error": "",
+      "assertions": []
+    },
+    {
+      "id": "test_expand_field_mixed_list_and_ranges",
+      "description": "Expand mixed comma-separated values and ranges",
+      "function": "_expand_field",
+      "category": "edge_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "field": "1,3-5,8",
+        "min_val": "0",
+        "max_val": "10"
+      },
+      "input_description": "",
+      "expected_output_description": "Returns set {1,3,4,5,8}",
+      "expected_error": "",
+      "assertions": []
+    },
+    {
+      "id": "test_expand_field_invalid_int_error",
+      "description": "Error when field contains non-integer value",
+      "function": "_expand_field",
+      "category": "error_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "field": "abc",
+        "min_val": "0",
+        "max_val": "10"
+      },
+      "input_description": "",
+      "expected_output_description": "",
+      "expected_error": "invalid_int",
+      "assertions": []
+    },
+    {
+      "id": "test_expand_field_edge_min_max_equal",
+      "description": "Expand field when min_val equals max_val",
+      "function": "_expand_field",
+      "category": "edge_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "field": "*",
+        "min_val": "5",
+        "max_val": "5"
+      },
+      "input_description": "",
+      "expected_output_description": "Returns set {5}",
+      "expected_error": "",
+      "assertions": []
+    },
+    {
+      "id": "test_compute_next_run_happy_path",
+      "description": "Compute next run time for a simple daily cron",
+      "function": "compute_next_run",
+      "category": "happy_path",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "cron_expr": "30 9 * * *",
+        "after": "2024-01-15T08:00:00"
+      },
+      "input_description": "",
+      "expected_output_description": "Returns next occurrence at 2024-01-15 09:30",
+      "expected_error": "",
+      "assertions": []
+    },
+    {
+      "id": "test_compute_next_run_next_day",
+      "description": "Compute next run when time already passed today",
+      "function": "compute_next_run",
+      "category": "happy_path",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "cron_expr": "30 9 * * *",
+        "after": "2024-01-15T10:00:00"
+      },
+      "input_description": "",
+      "expected_output_description": "Returns next day's occurrence at 2024-01-16 09:30",
+      "expected_error": "",
+      "assertions": []
+    },
+    {
+      "id": "test_compute_next_run_weekly_specific_day",
+      "description": "Compute next run for weekly schedule",
+      "function": "compute_next_run",
+      "category": "happy_path",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "cron_expr": "0 10 * * 1",
+        "after": "2024-01-15T08:00:00"
+      },
+      "input_description": "",
+      "expected_output_description": "Returns next Monday at 10:00",
+      "expected_error": "",
+      "assertions": []
+    },
+    {
+      "id": "test_compute_next_run_after_none",
+      "description": "Compute next run with after=None uses current time",
+      "function": "compute_next_run",
+      "category": "edge_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "cron_expr": "0 12 * * *",
+        "after": "None"
+      },
+      "input_description": "",
+      "expected_output_description": "Returns next occurrence after current time",
+      "expected_error": "",
+      "assertions": []
+    },
+    {
+      "id": "test_compute_next_run_year_boundary",
+      "description": "Compute next run crossing year boundary",
+      "function": "compute_next_run",
+      "category": "edge_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "cron_expr": "0 0 1 1 *",
+        "after": "2024-12-31T23:00:00"
+      },
+      "input_description": "",
+      "expected_output_description": "Returns 2025-01-01 00:00",
+      "expected_error": "",
+      "assertions": []
+    },
+    {
+      "id": "test_compute_next_run_no_match_within_366_days",
+      "description": "Return empty string when no match found within 366 days",
+      "function": "compute_next_run",
+      "category": "edge_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "cron_expr": "0 0 31 2 *",
+        "after": "2024-01-01T00:00:00"
+      },
+      "input_description": "",
+      "expected_output_description": "Returns empty string (Feb 31 doesn't exist)",
+      "expected_error": "",
+      "assertions": []
+    },
+    {
+      "id": "test_compute_next_run_invalid_cron_error",
+      "description": "Error when cron expression is invalid",
+      "function": "compute_next_run",
+      "category": "error_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "cron_expr": "invalid",
+        "after": "2024-01-15T08:00:00"
+      },
+      "input_description": "",
+      "expected_output_description": "",
+      "expected_error": "invalid_cron",
+      "assertions": []
+    },
+    {
+      "id": "test_compute_next_run_dom_dow_or_semantics",
+      "description": "Verify OR semantics when both dom and dow are specified",
+      "function": "compute_next_run",
+      "category": "edge_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "cron_expr": "0 10 15 * 1",
+        "after": "2024-01-01T00:00:00"
+      },
+      "input_description": "",
+      "expected_output_description": "Returns next occurrence matching either 15th OR Monday",
+      "expected_error": "",
+      "assertions": []
+    },
+    {
+      "id": "test_describe_cron_simple_daily",
+      "description": "Describe simple daily cron expression",
+      "function": "describe_cron",
+      "category": "happy_path",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "cron_expr": "30 9 * * *"
+      },
+      "input_description": "",
+      "expected_output_description": "Returns human-readable description like 'Daily at 09:30'",
+      "expected_error": "",
+      "assertions": []
+    },
+    {
+      "id": "test_describe_cron_weekdays",
+      "description": "Describe weekdays cron expression",
+      "function": "describe_cron",
+      "category": "happy_path",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "cron_expr": "0 8 * * 1-5"
+      },
+      "input_description": "",
+      "expected_output_description": "Returns human-readable description for weekdays",
+      "expected_error": "",
+      "assertions": []
+    },
+    {
+      "id": "test_describe_cron_weekly",
+      "description": "Describe weekly cron expression",
+      "function": "describe_cron",
+      "category": "happy_path",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "cron_expr": "0 10 * * 1"
+      },
+      "input_description": "",
+      "expected_output_description": "Returns human-readable description like 'Weekly on Monday at 10:00'",
+      "expected_error": "",
+      "assertions": []
+    },
+    {
+      "id": "test_describe_cron_complex_fallback",
+      "description": "Return raw expression for complex cron",
+      "function": "describe_cron",
+      "category": "edge_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "cron_expr": "*/5 1,2,3 * * *"
+      },
+      "input_description": "",
+      "expected_output_description": "Returns raw cron expression for complex cases",
+      "expected_error": "",
+      "assertions": []
+    },
+    {
+      "id": "test_describe_cron_invalid_cron_error",
+      "description": "Error when cron expression is invalid",
+      "function": "describe_cron",
+      "category": "error_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "cron_expr": "invalid cron"
+      },
+      "input_description": "",
+      "expected_output_description": "",
+      "expected_error": "invalid_cron",
+      "assertions": []
+    },
+    {
+      "id": "test_describe_cron_invalid_int_conversion_error",
+      "description": "Error when hour/minute cannot be converted to int",
+      "function": "describe_cron",
+      "category": "error_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "cron_expr": "*/5 * * * *"
+      },
+      "input_description": "",
+      "expected_output_description": "May raise invalid_int_conversion or fallback to raw expression",
+      "expected_error": "",
+      "assertions": []
+    },
+    {
+      "id": "test_find_ascend_path_happy_path",
+      "description": "Find ascend executable in PATH",
+      "function": "_find_ascend_path",
+      "category": "happy_path",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {},
+      "input_description": "",
+      "expected_output_description": "Returns path to ascend executable if found",
+      "expected_error": "",
+      "assertions": []
+    },
+    {
+      "id": "test_find_ascend_path_fallback",
+      "description": "Return 'ascend' as fallback when not found",
+      "function": "_find_ascend_path",
+      "category": "edge_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {},
+      "input_description": "",
+      "expected_output_description": "Returns 'ascend' when executable not found in PATH or common locations",
+      "expected_error": "",
+      "assertions": []
+    },
+    {
+      "id": "test_cron_to_calendar_intervals_simple",
+      "description": "Convert simple cron to CalendarInterval XML",
+      "function": "_cron_to_calendar_intervals",
+      "category": "happy_path",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "cron_expr": "30 9 * * *"
+      },
+      "input_description": "",
+      "expected_output_description": "Returns XML dict with Minute and Hour keys",
+      "expected_error": "",
+      "assertions": []
+    },
+    {
+      "id": "test_cron_to_calendar_intervals_multiple",
+      "description": "Convert cron with multiple values to CalendarInterval array",
+      "function": "_cron_to_calendar_intervals",
+      "category": "happy_path",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "cron_expr": "0 8,12,16 * * *"
+      },
+      "input_description": "",
+      "expected_output_description": "Returns XML array with multiple dict entries",
+      "expected_error": "",
+      "assertions": []
+    },
+    {
+      "id": "test_cron_to_calendar_intervals_invalid_cron_error",
+      "description": "Error when cron expression is invalid",
+      "function": "_cron_to_calendar_intervals",
+      "category": "error_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "cron_expr": "bad cron"
+      },
+      "input_description": "",
+      "expected_output_description": "",
+      "expected_error": "invalid_cron",
+      "assertions": []
+    },
+    {
+      "id": "test_generate_plist_happy_path",
+      "description": "Generate plist metadata for a schedule",
+      "function": "generate_plist",
+      "category": "happy_path",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "schedule_name": "daily-backup",
+        "schedules_dir": "/tmp/schedules"
+      },
+      "input_description": "",
+      "expected_output_description": "Returns tuple of (label, ascend_path, log_path)",
+      "expected_error": "",
+      "assertions": []
+    },
+    {
+      "id": "test_write_plist_happy_path",
+      "description": "Write plist file to LaunchAgents directory",
+      "function": "write_plist",
+      "category": "happy_path",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "schedule_name": "test-schedule",
+        "cron_expr": "30 9 * * *",
+        "schedules_dir": "/tmp/schedules"
+      },
+      "input_description": "",
+      "expected_output_description": "Returns Path to written plist file in ~/Library/LaunchAgents/",
+      "expected_error": "",
+      "assertions": []
+    },
+    {
+      "id": "test_write_plist_creates_directory",
+      "description": "Create LaunchAgents directory if it doesn't exist",
+      "function": "write_plist",
+      "category": "edge_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "schedule_name": "test-schedule",
+        "cron_expr": "0 12 * * *",
+        "schedules_dir": "/tmp/schedules"
+      },
+      "input_description": "",
+      "expected_output_description": "Creates ~/Library/LaunchAgents/ directory if needed",
+      "expected_error": "",
+      "assertions": []
+    },
+    {
+      "id": "test_write_plist_invalid_cron_error",
+      "description": "Error when cron expression is invalid",
+      "function": "write_plist",
+      "category": "error_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "schedule_name": "test-schedule",
+        "cron_expr": "bad",
+        "schedules_dir": "/tmp/schedules"
+      },
+      "input_description": "",
+      "expected_output_description": "",
+      "expected_error": "invalid_cron",
+      "assertions": []
+    },
+    {
+      "id": "test_load_plist_happy_path",
+      "description": "Load plist using launchctl successfully",
+      "function": "load_plist",
+      "category": "happy_path",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "schedule_name": "test-schedule"
+      },
+      "input_description": "",
+      "expected_output_description": "Returns True when plist exists and loads successfully",
+      "expected_error": "",
+      "assertions": []
+    },
+    {
+      "id": "test_load_plist_file_not_exists",
+      "description": "Return False when plist file doesn't exist",
+      "function": "load_plist",
+      "category": "edge_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "schedule_name": "nonexistent-schedule"
+      },
+      "input_description": "",
+      "expected_output_description": "Returns False when plist file doesn't exist",
+      "expected_error": "",
+      "assertions": []
+    },
+    {
+      "id": "test_load_plist_launchctl_fails",
+      "description": "Return False when launchctl command fails",
+      "function": "load_plist",
+      "category": "edge_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "schedule_name": "test-schedule"
+      },
+      "input_description": "",
+      "expected_output_description": "Returns False when launchctl load fails",
+      "expected_error": "",
+      "assertions": []
+    },
+    {
+      "id": "test_unload_plist_happy_path",
+      "description": "Unload plist using launchctl successfully",
+      "function": "unload_plist",
+      "category": "happy_path",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "schedule_name": "test-schedule"
+      },
+      "input_description": "",
+      "expected_output_description": "Returns True when plist exists and unloads successfully",
+      "expected_error": "",
+      "assertions": []
+    },
+    {
+      "id": "test_unload_plist_file_not_exists",
+      "description": "Return False when plist file doesn't exist",
+      "function": "unload_plist",
+      "category": "edge_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "schedule_name": "nonexistent-schedule"
+      },
+      "input_description": "",
+      "expected_output_description": "Returns False when plist file doesn't exist",
+      "expected_error": "",
+      "assertions": []
+    },
+    {
+      "id": "test_unload_plist_launchctl_fails",
+      "description": "Return False when launchctl command fails",
+      "function": "unload_plist",
+      "category": "edge_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "schedule_name": "test-schedule"
+      },
+      "input_description": "",
+      "expected_output_description": "Returns False when launchctl unload fails",
+      "expected_error": "",
+      "assertions": []
+    },
+    {
+      "id": "test_remove_plist_happy_path",
+      "description": "Unload and remove plist file successfully",
+      "function": "remove_plist",
+      "category": "happy_path",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "schedule_name": "test-schedule"
+      },
+      "input_description": "",
+      "expected_output_description": "Returns True when plist file was removed",
+      "expected_error": "",
+      "assertions": []
+    },
+    {
+      "id": "test_remove_plist_file_not_exists",
+      "description": "Return False when plist file doesn't exist",
+      "function": "remove_plist",
+      "category": "edge_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "schedule_name": "nonexistent-schedule"
+      },
+      "input_description": "",
+      "expected_output_description": "Returns False when plist file doesn't exist",
+      "expected_error": "",
+      "assertions": []
+    },
+    {
+      "id": "test_invariant_day_map_sunday_is_zero",
+      "description": "Verify _DAY_MAP maps Sunday to 0",
+      "function": "schedule_to_cron",
+      "category": "invariant",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "daily": "False",
+        "weekdays": "False",
+        "weekly": "sun",
+        "biweekly": "None",
+        "monthly": "None",
+        "quarterly": "False",
+        "hour": "10",
+        "minute": "0"
+      },
+      "input_description": "",
+      "expected_output_description": "Cron expression has dow=0 for Sunday",
+      "expected_error": "",
+      "assertions": []
+    },
+    {
+      "id": "test_invariant_biweekly_targets_correct_days",
+      "description": "Verify biweekly schedules target days 8-14 and 22-28",
+      "function": "schedule_to_cron",
+      "category": "invariant",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "daily": "False",
+        "weekdays": "False",
+        "weekly": "None",
+        "biweekly": "mon",
+        "monthly": "None",
+        "quarterly": "False",
+        "hour": "10",
+        "minute": "0"
+      },
+      "input_description": "",
+      "expected_output_description": "Cron expression dom field contains 8-14,22-28",
+      "expected_error": "",
+      "assertions": []
+    },
+    {
+      "id": "test_invariant_quarterly_first_day_of_quarters",
+      "description": "Verify quarterly schedules run on first day of months 1,4,7,10",
+      "function": "schedule_to_cron",
+      "category": "invariant",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "daily": "False",
+        "weekdays": "False",
+        "weekly": "None",
+        "biweekly": "None",
+        "monthly": "None",
+        "quarterly": "True",
+        "hour": "6",
+        "minute": "0"
+      },
+      "input_description": "",
+      "expected_output_description": "Cron expression has dom=1 and month=1,4,7,10",
+      "expected_error": "",
+      "assertions": []
+    },
+    {
+      "id": "test_invariant_cron_always_5_fields",
+      "description": "Verify all generated cron expressions have exactly 5 fields",
+      "function": "schedule_to_cron",
+      "category": "invariant",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "daily": "True",
+        "weekdays": "False",
+        "weekly": "None",
+        "biweekly": "None",
+        "monthly": "None",
+        "quarterly": "False",
+        "hour": "9",
+        "minute": "30"
+      },
+      "input_description": "",
+      "expected_output_description": "Cron expression has exactly 5 whitespace-separated fields",
+      "expected_error": "",
+      "assertions": []
+    },
+    {
+      "id": "test_invariant_plist_path_format",
+      "description": "Verify plist files are stored at correct path",
+      "function": "write_plist",
+      "category": "invariant",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "schedule_name": "my-schedule",
+        "cron_expr": "0 10 * * *",
+        "schedules_dir": "/tmp/schedules"
+      },
+      "input_description": "",
+      "expected_output_description": "Returns path matching ~/Library/LaunchAgents/com.ascend.schedule.{name}.plist",
+      "expected_error": "",
+      "assertions": []
+    },
+    {
+      "id": "test_parse_cron_returns_correct_keys",
+      "description": "Verify parse_cron returns dict with all required keys",
+      "function": "parse_cron",
+      "category": "invariant",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "expr": "0 10 * * *"
+      },
+      "input_description": "",
+      "expected_output_description": "Returns dict with keys: minute, hour, dom, month, dow",
+      "expected_error": "",
+      "assertions": []
+    },
+    {
+      "id": "test_compute_next_run_strictly_after",
+      "description": "Verify returned time is strictly after the 'after' parameter",
+      "function": "compute_next_run",
+      "category": "invariant",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "cron_expr": "30 9 * * *",
+        "after": "2024-01-15T09:30:00"
+      },
+      "input_description": "",
+      "expected_output_description": "Returns time strictly after 2024-01-15 09:30 (not equal)",
+      "expected_error": "",
+      "assertions": []
+    }
+  ],
+  "test_language": "python",
+  "generated_code": "\"\"\"\nContract Test Suite for Ascend Scheduler Interface\nGenerated from contract version 1\nTests cover happy paths, edge cases, error cases, and invariants\n\"\"\"\n\nimport pytest\nfrom unittest.mock import Mock, patch, MagicMock, mock_open\nfrom datetime import datetime, timedelta\nfrom pathlib import Path\nimport subprocess\nimport os\n\n# Import the module under test\nfrom contracts.src_ascend_scheduler.interface import *\n\n\n# ============================================================================\n# SCHEDULE_TO_CRON TESTS\n# ============================================================================\n\ndef test_schedule_to_cron_daily_happy_path():\n    \"\"\"Convert daily schedule to cron expression\"\"\"\n    result = schedule_to_cron(\n        daily=True,\n        weekdays=False,\n        weekly=None,\n        biweekly=None,\n        monthly=None,\n        quarterly=False,\n        hour=9,\n        minute=30\n    )\n    assert result == \"30 9 * * *\"\n\n\ndef test_schedule_to_cron_weekdays_happy_path():\n    \"\"\"Convert weekdays schedule to cron expression\"\"\"\n    result = schedule_to_cron(\n        daily=False,\n        weekdays=True,\n        weekly=None,\n        biweekly=None,\n        monthly=None,\n        quarterly=False,\n        hour=8,\n        minute=0\n    )\n    assert result == \"0 8 * * 1-5\"\n\n\ndef test_schedule_to_cron_weekly_happy_path():\n    \"\"\"Convert weekly schedule to cron expression\"\"\"\n    result = schedule_to_cron(\n        daily=False,\n        weekdays=False,\n        weekly=\"mon\",\n        biweekly=None,\n        monthly=None,\n        quarterly=False,\n        hour=10,\n        minute=15\n    )\n    assert result == \"15 10 * * 1\"\n\n\ndef test_schedule_to_cron_biweekly_happy_path():\n    \"\"\"Convert biweekly schedule to cron expression\"\"\"\n    result = schedule_to_cron(\n        daily=False,\n        weekdays=False,\n        weekly=None,\n        biweekly=\"wednesday\",\n        monthly=None,\n        quarterly=False,\n        hour=14,\n        minute=30\n    )\n    # Biweekly targets days 8-14 and 22-28\n    assert \"8-14\" in result or \"22-28\" in result\n    assert \"3\" in result  # Wednesday = 3\n    assert \"30 14\" in result\n\n\ndef test_schedule_to_cron_monthly_happy_path():\n    \"\"\"Convert monthly schedule to cron expression\"\"\"\n    result = schedule_to_cron(\n        daily=False,\n        weekdays=False,\n        weekly=None,\n        biweekly=None,\n        monthly=\"15\",\n        quarterly=False,\n        hour=12,\n        minute=0\n    )\n    assert result == \"0 12 15 * *\"\n\n\ndef test_schedule_to_cron_quarterly_happy_path():\n    \"\"\"Convert quarterly schedule to cron expression\"\"\"\n    result = schedule_to_cron(\n        daily=False,\n        weekdays=False,\n        weekly=None,\n        biweekly=None,\n        monthly=None,\n        quarterly=True,\n        hour=6,\n        minute=0\n    )\n    assert result == \"0 6 1 1,4,7,10 *\"\n\n\ndef test_schedule_to_cron_weekly_full_day_name():\n    \"\"\"Weekly schedule with full day name\"\"\"\n    result = schedule_to_cron(\n        daily=False,\n        weekdays=False,\n        weekly=\"Friday\",\n        biweekly=None,\n        monthly=None,\n        quarterly=False,\n        hour=17,\n        minute=45\n    )\n    assert result == \"45 17 * * 5\"  # Friday = 5\n\n\ndef test_schedule_to_cron_weekly_sunday():\n    \"\"\"Weekly schedule on Sunday (cron value 0)\"\"\"\n    result = schedule_to_cron(\n        daily=False,\n        weekdays=False,\n        weekly=\"sun\",\n        biweekly=None,\n        monthly=None,\n        quarterly=False,\n        hour=7,\n        minute=0\n    )\n    assert result == \"0 7 * * 0\"  # Sunday = 0\n\n\ndef test_schedule_to_cron_unknown_day_error():\n    \"\"\"Error when weekly day name is invalid\"\"\"\n    with pytest.raises(Exception) as exc_info:\n        schedule_to_cron(\n            daily=False,\n            weekdays=False,\n            weekly=\"funday\",\n            biweekly=None,\n            monthly=None,\n            quarterly=False,\n            hour=10,\n            minute=0\n        )\n    # Check that error is related to unknown day\n    assert \"unknown\" in str(exc_info.value).lower() or \"day\" in str(exc_info.value).lower()\n\n\ndef test_schedule_to_cron_no_frequency_error():\n    \"\"\"Error when no schedule frequency is specified\"\"\"\n    with pytest.raises(Exception) as exc_info:\n        schedule_to_cron(\n            daily=False,\n            weekdays=False,\n            weekly=None,\n            biweekly=None,\n            monthly=None,\n            quarterly=False,\n            hour=10,\n            minute=0\n        )\n    # Check that error is related to no frequency\n    assert \"frequency\" in str(exc_info.value).lower() or \"no\" in str(exc_info.value).lower()\n\n\ndef test_schedule_to_cron_biweekly_invalid_day_error():\n    \"\"\"Error when biweekly day name is invalid\"\"\"\n    with pytest.raises(Exception) as exc_info:\n        schedule_to_cron(\n            daily=False,\n            weekdays=False,\n            weekly=None,\n            biweekly=\"notaday\",\n            monthly=None,\n            quarterly=False,\n            hour=10,\n            minute=0\n        )\n    assert \"unknown\" in str(exc_info.value).lower() or \"day\" in str(exc_info.value).lower()\n\n\ndef test_schedule_to_cron_midnight():\n    \"\"\"Schedule at midnight (hour=0, minute=0)\"\"\"\n    result = schedule_to_cron(\n        daily=True,\n        weekdays=False,\n        weekly=None,\n        biweekly=None,\n        monthly=None,\n        quarterly=False,\n        hour=0,\n        minute=0\n    )\n    assert result == \"0 0 * * *\"\n\n\ndef test_schedule_to_cron_last_minute_of_day():\n    \"\"\"Schedule at 23:59\"\"\"\n    result = schedule_to_cron(\n        daily=True,\n        weekdays=False,\n        weekly=None,\n        biweekly=None,\n        monthly=None,\n        quarterly=False,\n        hour=23,\n        minute=59\n    )\n    assert result == \"59 23 * * *\"\n\n\n# ============================================================================\n# PARSE_CRON TESTS\n# ============================================================================\n\ndef test_parse_cron_happy_path():\n    \"\"\"Parse a standard 5-field cron expression\"\"\"\n    result = parse_cron(\"30 9 * * 1-5\")\n    assert result[\"minute\"] == \"30\"\n    assert result[\"hour\"] == \"9\"\n    assert result[\"dom\"] == \"*\"\n    assert result[\"month\"] == \"*\"\n    assert result[\"dow\"] == \"1-5\"\n\n\ndef test_parse_cron_with_lists():\n    \"\"\"Parse cron expression with comma-separated lists\"\"\"\n    result = parse_cron(\"0,15,30,45 8,12,16 1,15 * *\")\n    assert result[\"minute\"] == \"0,15,30,45\"\n    assert result[\"hour\"] == \"8,12,16\"\n    assert result[\"dom\"] == \"1,15\"\n    assert result[\"month\"] == \"*\"\n    assert result[\"dow\"] == \"*\"\n\n\ndef test_parse_cron_all_wildcards():\n    \"\"\"Parse cron expression with all wildcards\"\"\"\n    result = parse_cron(\"* * * * *\")\n    assert all(result[key] == \"*\" for key in [\"minute\", \"hour\", \"dom\", \"month\", \"dow\"])\n\n\ndef test_parse_cron_invalid_field_count_too_few():\n    \"\"\"Error when cron expression has too few fields\"\"\"\n    with pytest.raises(Exception) as exc_info:\n        parse_cron(\"30 9 * *\")\n    assert \"field\" in str(exc_info.value).lower() or \"count\" in str(exc_info.value).lower()\n\n\ndef test_parse_cron_invalid_field_count_too_many():\n    \"\"\"Error when cron expression has too many fields\"\"\"\n    with pytest.raises(Exception) as exc_info:\n        parse_cron(\"30 9 * * * * extra\")\n    assert \"field\" in str(exc_info.value).lower() or \"count\" in str(exc_info.value).lower()\n\n\ndef test_parse_cron_empty_string():\n    \"\"\"Error when cron expression is empty\"\"\"\n    with pytest.raises(Exception) as exc_info:\n        parse_cron(\"\")\n    assert \"field\" in str(exc_info.value).lower() or \"count\" in str(exc_info.value).lower()\n\n\ndef test_parse_cron_returns_correct_keys():\n    \"\"\"Verify parse_cron returns dict with all required keys\"\"\"\n    result = parse_cron(\"0 10 * * *\")\n    assert set(result.keys()) == {\"minute\", \"hour\", \"dom\", \"month\", \"dow\"}\n\n\n# ============================================================================\n# _EXPAND_FIELD TESTS\n# ============================================================================\n\ndef test_expand_field_wildcard():\n    \"\"\"Expand wildcard to full range\"\"\"\n    result = _expand_field(\"*\", 0, 23)\n    assert result == set(range(0, 24))\n\n\ndef test_expand_field_single_value():\n    \"\"\"Expand single integer value\"\"\"\n    result = _expand_field(\"15\", 0, 59)\n    assert result == {15}\n\n\ndef test_expand_field_range():\n    \"\"\"Expand range notation\"\"\"\n    result = _expand_field(\"1-5\", 0, 6)\n    assert result == {1, 2, 3, 4, 5}\n\n\ndef test_expand_field_comma_list():\n    \"\"\"Expand comma-separated list\"\"\"\n    result = _expand_field(\"1,3,5,7\", 0, 10)\n    assert result == {1, 3, 5, 7}\n\n\ndef test_expand_field_mixed_list_and_ranges():\n    \"\"\"Expand mixed comma-separated values and ranges\"\"\"\n    result = _expand_field(\"1,3-5,8\", 0, 10)\n    assert result == {1, 3, 4, 5, 8}\n\n\ndef test_expand_field_invalid_int_error():\n    \"\"\"Error when field contains non-integer value\"\"\"\n    with pytest.raises(Exception) as exc_info:\n        _expand_field(\"abc\", 0, 10)\n    assert \"int\" in str(exc_info.value).lower() or \"invalid\" in str(exc_info.value).lower()\n\n\ndef test_expand_field_edge_min_max_equal():\n    \"\"\"Expand field when min_val equals max_val\"\"\"\n    result = _expand_field(\"*\", 5, 5)\n    assert result == {5}\n\n\n# ============================================================================\n# COMPUTE_NEXT_RUN TESTS\n# ============================================================================\n\ndef test_compute_next_run_happy_path():\n    \"\"\"Compute next run time for a simple daily cron\"\"\"\n    after = datetime(2024, 1, 15, 8, 0)\n    result = compute_next_run(\"30 9 * * *\", after)\n    assert result == \"2024-01-15 09:30\"\n\n\ndef test_compute_next_run_next_day():\n    \"\"\"Compute next run when time already passed today\"\"\"\n    after = datetime(2024, 1, 15, 10, 0)\n    result = compute_next_run(\"30 9 * * *\", after)\n    assert result == \"2024-01-16 09:30\"\n\n\ndef test_compute_next_run_weekly_specific_day():\n    \"\"\"Compute next run for weekly schedule\"\"\"\n    # 2024-01-15 is a Monday\n    after = datetime(2024, 1, 15, 8, 0)\n    result = compute_next_run(\"0 10 * * 1\", after)\n    # Should return today at 10:00 or next Monday\n    assert \"10:00\" in result\n\n\ndef test_compute_next_run_after_none():\n    \"\"\"Compute next run with after=None uses current time\"\"\"\n    with patch('contracts_src_ascend_scheduler_interface.datetime') as mock_dt:\n        mock_dt.now.return_value = datetime(2024, 1, 15, 8, 0)\n        mock_dt.side_effect = lambda *args, **kw: datetime(*args, **kw)\n        result = compute_next_run(\"0 12 * * *\", None)\n        # Should compute based on mocked current time\n        assert isinstance(result, str)\n\n\ndef test_compute_next_run_year_boundary():\n    \"\"\"Compute next run crossing year boundary\"\"\"\n    after = datetime(2024, 12, 31, 23, 0)\n    result = compute_next_run(\"0 0 1 1 *\", after)\n    assert result == \"2025-01-01 00:00\"\n\n\ndef test_compute_next_run_no_match_within_366_days():\n    \"\"\"Return empty string when no match found within 366 days\"\"\"\n    after = datetime(2024, 1, 1, 0, 0)\n    result = compute_next_run(\"0 0 31 2 *\", after)\n    # Feb 31 doesn't exist\n    assert result == \"\"\n\n\ndef test_compute_next_run_invalid_cron_error():\n    \"\"\"Error when cron expression is invalid\"\"\"\n    after = datetime(2024, 1, 15, 8, 0)\n    with pytest.raises(Exception) as exc_info:\n        compute_next_run(\"invalid\", after)\n    assert \"cron\" in str(exc_info.value).lower() or \"invalid\" in str(exc_info.value).lower()\n\n\ndef test_compute_next_run_dom_dow_or_semantics():\n    \"\"\"Verify OR semantics when both dom and dow are specified\"\"\"\n    after = datetime(2024, 1, 1, 0, 0)\n    result = compute_next_run(\"0 10 15 * 1\", after)\n    # Should match either 15th OR Monday\n    assert result != \"\"\n    # Parse result and verify it's either 15th or Monday\n    if result:\n        result_dt = datetime.strptime(result, \"%Y-%m-%d %H:%M\")\n        # Should be either day 15 or a Monday (weekday 0)\n        is_15th = result_dt.day == 15\n        is_monday = result_dt.weekday() == 0\n        assert is_15th or is_monday\n\n\ndef test_compute_next_run_strictly_after():\n    \"\"\"Verify returned time is strictly after the 'after' parameter\"\"\"\n    after = datetime(2024, 1, 15, 9, 30)\n    result = compute_next_run(\"30 9 * * *\", after)\n    # Should not return the same time\n    assert result != \"2024-01-15 09:30\"\n    # Should be the next day\n    assert result == \"2024-01-16 09:30\"\n\n\n# ============================================================================\n# DESCRIBE_CRON TESTS\n# ============================================================================\n\ndef test_describe_cron_simple_daily():\n    \"\"\"Describe simple daily cron expression\"\"\"\n    result = describe_cron(\"30 9 * * *\")\n    # Should contain human-readable description\n    assert isinstance(result, str)\n    assert len(result) > 0\n\n\ndef test_describe_cron_weekdays():\n    \"\"\"Describe weekdays cron expression\"\"\"\n    result = describe_cron(\"0 8 * * 1-5\")\n    assert isinstance(result, str)\n    assert len(result) > 0\n\n\ndef test_describe_cron_weekly():\n    \"\"\"Describe weekly cron expression\"\"\"\n    result = describe_cron(\"0 10 * * 1\")\n    assert isinstance(result, str)\n    assert len(result) > 0\n\n\ndef test_describe_cron_complex_fallback():\n    \"\"\"Return raw expression for complex cron\"\"\"\n    result = describe_cron(\"*/5 1,2,3 * * *\")\n    # Should return something (either description or raw expression)\n    assert isinstance(result, str)\n    assert len(result) > 0\n\n\ndef test_describe_cron_invalid_cron_error():\n    \"\"\"Error when cron expression is invalid\"\"\"\n    with pytest.raises(Exception) as exc_info:\n        describe_cron(\"invalid cron\")\n    assert \"cron\" in str(exc_info.value).lower() or \"invalid\" in str(exc_info.value).lower()\n\n\n# ============================================================================\n# _FIND_ASCEND_PATH TESTS\n# ============================================================================\n\ndef test_find_ascend_path_happy_path():\n    \"\"\"Find ascend executable in PATH\"\"\"\n    with patch('shutil.which') as mock_which:\n        mock_which.return_value = \"/usr/local/bin/ascend\"\n        result = _find_ascend_path()\n        assert result == \"/usr/local/bin/ascend\"\n\n\ndef test_find_ascend_path_fallback():\n    \"\"\"Return 'ascend' as fallback when not found\"\"\"\n    with patch('shutil.which', return_value=None), \\\n         patch('pathlib.Path.exists', return_value=False):\n        result = _find_ascend_path()\n        assert result == \"ascend\"\n\n\n# ============================================================================\n# _CRON_TO_CALENDAR_INTERVALS TESTS\n# ============================================================================\n\ndef test_cron_to_calendar_intervals_simple():\n    \"\"\"Convert simple cron to CalendarInterval XML\"\"\"\n    result = _cron_to_calendar_intervals(\"30 9 * * *\")\n    # Should return XML string\n    assert isinstance(result, str)\n    assert \"<dict>\" in result or \"<array>\" in result\n    assert \"Minute\" in result or \"Hour\" in result\n\n\ndef test_cron_to_calendar_intervals_multiple():\n    \"\"\"Convert cron with multiple values to CalendarInterval array\"\"\"\n    result = _cron_to_calendar_intervals(\"0 8,12,16 * * *\")\n    # Should return XML with array for multiple intervals\n    assert isinstance(result, str)\n    assert \"<array>\" in result or \"<dict>\" in result\n\n\ndef test_cron_to_calendar_intervals_invalid_cron_error():\n    \"\"\"Error when cron expression is invalid\"\"\"\n    with pytest.raises(Exception) as exc_info:\n        _cron_to_calendar_intervals(\"bad cron\")\n    assert \"cron\" in str(exc_info.value).lower() or \"invalid\" in str(exc_info.value).lower()\n\n\n# ============================================================================\n# GENERATE_PLIST TESTS\n# ============================================================================\n\ndef test_generate_plist_happy_path():\n    \"\"\"Generate plist metadata for a schedule\"\"\"\n    schedules_dir = Path(\"/tmp/schedules\")\n    result = generate_plist(\"daily-backup\", schedules_dir)\n    # Contract says it returns tuple of (label, ascend_path, log_path)\n    assert isinstance(result, tuple)\n    assert len(result) == 3\n    label, ascend_path, log_path = result\n    assert \"daily-backup\" in label\n    assert isinstance(ascend_path, str)\n    assert isinstance(log_path, str)\n\n\n# ============================================================================\n# WRITE_PLIST TESTS\n# ============================================================================\n\ndef test_write_plist_happy_path():\n    \"\"\"Write plist file to LaunchAgents directory\"\"\"\n    with patch('pathlib.Path.mkdir'), \\\n         patch('pathlib.Path.write_text'), \\\n         patch('pathlib.Path.expanduser') as mock_expand, \\\n         patch('contracts_src_ascend_scheduler_interface._find_ascend_path', return_value='ascend'), \\\n         patch('contracts_src_ascend_scheduler_interface._cron_to_calendar_intervals', return_value='<dict></dict>'):\n        \n        mock_home = Path(\"/home/user\")\n        mock_expand.return_value = mock_home / \"Library\" / \"LaunchAgents\" / \"com.ascend.schedule.test-schedule.plist\"\n        \n        result = write_plist(\"test-schedule\", \"30 9 * * *\", Path(\"/tmp/schedules\"))\n        \n        assert isinstance(result, Path)\n        assert \"com.ascend.schedule.test-schedule.plist\" in str(result)\n\n\ndef test_write_plist_creates_directory():\n    \"\"\"Create LaunchAgents directory if it doesn't exist\"\"\"\n    with patch('pathlib.Path.mkdir') as mock_mkdir, \\\n         patch('pathlib.Path.write_text'), \\\n         patch('pathlib.Path.expanduser') as mock_expand, \\\n         patch('contracts_src_ascend_scheduler_interface._find_ascend_path', return_value='ascend'), \\\n         patch('contracts_src_ascend_scheduler_interface._cron_to_calendar_intervals', return_value='<dict></dict>'):\n        \n        mock_home = Path(\"/home/user\")\n        mock_expand.return_value = mock_home / \"Library\" / \"LaunchAgents\" / \"com.ascend.schedule.test-schedule.plist\"\n        \n        result = write_plist(\"test-schedule\", \"0 12 * * *\", Path(\"/tmp/schedules\"))\n        \n        # Verify mkdir was called with parents=True\n        assert mock_mkdir.called\n\n\ndef test_write_plist_invalid_cron_error():\n    \"\"\"Error when cron expression is invalid\"\"\"\n    with pytest.raises(Exception) as exc_info:\n        write_plist(\"test-schedule\", \"bad\", Path(\"/tmp/schedules\"))\n    assert \"cron\" in str(exc_info.value).lower() or \"invalid\" in str(exc_info.value).lower()\n\n\n# ============================================================================\n# LOAD_PLIST TESTS\n# ============================================================================\n\ndef test_load_plist_happy_path():\n    \"\"\"Load plist using launchctl successfully\"\"\"\n    with patch('pathlib.Path.exists', return_value=True), \\\n         patch('subprocess.run') as mock_run:\n        mock_run.return_value = Mock(returncode=0)\n        \n        result = load_plist(\"test-schedule\")\n        \n        assert result is True\n        assert mock_run.called\n\n\ndef test_load_plist_file_not_exists():\n    \"\"\"Return False when plist file doesn't exist\"\"\"\n    with patch('pathlib.Path.exists', return_value=False):\n        result = load_plist(\"nonexistent-schedule\")\n        assert result is False\n\n\ndef test_load_plist_launchctl_fails():\n    \"\"\"Return False when launchctl command fails\"\"\"\n    with patch('pathlib.Path.exists', return_value=True), \\\n         patch('subprocess.run') as mock_run:\n        mock_run.return_value = Mock(returncode=1)\n        \n        result = load_plist(\"test-schedule\")\n        \n        assert result is False\n\n\n# ============================================================================\n# UNLOAD_PLIST TESTS\n# ============================================================================\n\ndef test_unload_plist_happy_path():\n    \"\"\"Unload plist using launchctl successfully\"\"\"\n    with patch('pathlib.Path.exists', return_value=True), \\\n         patch('subprocess.run') as mock_run:\n        mock_run.return_value = Mock(returncode=0)\n        \n        result = unload_plist(\"test-schedule\")\n        \n        assert result is True\n        assert mock_run.called\n\n\ndef test_unload_plist_file_not_exists():\n    \"\"\"Return False when plist file doesn't exist\"\"\"\n    with patch('pathlib.Path.exists', return_value=False):\n        result = unload_plist(\"nonexistent-schedule\")\n        assert result is False\n\n\ndef test_unload_plist_launchctl_fails():\n    \"\"\"Return False when launchctl command fails\"\"\"\n    with patch('pathlib.Path.exists', return_value=True), \\\n         patch('subprocess.run') as mock_run:\n        mock_run.return_value = Mock(returncode=1)\n        \n        result = unload_plist(\"test-schedule\")\n        \n        assert result is False\n\n\n# ============================================================================\n# REMOVE_PLIST TESTS\n# ============================================================================\n\ndef test_remove_plist_happy_path():\n    \"\"\"Unload and remove plist file successfully\"\"\"\n    with patch('pathlib.Path.exists', return_value=True), \\\n         patch('pathlib.Path.unlink') as mock_unlink, \\\n         patch('contracts_src_ascend_scheduler_interface.unload_plist', return_value=True):\n        \n        result = remove_plist(\"test-schedule\")\n        \n        assert result is True\n        assert mock_unlink.called\n\n\ndef test_remove_plist_file_not_exists():\n    \"\"\"Return False when plist file doesn't exist\"\"\"\n    with patch('pathlib.Path.exists', return_value=False):\n        result = remove_plist(\"nonexistent-schedule\")\n        assert result is False\n\n\n# ============================================================================\n# INVARIANT TESTS\n# ============================================================================\n\ndef test_invariant_day_map_sunday_is_zero():\n    \"\"\"Verify _DAY_MAP maps Sunday to 0\"\"\"\n    result = schedule_to_cron(\n        daily=False,\n        weekdays=False,\n        weekly=\"sun\",\n        biweekly=None,\n        monthly=None,\n        quarterly=False,\n        hour=10,\n        minute=0\n    )\n    # Sunday should map to 0\n    assert result.endswith(\" 0\")\n\n\ndef test_invariant_biweekly_targets_correct_days():\n    \"\"\"Verify biweekly schedules target days 8-14 and 22-28\"\"\"\n    result = schedule_to_cron(\n        daily=False,\n        weekdays=False,\n        weekly=None,\n        biweekly=\"mon\",\n        monthly=None,\n        quarterly=False,\n        hour=10,\n        minute=0\n    )\n    # Should contain days 8-14,22-28\n    assert \"8-14\" in result or \"22-28\" in result\n\n\ndef test_invariant_quarterly_first_day_of_quarters():\n    \"\"\"Verify quarterly schedules run on first day of months 1,4,7,10\"\"\"\n    result = schedule_to_cron(\n        daily=False,\n        weekdays=False,\n        weekly=None,\n        biweekly=None,\n        monthly=None,\n        quarterly=True,\n        hour=6,\n        minute=0\n    )\n    assert \" 1 \" in result  # day of month = 1\n    assert \"1,4,7,10\" in result  # months\n\n\ndef test_invariant_cron_always_5_fields():\n    \"\"\"Verify all generated cron expressions have exactly 5 fields\"\"\"\n    result = schedule_to_cron(\n        daily=True,\n        weekdays=False,\n        weekly=None,\n        biweekly=None,\n        monthly=None,\n        quarterly=False,\n        hour=9,\n        minute=30\n    )\n    fields = result.split()\n    assert len(fields) == 5\n\n\ndef test_invariant_plist_path_format():\n    \"\"\"Verify plist files are stored at correct path\"\"\"\n    with patch('pathlib.Path.mkdir'), \\\n         patch('pathlib.Path.write_text'), \\\n         patch('pathlib.Path.expanduser') as mock_expand, \\\n         patch('contracts_src_ascend_scheduler_interface._find_ascend_path', return_value='ascend'), \\\n         patch('contracts_src_ascend_scheduler_interface._cron_to_calendar_intervals', return_value='<dict></dict>'):\n        \n        mock_home = Path(\"/home/user\")\n        mock_expand.return_value = mock_home / \"Library\" / \"LaunchAgents\" / \"com.ascend.schedule.my-schedule.plist\"\n        \n        result = write_plist(\"my-schedule\", \"0 10 * * *\", Path(\"/tmp/schedules\"))\n        \n        # Verify path format\n        assert \"LaunchAgents\" in str(result)\n        assert \"com.ascend.schedule.my-schedule.plist\" in str(result)\n"
+}

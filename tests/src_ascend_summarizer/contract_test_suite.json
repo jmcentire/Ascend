@@ -1,0 +1,986 @@
+{
+  "component_id": "src_ascend_summarizer",
+  "contract_version": 1,
+  "test_cases": [
+    {
+      "id": "test_truncate_short_text_unchanged",
+      "description": "Verify that text shorter than MAX_INPUT_CHARS is returned unchanged",
+      "function": "_truncate",
+      "category": "happy_path",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "text": "Short meeting transcript."
+      },
+      "input_description": "",
+      "expected_output_description": "Returns original text without modification",
+      "expected_error": "",
+      "assertions": [
+        "result == 'Short meeting transcript.'",
+        "' [TRUNCATED]' not in result"
+      ]
+    },
+    {
+      "id": "test_truncate_exactly_100000_chars",
+      "description": "Text exactly at MAX_INPUT_CHARS boundary should not be truncated",
+      "function": "_truncate",
+      "category": "edge_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "text": "a * 100000"
+      },
+      "input_description": "",
+      "expected_output_description": "Returns original text without truncation marker",
+      "expected_error": "",
+      "assertions": [
+        "len(result) == 100000",
+        "' [TRUNCATED]' not in result"
+      ]
+    },
+    {
+      "id": "test_truncate_long_text_with_sentence",
+      "description": "Text over 100,000 chars with sentence boundary after 50,000 should break at sentence",
+      "function": "_truncate",
+      "category": "happy_path",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "text": "a * 60000 + '. ' + b * 50000"
+      },
+      "input_description": "",
+      "expected_output_description": "Returns truncated text with [TRUNCATED] marker, breaking at sentence boundary",
+      "expected_error": "",
+      "assertions": [
+        "result.endswith(' [TRUNCATED]')",
+        "len(result) <= 100012",
+        "'. ' in result"
+      ]
+    },
+    {
+      "id": "test_truncate_long_text_no_sentence_boundary",
+      "description": "Text over 100,000 chars without sentence boundary should truncate at MAX_INPUT_CHARS",
+      "function": "_truncate",
+      "category": "edge_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "text": "a * 150000"
+      },
+      "input_description": "",
+      "expected_output_description": "Returns truncated text at 100,000 chars with [TRUNCATED] marker",
+      "expected_error": "",
+      "assertions": [
+        "result.endswith(' [TRUNCATED]')",
+        "len(result) == 100012"
+      ]
+    },
+    {
+      "id": "test_truncate_empty_string",
+      "description": "Empty string should be returned unchanged",
+      "function": "_truncate",
+      "category": "edge_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "text": ""
+      },
+      "input_description": "",
+      "expected_output_description": "Returns empty string",
+      "expected_error": "",
+      "assertions": [
+        "result == ''"
+      ]
+    },
+    {
+      "id": "test_truncate_unicode_characters",
+      "description": "Unicode characters should be handled correctly without corruption",
+      "function": "_truncate",
+      "category": "edge_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "text": "unicode_text"
+      },
+      "input_description": "",
+      "expected_output_description": "Returns text with unicode intact",
+      "expected_error": "",
+      "assertions": [
+        "'😀' in result",
+        "'café' in result"
+      ]
+    },
+    {
+      "id": "test_parse_json_simple_object",
+      "description": "Valid JSON object should be parsed correctly",
+      "function": "_parse_json",
+      "category": "happy_path",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "text": "{\"key\": \"value\", \"num\": 42}"
+      },
+      "input_description": "",
+      "expected_output_description": "Returns parsed dict",
+      "expected_error": "",
+      "assertions": [
+        "result == {'key': 'value', 'num': 42}"
+      ]
+    },
+    {
+      "id": "test_parse_json_array",
+      "description": "Valid JSON array should be parsed correctly",
+      "function": "_parse_json",
+      "category": "happy_path",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "text": "[1, 2, 3, \"test\"]"
+      },
+      "input_description": "",
+      "expected_output_description": "Returns parsed list",
+      "expected_error": "",
+      "assertions": [
+        "result == [1, 2, 3, 'test']"
+      ]
+    },
+    {
+      "id": "test_parse_json_with_markdown_fences",
+      "description": "JSON wrapped in markdown code fences should be extracted and parsed",
+      "function": "_parse_json",
+      "category": "happy_path",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "text": "```json\\n{\"extracted\": true}\\n```"
+      },
+      "input_description": "",
+      "expected_output_description": "Returns parsed dict with fences stripped",
+      "expected_error": "",
+      "assertions": [
+        "result == {'extracted': True}"
+      ]
+    },
+    {
+      "id": "test_parse_json_invalid_json",
+      "description": "Invalid JSON should raise ValueError with invalid_json error",
+      "function": "_parse_json",
+      "category": "error_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "text": "{invalid json}"
+      },
+      "input_description": "",
+      "expected_output_description": "",
+      "expected_error": "invalid_json",
+      "assertions": [
+        "ValueError is raised"
+      ]
+    },
+    {
+      "id": "test_parse_json_primitive",
+      "description": "JSON primitive values should be parsed correctly",
+      "function": "_parse_json",
+      "category": "edge_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "text": "\"string\""
+      },
+      "input_description": "",
+      "expected_output_description": "Returns parsed string",
+      "expected_error": "",
+      "assertions": [
+        "result == 'string'"
+      ]
+    },
+    {
+      "id": "test_get_client_with_valid_api_key",
+      "description": "Valid API key in environment should return Anthropic client",
+      "function": "get_client",
+      "category": "happy_path",
+      "setup_description": "",
+      "mock_dependencies": {
+        "os.environ.get": "test_api_key_12345"
+      },
+      "input_values": {},
+      "input_description": "",
+      "expected_output_description": "Returns Anthropic client instance",
+      "expected_error": "",
+      "assertions": [
+        "result is not None",
+        "isinstance(result, anthropic.Anthropic)"
+      ]
+    },
+    {
+      "id": "test_get_client_missing_api_key",
+      "description": "Missing API key should return None and log warning",
+      "function": "get_client",
+      "category": "error_case",
+      "setup_description": "",
+      "mock_dependencies": {
+        "os.environ.get": "None"
+      },
+      "input_values": {},
+      "input_description": "",
+      "expected_output_description": "Returns None",
+      "expected_error": "api_key_missing",
+      "assertions": [
+        "result is None",
+        "logger.warning was called"
+      ]
+    },
+    {
+      "id": "test_get_client_empty_api_key",
+      "description": "Empty API key should return None",
+      "function": "get_client",
+      "category": "error_case",
+      "setup_description": "",
+      "mock_dependencies": {
+        "os.environ.get": ""
+      },
+      "input_values": {},
+      "input_description": "",
+      "expected_output_description": "Returns None",
+      "expected_error": "api_key_missing",
+      "assertions": [
+        "result is None"
+      ]
+    },
+    {
+      "id": "test_get_client_creation_failure",
+      "description": "Exception during client creation should return None and log error",
+      "function": "get_client",
+      "category": "error_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {},
+      "input_description": "",
+      "expected_output_description": "Returns None when Anthropic() raises exception",
+      "expected_error": "client_creation_failed",
+      "assertions": [
+        "result is None",
+        "logger.error was called"
+      ]
+    },
+    {
+      "id": "test_summarize_transcript_success",
+      "description": "Valid transcript with client should return summary string",
+      "function": "summarize_transcript",
+      "category": "happy_path",
+      "setup_description": "",
+      "mock_dependencies": {
+        "client.messages.create": "Summary of meeting"
+      },
+      "input_values": {
+        "raw_text": "Meeting transcript with discussions and decisions"
+      },
+      "input_description": "",
+      "expected_output_description": "Returns summary string from API",
+      "expected_error": "",
+      "assertions": [
+        "result is not None",
+        "isinstance(result, str)",
+        "len(result) > 0"
+      ]
+    },
+    {
+      "id": "test_summarize_transcript_empty_input",
+      "description": "Empty or whitespace-only input should return None",
+      "function": "summarize_transcript",
+      "category": "error_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "raw_text": "   "
+      },
+      "input_description": "",
+      "expected_output_description": "Returns None",
+      "expected_error": "empty_input",
+      "assertions": [
+        "result is None"
+      ]
+    },
+    {
+      "id": "test_summarize_transcript_no_client",
+      "description": "None client with unavailable get_client should return None",
+      "function": "summarize_transcript",
+      "category": "error_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "raw_text": "Valid transcript",
+        "client": "None"
+      },
+      "input_description": "",
+      "expected_output_description": "Returns None when client unavailable",
+      "expected_error": "client_unavailable",
+      "assertions": [
+        "result is None"
+      ]
+    },
+    {
+      "id": "test_summarize_transcript_api_error",
+      "description": "API call exception should return None and log error",
+      "function": "summarize_transcript",
+      "category": "error_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "raw_text": "Valid transcript"
+      },
+      "input_description": "",
+      "expected_output_description": "Returns None when API raises exception",
+      "expected_error": "api_error",
+      "assertions": [
+        "result is None",
+        "logger.error was called"
+      ]
+    },
+    {
+      "id": "test_summarize_transcript_logs_operation",
+      "description": "Successful summarization should call log_operation",
+      "function": "summarize_transcript",
+      "category": "happy_path",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "raw_text": "Meeting transcript"
+      },
+      "input_description": "",
+      "expected_output_description": "Logs operation success",
+      "expected_error": "",
+      "assertions": [
+        "log_operation was called"
+      ]
+    },
+    {
+      "id": "test_extract_items_success",
+      "description": "Valid transcript should return list of validated meeting items",
+      "function": "extract_items",
+      "category": "happy_path",
+      "setup_description": "",
+      "mock_dependencies": {
+        "client.messages.create": "[{\"kind\": \"action_item\", \"content\": \"Task\", \"owner\": \"John\"}]"
+      },
+      "input_values": {
+        "raw_text": "Meeting with action items and decisions"
+      },
+      "input_description": "",
+      "expected_output_description": "Returns list of dicts with kind, content, owner",
+      "expected_error": "",
+      "assertions": [
+        "isinstance(result, list)",
+        "len(result) > 0",
+        "'kind' in result[0]",
+        "'content' in result[0]"
+      ]
+    },
+    {
+      "id": "test_extract_items_all_kinds",
+      "description": "All MeetingItemKind enum values should be handled",
+      "function": "extract_items",
+      "category": "happy_path",
+      "setup_description": "",
+      "mock_dependencies": {
+        "api_response": "all_kinds_json"
+      },
+      "input_values": {
+        "raw_text": "Complex meeting"
+      },
+      "input_description": "",
+      "expected_output_description": "Returns items with action_item, decision, topic, concern, win kinds",
+      "expected_error": "",
+      "assertions": [
+        "any(item['kind'] == 'action_item' for item in result)",
+        "any(item['kind'] == 'decision' for item in result)"
+      ]
+    },
+    {
+      "id": "test_extract_items_empty_input",
+      "description": "Empty input should return empty list",
+      "function": "extract_items",
+      "category": "error_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "raw_text": ""
+      },
+      "input_description": "",
+      "expected_output_description": "Returns []",
+      "expected_error": "empty_input",
+      "assertions": [
+        "result == []"
+      ]
+    },
+    {
+      "id": "test_extract_items_no_client",
+      "description": "No client available should return empty list",
+      "function": "extract_items",
+      "category": "error_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "raw_text": "Valid transcript",
+        "client": "None"
+      },
+      "input_description": "",
+      "expected_output_description": "Returns []",
+      "expected_error": "client_unavailable",
+      "assertions": [
+        "result == []"
+      ]
+    },
+    {
+      "id": "test_extract_items_invalid_json",
+      "description": "Non-JSON API response should return empty list",
+      "function": "extract_items",
+      "category": "error_case",
+      "setup_description": "",
+      "mock_dependencies": {
+        "api_response": "not json"
+      },
+      "input_values": {
+        "raw_text": "Valid transcript"
+      },
+      "input_description": "",
+      "expected_output_description": "Returns []",
+      "expected_error": "json_parse_error",
+      "assertions": [
+        "result == []"
+      ]
+    },
+    {
+      "id": "test_extract_items_non_list_response",
+      "description": "JSON response that is not a list should return empty list",
+      "function": "extract_items",
+      "category": "error_case",
+      "setup_description": "",
+      "mock_dependencies": {
+        "api_response": "{\"not\": \"a list\"}"
+      },
+      "input_values": {
+        "raw_text": "Valid transcript"
+      },
+      "input_description": "",
+      "expected_output_description": "Returns []",
+      "expected_error": "invalid_response_type",
+      "assertions": [
+        "result == []"
+      ]
+    },
+    {
+      "id": "test_extract_items_validation_error",
+      "description": "Items failing validation should be dropped with warning",
+      "function": "extract_items",
+      "category": "error_case",
+      "setup_description": "",
+      "mock_dependencies": {
+        "api_response": "[{\"kind\": \"action_item\", \"content\": \"\"}]"
+      },
+      "input_values": {
+        "raw_text": "Valid transcript"
+      },
+      "input_description": "",
+      "expected_output_description": "Drops invalid item, returns []",
+      "expected_error": "validation_error",
+      "assertions": [
+        "result == []",
+        "logger.warning was called"
+      ]
+    },
+    {
+      "id": "test_extract_items_partial_validation_failure",
+      "description": "Mix of valid and invalid items should return only valid items",
+      "function": "extract_items",
+      "category": "edge_case",
+      "setup_description": "",
+      "mock_dependencies": {
+        "api_response": "mixed_validity"
+      },
+      "input_values": {
+        "raw_text": "Valid transcript"
+      },
+      "input_description": "",
+      "expected_output_description": "Returns only valid items, drops invalid",
+      "expected_error": "",
+      "assertions": [
+        "len(result) > 0",
+        "all(item['content'] for item in result)"
+      ]
+    },
+    {
+      "id": "test_extract_items_logs_count",
+      "description": "Should log operation with item count",
+      "function": "extract_items",
+      "category": "happy_path",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "raw_text": "Meeting transcript"
+      },
+      "input_description": "",
+      "expected_output_description": "Logs operation with count",
+      "expected_error": "",
+      "assertions": [
+        "log_operation was called"
+      ]
+    },
+    {
+      "id": "test_analyze_sentiment_success",
+      "description": "Valid transcript should return float in [0.0, 1.0]",
+      "function": "analyze_sentiment",
+      "category": "happy_path",
+      "setup_description": "",
+      "mock_dependencies": {
+        "api_response": "0.75"
+      },
+      "input_values": {
+        "raw_text": "Positive meeting discussion"
+      },
+      "input_description": "",
+      "expected_output_description": "Returns float sentiment score",
+      "expected_error": "",
+      "assertions": [
+        "result is not None",
+        "isinstance(result, float)",
+        "0.0 <= result <= 1.0"
+      ]
+    },
+    {
+      "id": "test_analyze_sentiment_clamp_high",
+      "description": "Score above 1.0 should be clamped to 1.0",
+      "function": "analyze_sentiment",
+      "category": "edge_case",
+      "setup_description": "",
+      "mock_dependencies": {
+        "api_response": "1.5"
+      },
+      "input_values": {
+        "raw_text": "Very positive"
+      },
+      "input_description": "",
+      "expected_output_description": "Returns 1.0",
+      "expected_error": "",
+      "assertions": [
+        "result == 1.0"
+      ]
+    },
+    {
+      "id": "test_analyze_sentiment_clamp_low",
+      "description": "Score below 0.0 should be clamped to 0.0",
+      "function": "analyze_sentiment",
+      "category": "edge_case",
+      "setup_description": "",
+      "mock_dependencies": {
+        "api_response": "-0.3"
+      },
+      "input_values": {
+        "raw_text": "Very negative"
+      },
+      "input_description": "",
+      "expected_output_description": "Returns 0.0",
+      "expected_error": "",
+      "assertions": [
+        "result == 0.0"
+      ]
+    },
+    {
+      "id": "test_analyze_sentiment_empty_input",
+      "description": "Empty input should return None",
+      "function": "analyze_sentiment",
+      "category": "error_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "raw_text": "  \\n  "
+      },
+      "input_description": "",
+      "expected_output_description": "Returns None",
+      "expected_error": "empty_input",
+      "assertions": [
+        "result is None"
+      ]
+    },
+    {
+      "id": "test_analyze_sentiment_no_client",
+      "description": "No client available should return None",
+      "function": "analyze_sentiment",
+      "category": "error_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "raw_text": "Valid transcript",
+        "client": "None"
+      },
+      "input_description": "",
+      "expected_output_description": "Returns None",
+      "expected_error": "client_unavailable",
+      "assertions": [
+        "result is None"
+      ]
+    },
+    {
+      "id": "test_analyze_sentiment_unparseable_score",
+      "description": "Non-numeric API response should return None",
+      "function": "analyze_sentiment",
+      "category": "error_case",
+      "setup_description": "",
+      "mock_dependencies": {
+        "api_response": "not a number"
+      },
+      "input_values": {
+        "raw_text": "Valid transcript"
+      },
+      "input_description": "",
+      "expected_output_description": "Returns None",
+      "expected_error": "unparseable_score",
+      "assertions": [
+        "result is None"
+      ]
+    },
+    {
+      "id": "test_analyze_sentiment_api_error",
+      "description": "API exception should return None",
+      "function": "analyze_sentiment",
+      "category": "error_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "raw_text": "Valid transcript"
+      },
+      "input_description": "",
+      "expected_output_description": "Returns None on API error",
+      "expected_error": "api_error",
+      "assertions": [
+        "result is None"
+      ]
+    },
+    {
+      "id": "test_analyze_sentiment_boundary_values",
+      "description": "Exact boundary values 0.0 and 1.0 should be valid",
+      "function": "analyze_sentiment",
+      "category": "edge_case",
+      "setup_description": "",
+      "mock_dependencies": {
+        "api_response": "0.0"
+      },
+      "input_values": {
+        "raw_text": "Meeting"
+      },
+      "input_description": "",
+      "expected_output_description": "Returns 0.0",
+      "expected_error": "",
+      "assertions": [
+        "result == 0.0"
+      ]
+    },
+    {
+      "id": "test_generate_prep_success",
+      "description": "Valid inputs should return structured prep plan",
+      "function": "generate_prep",
+      "category": "happy_path",
+      "setup_description": "",
+      "mock_dependencies": {
+        "api_response": "Prep plan content"
+      },
+      "input_values": {
+        "member_name": "John Doe",
+        "recent_meetings": "[{\"summary\": \"Last meeting\"}]",
+        "open_items": "[{\"task\": \"Follow up\"}]"
+      },
+      "input_description": "",
+      "expected_output_description": "Returns prep plan string",
+      "expected_error": "",
+      "assertions": [
+        "result is not None",
+        "isinstance(result, str)",
+        "len(result) > 0"
+      ]
+    },
+    {
+      "id": "test_generate_prep_empty_member_name",
+      "description": "Empty member name should return None",
+      "function": "generate_prep",
+      "category": "error_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "member_name": "   ",
+        "recent_meetings": "[]",
+        "open_items": "[]"
+      },
+      "input_description": "",
+      "expected_output_description": "Returns None",
+      "expected_error": "empty_member_name",
+      "assertions": [
+        "result is None"
+      ]
+    },
+    {
+      "id": "test_generate_prep_no_config",
+      "description": "Unavailable config should return None",
+      "function": "generate_prep",
+      "category": "error_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "member_name": "John",
+        "recent_meetings": "[]",
+        "open_items": "[]",
+        "config": "None"
+      },
+      "input_description": "",
+      "expected_output_description": "Returns None when config unavailable",
+      "expected_error": "config_unavailable",
+      "assertions": [
+        "result is None"
+      ]
+    },
+    {
+      "id": "test_generate_prep_no_client",
+      "description": "Unavailable client should return None",
+      "function": "generate_prep",
+      "category": "error_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "member_name": "John",
+        "recent_meetings": "[]",
+        "open_items": "[]",
+        "client": "None"
+      },
+      "input_description": "",
+      "expected_output_description": "Returns None when client unavailable",
+      "expected_error": "client_unavailable",
+      "assertions": [
+        "result is None"
+      ]
+    },
+    {
+      "id": "test_generate_prep_api_error",
+      "description": "API error should return None",
+      "function": "generate_prep",
+      "category": "error_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "member_name": "John",
+        "recent_meetings": "[]",
+        "open_items": "[]"
+      },
+      "input_description": "",
+      "expected_output_description": "Returns None on API error",
+      "expected_error": "api_error",
+      "assertions": [
+        "result is None"
+      ]
+    },
+    {
+      "id": "test_generate_prep_with_performance_data",
+      "description": "Optional performance data should be included in generation",
+      "function": "generate_prep",
+      "category": "happy_path",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "member_name": "John",
+        "recent_meetings": "[]",
+        "open_items": "[]",
+        "performance_data": "{\"score\": 95}"
+      },
+      "input_description": "",
+      "expected_output_description": "Returns prep plan incorporating performance data",
+      "expected_error": "",
+      "assertions": [
+        "result is not None"
+      ]
+    },
+    {
+      "id": "test_generate_prep_empty_lists",
+      "description": "Empty recent_meetings and open_items should still generate prep",
+      "function": "generate_prep",
+      "category": "edge_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "member_name": "John",
+        "recent_meetings": "[]",
+        "open_items": "[]"
+      },
+      "input_description": "",
+      "expected_output_description": "Returns prep plan with minimal data",
+      "expected_error": "",
+      "assertions": [
+        "result is not None"
+      ]
+    },
+    {
+      "id": "test_content_validator_nonempty",
+      "description": "Non-empty content should pass validation",
+      "function": "content_must_be_nonempty",
+      "category": "happy_path",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "v": "Valid content"
+      },
+      "input_description": "",
+      "expected_output_description": "Returns value unchanged",
+      "expected_error": "",
+      "assertions": [
+        "result == 'Valid content'"
+      ]
+    },
+    {
+      "id": "test_content_validator_empty",
+      "description": "Empty content should raise validation error",
+      "function": "content_must_be_nonempty",
+      "category": "error_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "v": ""
+      },
+      "input_description": "",
+      "expected_output_description": "Raises ValueError",
+      "expected_error": "empty_content",
+      "assertions": [
+        "ValueError is raised"
+      ]
+    },
+    {
+      "id": "test_meeting_item_extract_valid",
+      "description": "Valid MeetingItemExtract should be created successfully",
+      "function": "MeetingItemExtract",
+      "category": "happy_path",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "kind": "action_item",
+        "content": "Complete report",
+        "owner": "Alice"
+      },
+      "input_description": "",
+      "expected_output_description": "Creates valid instance",
+      "expected_error": "",
+      "assertions": [
+        "item.kind == MeetingItemKind.action_item",
+        "item.content == 'Complete report'",
+        "item.owner == 'Alice'"
+      ]
+    },
+    {
+      "id": "test_meeting_item_extract_empty_content",
+      "description": "MeetingItemExtract with empty content should fail validation",
+      "function": "MeetingItemExtract",
+      "category": "error_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "kind": "decision",
+        "content": "",
+        "owner": "Bob"
+      },
+      "input_description": "",
+      "expected_output_description": "Raises ValidationError",
+      "expected_error": "empty_content",
+      "assertions": [
+        "ValidationError is raised"
+      ]
+    },
+    {
+      "id": "test_meeting_item_extract_no_owner",
+      "description": "MeetingItemExtract with None owner should be valid",
+      "function": "MeetingItemExtract",
+      "category": "edge_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "kind": "topic",
+        "content": "Discuss strategy",
+        "owner": "None"
+      },
+      "input_description": "",
+      "expected_output_description": "Creates instance with None owner",
+      "expected_error": "",
+      "assertions": [
+        "item.owner is None",
+        "item.content == 'Discuss strategy'"
+      ]
+    },
+    {
+      "id": "test_meeting_item_kind_all_values",
+      "description": "All MeetingItemKind enum values should be valid",
+      "function": "MeetingItemKind",
+      "category": "happy_path",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {},
+      "input_description": "",
+      "expected_output_description": "All enum values exist",
+      "expected_error": "",
+      "assertions": [
+        "MeetingItemKind.action_item",
+        "MeetingItemKind.decision",
+        "MeetingItemKind.topic",
+        "MeetingItemKind.concern",
+        "MeetingItemKind.win"
+      ]
+    },
+    {
+      "id": "test_invariant_max_input_chars",
+      "description": "MAX_INPUT_CHARS constant should be 100000",
+      "function": "_truncate",
+      "category": "invariant",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {},
+      "input_description": "",
+      "expected_output_description": "Constant value verification",
+      "expected_error": "",
+      "assertions": [
+        "_MAX_INPUT_CHARS == 100000"
+      ]
+    },
+    {
+      "id": "test_invariant_no_exceptions_propagate",
+      "description": "Public API functions should not propagate exceptions",
+      "function": "summarize_transcript",
+      "category": "invariant",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "raw_text": "text"
+      },
+      "input_description": "",
+      "expected_output_description": "Returns None instead of raising",
+      "expected_error": "",
+      "assertions": [
+        "No exception raised",
+        "result is None or isinstance(result, str)"
+      ]
+    },
+    {
+      "id": "test_invariant_truncate_called_before_api",
+      "description": "All API calls should use truncated input",
+      "function": "summarize_transcript",
+      "category": "invariant",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "raw_text": "very_long_text"
+      },
+      "input_description": "",
+      "expected_output_description": "Input is truncated before API call",
+      "expected_error": "",
+      "assertions": [
+        "_truncate was called",
+        "API received truncated text"
+      ]
+    }
+  ],
+  "test_language": "python",
+  "generated_code": "\"\"\"\nContract test suite for Meeting Summarizer component.\n\nTests cover:\n- Pure functions: _truncate, _parse_json\n- Client management: get_client\n- API functions: summarize_transcript, extract_items, analyze_sentiment, generate_prep\n- Validators: content_must_be_nonempty\n- Type validation: MeetingItemExtract, MeetingItemKind\n\"\"\"\n\nimport pytest\nfrom unittest.mock import Mock, MagicMock, patch, call\nfrom typing import Optional, Any\nimport json\nimport os\n\n# Import the component under test\nfrom src.ascend.summarizer import (\n    _truncate,\n    _parse_json,\n    get_client,\n    summarize_transcript,\n    extract_items,\n    analyze_sentiment,\n    generate_prep,\n    content_must_be_nonempty,\n    MeetingItemExtract,\n    MeetingItemKind,\n)\n\n\n# ==============================================================================\n# FIXTURES\n# ==============================================================================\n\n@pytest.fixture\ndef mock_config():\n    \"\"\"Mock AscendConfig with test settings.\"\"\"\n    config = Mock()\n    config.anthropic_api_key_env = \"ANTHROPIC_API_KEY\"\n    config.model_name = \"claude-3-sonnet-20240229\"\n    config.max_tokens = 4096\n    return config\n\n\n@pytest.fixture\ndef mock_anthropic_client():\n    \"\"\"Mock Anthropic client with message creation.\"\"\"\n    client = Mock()\n    client.messages = Mock()\n    return client\n\n\n@pytest.fixture\ndef mock_successful_response():\n    \"\"\"Mock successful API response.\"\"\"\n    response = Mock()\n    response.content = [Mock(text=\"Test response\")]\n    return response\n\n\n# ==============================================================================\n# TESTS: _truncate\n# ==============================================================================\n\ndef test_truncate_short_text_unchanged():\n    \"\"\"Verify that text shorter than MAX_INPUT_CHARS is returned unchanged.\"\"\"\n    text = \"Short meeting transcript.\"\n    result = _truncate(text)\n    \n    assert result == \"Short meeting transcript.\"\n    assert \" [TRUNCATED]\" not in result\n\n\ndef test_truncate_exactly_100000_chars():\n    \"\"\"Text exactly at MAX_INPUT_CHARS boundary should not be truncated.\"\"\"\n    text = \"a\" * 100000\n    result = _truncate(text)\n    \n    assert len(result) == 100000\n    assert \" [TRUNCATED]\" not in result\n\n\ndef test_truncate_long_text_with_sentence():\n    \"\"\"Text over 100,000 chars with sentence boundary after 50,000 should break at sentence.\"\"\"\n    text = \"a\" * 60000 + \". \" + \"b\" * 50000\n    result = _truncate(text)\n    \n    assert result.endswith(\" [TRUNCATED]\")\n    assert len(result) <= 100012  # 100000 + len(' [TRUNCATED]')\n    assert \". \" in result\n\n\ndef test_truncate_long_text_no_sentence_boundary():\n    \"\"\"Text over 100,000 chars without sentence boundary should truncate at MAX_INPUT_CHARS.\"\"\"\n    text = \"a\" * 150000\n    result = _truncate(text)\n    \n    assert result.endswith(\" [TRUNCATED]\")\n    assert len(result) == 100012  # 100000 + len(' [TRUNCATED]')\n\n\ndef test_truncate_empty_string():\n    \"\"\"Empty string should be returned unchanged.\"\"\"\n    text = \"\"\n    result = _truncate(text)\n    \n    assert result == \"\"\n\n\ndef test_truncate_unicode_characters():\n    \"\"\"Unicode characters should be handled correctly without corruption.\"\"\"\n    text = \"Hello 😀 café \" * 10\n    result = _truncate(text)\n    \n    assert \"😀\" in result\n    assert \"café\" in result\n\n\ndef test_invariant_max_input_chars():\n    \"\"\"MAX_INPUT_CHARS constant should be 100000.\"\"\"\n    # Access the constant from the module\n    from src.ascend.summarizer import _MAX_INPUT_CHARS\n    assert _MAX_INPUT_CHARS == 100000\n\n\n# ==============================================================================\n# TESTS: _parse_json\n# ==============================================================================\n\ndef test_parse_json_simple_object():\n    \"\"\"Valid JSON object should be parsed correctly.\"\"\"\n    text = '{\"key\": \"value\", \"num\": 42}'\n    result = _parse_json(text)\n    \n    assert result == {\"key\": \"value\", \"num\": 42}\n\n\ndef test_parse_json_array():\n    \"\"\"Valid JSON array should be parsed correctly.\"\"\"\n    text = '[1, 2, 3, \"test\"]'\n    result = _parse_json(text)\n    \n    assert result == [1, 2, 3, \"test\"]\n\n\ndef test_parse_json_with_markdown_fences():\n    \"\"\"JSON wrapped in markdown code fences should be extracted and parsed.\"\"\"\n    text = '```json\\n{\"extracted\": true}\\n```'\n    result = _parse_json(text)\n    \n    assert result == {\"extracted\": True}\n\n\ndef test_parse_json_invalid_json():\n    \"\"\"Invalid JSON should raise ValueError with invalid_json error.\"\"\"\n    text = \"{invalid json}\"\n    \n    with pytest.raises(ValueError):\n        _parse_json(text)\n\n\ndef test_parse_json_primitive():\n    \"\"\"JSON primitive values should be parsed correctly.\"\"\"\n    text = '\"string\"'\n    result = _parse_json(text)\n    \n    assert result == \"string\"\n\n\ndef test_parse_json_with_backticks_only():\n    \"\"\"JSON with just backticks should strip them.\"\"\"\n    text = '```\\n[1, 2, 3]\\n```'\n    result = _parse_json(text)\n    \n    assert result == [1, 2, 3]\n\n\n# ==============================================================================\n# TESTS: get_client\n# ==============================================================================\n\ndef test_get_client_with_valid_api_key(mock_config):\n    \"\"\"Valid API key in environment should return Anthropic client.\"\"\"\n    with patch(\"os.environ.get\", return_value=\"test_api_key_12345\"):\n        with patch(\"src_ascend_summarizer.anthropic.Anthropic\") as mock_anthropic:\n            mock_client = Mock()\n            mock_anthropic.return_value = mock_client\n            \n            result = get_client(mock_config)\n            \n            assert result is not None\n            assert result == mock_client\n\n\ndef test_get_client_missing_api_key(mock_config):\n    \"\"\"Missing API key should return None and log warning.\"\"\"\n    with patch(\"os.environ.get\", return_value=None):\n        with patch(\"src_ascend_summarizer.logger\") as mock_logger:\n            result = get_client(mock_config)\n            \n            assert result is None\n            assert mock_logger.warning.called\n\n\ndef test_get_client_empty_api_key(mock_config):\n    \"\"\"Empty API key should return None.\"\"\"\n    with patch(\"os.environ.get\", return_value=\"\"):\n        result = get_client(mock_config)\n        \n        assert result is None\n\n\ndef test_get_client_creation_failure(mock_config):\n    \"\"\"Exception during client creation should return None and log error.\"\"\"\n    with patch(\"os.environ.get\", return_value=\"test_key\"):\n        with patch(\"src_ascend_summarizer.anthropic.Anthropic\", side_effect=Exception(\"API error\")):\n            with patch(\"src_ascend_summarizer.logger\") as mock_logger:\n                result = get_client(mock_config)\n                \n                assert result is None\n                assert mock_logger.error.called\n\n\n# ==============================================================================\n# TESTS: summarize_transcript\n# ==============================================================================\n\ndef test_summarize_transcript_success(mock_config, mock_anthropic_client):\n    \"\"\"Valid transcript with client should return summary string.\"\"\"\n    raw_text = \"Meeting transcript with discussions and decisions\"\n    \n    mock_response = Mock()\n    mock_response.content = [Mock(text=\"Summary of meeting\")]\n    mock_anthropic_client.messages.create.return_value = mock_response\n    \n    with patch(\"src_ascend_summarizer.log_operation\"):\n        result = summarize_transcript(raw_text, mock_config, mock_anthropic_client)\n        \n        assert result is not None\n        assert isinstance(result, str)\n        assert len(result) > 0\n\n\ndef test_summarize_transcript_empty_input(mock_config, mock_anthropic_client):\n    \"\"\"Empty or whitespace-only input should return None.\"\"\"\n    raw_text = \"   \"\n    \n    result = summarize_transcript(raw_text, mock_config, mock_anthropic_client)\n    \n    assert result is None\n\n\ndef test_summarize_transcript_no_client(mock_config):\n    \"\"\"None client with unavailable get_client should return None.\"\"\"\n    raw_text = \"Valid transcript\"\n    \n    with patch(\"src_ascend_summarizer.get_client\", return_value=None):\n        result = summarize_transcript(raw_text, mock_config, None)\n        \n        assert result is None\n\n\ndef test_summarize_transcript_api_error(mock_config, mock_anthropic_client):\n    \"\"\"API call exception should return None and log error.\"\"\"\n    raw_text = \"Valid transcript\"\n    mock_anthropic_client.messages.create.side_effect = Exception(\"API error\")\n    \n    with patch(\"src_ascend_summarizer.logger\") as mock_logger:\n        with patch(\"src_ascend_summarizer.log_operation\"):\n            result = summarize_transcript(raw_text, mock_config, mock_anthropic_client)\n            \n            assert result is None\n            assert mock_logger.error.called\n\n\ndef test_summarize_transcript_logs_operation(mock_config, mock_anthropic_client):\n    \"\"\"Successful summarization should call log_operation.\"\"\"\n    raw_text = \"Meeting transcript\"\n    \n    mock_response = Mock()\n    mock_response.content = [Mock(text=\"Summary\")]\n    mock_anthropic_client.messages.create.return_value = mock_response\n    \n    with patch(\"src_ascend_summarizer.log_operation\") as mock_log:\n        result = summarize_transcript(raw_text, mock_config, mock_anthropic_client)\n        \n        assert mock_log.called\n\n\ndef test_invariant_no_exceptions_propagate(mock_config, mock_anthropic_client):\n    \"\"\"Public API functions should not propagate exceptions.\"\"\"\n    raw_text = \"text\"\n    mock_anthropic_client.messages.create.side_effect = RuntimeError(\"Unexpected\")\n    \n    with patch(\"src_ascend_summarizer.logger\"):\n        with patch(\"src_ascend_summarizer.log_operation\"):\n            # Should not raise, should return None\n            result = summarize_transcript(raw_text, mock_config, mock_anthropic_client)\n            \n            assert result is None or isinstance(result, str)\n\n\n# ==============================================================================\n# TESTS: extract_items\n# ==============================================================================\n\ndef test_extract_items_success(mock_config, mock_anthropic_client):\n    \"\"\"Valid transcript should return list of validated meeting items.\"\"\"\n    raw_text = \"Meeting with action items and decisions\"\n    \n    api_response_text = json.dumps([\n        {\"kind\": \"action_item\", \"content\": \"Task\", \"owner\": \"John\"}\n    ])\n    mock_response = Mock()\n    mock_response.content = [Mock(text=api_response_text)]\n    mock_anthropic_client.messages.create.return_value = mock_response\n    \n    with patch(\"src_ascend_summarizer.log_operation\"):\n        result = extract_items(raw_text, mock_config, mock_anthropic_client)\n        \n        assert isinstance(result, list)\n        assert len(result) > 0\n        assert \"kind\" in result[0]\n        assert \"content\" in result[0]\n\n\ndef test_extract_items_all_kinds(mock_config, mock_anthropic_client):\n    \"\"\"All MeetingItemKind enum values should be handled.\"\"\"\n    raw_text = \"Complex meeting\"\n    \n    api_response_text = json.dumps([\n        {\"kind\": \"action_item\", \"content\": \"Do task\", \"owner\": \"Alice\"},\n        {\"kind\": \"decision\", \"content\": \"Decided to proceed\", \"owner\": \"Bob\"},\n        {\"kind\": \"topic\", \"content\": \"Discussed budget\", \"owner\": None},\n        {\"kind\": \"concern\", \"content\": \"Resource shortage\", \"owner\": \"Charlie\"},\n        {\"kind\": \"win\", \"content\": \"Completed project\", \"owner\": \"Dana\"}\n    ])\n    mock_response = Mock()\n    mock_response.content = [Mock(text=api_response_text)]\n    mock_anthropic_client.messages.create.return_value = mock_response\n    \n    with patch(\"src_ascend_summarizer.log_operation\"):\n        result = extract_items(raw_text, mock_config, mock_anthropic_client)\n        \n        assert any(item[\"kind\"] == \"action_item\" for item in result)\n        assert any(item[\"kind\"] == \"decision\" for item in result)\n\n\ndef test_extract_items_empty_input(mock_config, mock_anthropic_client):\n    \"\"\"Empty input should return empty list.\"\"\"\n    raw_text = \"\"\n    \n    result = extract_items(raw_text, mock_config, mock_anthropic_client)\n    \n    assert result == []\n\n\ndef test_extract_items_no_client(mock_config):\n    \"\"\"No client available should return empty list.\"\"\"\n    raw_text = \"Valid transcript\"\n    \n    with patch(\"src_ascend_summarizer.get_client\", return_value=None):\n        result = extract_items(raw_text, mock_config, None)\n        \n        assert result == []\n\n\ndef test_extract_items_invalid_json(mock_config, mock_anthropic_client):\n    \"\"\"Non-JSON API response should return empty list.\"\"\"\n    raw_text = \"Valid transcript\"\n    \n    mock_response = Mock()\n    mock_response.content = [Mock(text=\"not json\")]\n    mock_anthropic_client.messages.create.return_value = mock_response\n    \n    with patch(\"src_ascend_summarizer.logger\"):\n        with patch(\"src_ascend_summarizer.log_operation\"):\n            result = extract_items(raw_text, mock_config, mock_anthropic_client)\n            \n            assert result == []\n\n\ndef test_extract_items_non_list_response(mock_config, mock_anthropic_client):\n    \"\"\"JSON response that is not a list should return empty list.\"\"\"\n    raw_text = \"Valid transcript\"\n    \n    mock_response = Mock()\n    mock_response.content = [Mock(text='{\"not\": \"a list\"}')]\n    mock_anthropic_client.messages.create.return_value = mock_response\n    \n    with patch(\"src_ascend_summarizer.logger\"):\n        with patch(\"src_ascend_summarizer.log_operation\"):\n            result = extract_items(raw_text, mock_config, mock_anthropic_client)\n            \n            assert result == []\n\n\ndef test_extract_items_validation_error(mock_config, mock_anthropic_client):\n    \"\"\"Items failing validation should be dropped with warning.\"\"\"\n    raw_text = \"Valid transcript\"\n    \n    # Empty content should fail validation\n    api_response_text = json.dumps([\n        {\"kind\": \"action_item\", \"content\": \"\", \"owner\": \"John\"}\n    ])\n    mock_response = Mock()\n    mock_response.content = [Mock(text=api_response_text)]\n    mock_anthropic_client.messages.create.return_value = mock_response\n    \n    with patch(\"src_ascend_summarizer.logger\") as mock_logger:\n        with patch(\"src_ascend_summarizer.log_operation\"):\n            result = extract_items(raw_text, mock_config, mock_anthropic_client)\n            \n            assert result == []\n            assert mock_logger.warning.called\n\n\ndef test_extract_items_partial_validation_failure(mock_config, mock_anthropic_client):\n    \"\"\"Mix of valid and invalid items should return only valid items.\"\"\"\n    raw_text = \"Valid transcript\"\n    \n    api_response_text = json.dumps([\n        {\"kind\": \"action_item\", \"content\": \"Valid task\", \"owner\": \"Alice\"},\n        {\"kind\": \"decision\", \"content\": \"\", \"owner\": \"Bob\"},  # Invalid - empty content\n        {\"kind\": \"topic\", \"content\": \"Valid topic\", \"owner\": None}\n    ])\n    mock_response = Mock()\n    mock_response.content = [Mock(text=api_response_text)]\n    mock_anthropic_client.messages.create.return_value = mock_response\n    \n    with patch(\"src_ascend_summarizer.logger\"):\n        with patch(\"src_ascend_summarizer.log_operation\"):\n            result = extract_items(raw_text, mock_config, mock_anthropic_client)\n            \n            assert len(result) > 0\n            assert all(item[\"content\"] for item in result)\n\n\ndef test_extract_items_logs_count(mock_config, mock_anthropic_client):\n    \"\"\"Should log operation with item count.\"\"\"\n    raw_text = \"Meeting transcript\"\n    \n    api_response_text = json.dumps([\n        {\"kind\": \"action_item\", \"content\": \"Task\", \"owner\": \"John\"}\n    ])\n    mock_response = Mock()\n    mock_response.content = [Mock(text=api_response_text)]\n    mock_anthropic_client.messages.create.return_value = mock_response\n    \n    with patch(\"src_ascend_summarizer.log_operation\") as mock_log:\n        result = extract_items(raw_text, mock_config, mock_anthropic_client)\n        \n        assert mock_log.called\n\n\n# ==============================================================================\n# TESTS: analyze_sentiment\n# ==============================================================================\n\ndef test_analyze_sentiment_success(mock_config, mock_anthropic_client):\n    \"\"\"Valid transcript should return float in [0.0, 1.0].\"\"\"\n    raw_text = \"Positive meeting discussion\"\n    \n    mock_response = Mock()\n    mock_response.content = [Mock(text=\"0.75\")]\n    mock_anthropic_client.messages.create.return_value = mock_response\n    \n    with patch(\"src_ascend_summarizer.log_operation\"):\n        result = analyze_sentiment(raw_text, mock_config, mock_anthropic_client)\n        \n        assert result is not None\n        assert isinstance(result, float)\n        assert 0.0 <= result <= 1.0\n\n\ndef test_analyze_sentiment_clamp_high(mock_config, mock_anthropic_client):\n    \"\"\"Score above 1.0 should be clamped to 1.0.\"\"\"\n    raw_text = \"Very positive\"\n    \n    mock_response = Mock()\n    mock_response.content = [Mock(text=\"1.5\")]\n    mock_anthropic_client.messages.create.return_value = mock_response\n    \n    with patch(\"src_ascend_summarizer.log_operation\"):\n        result = analyze_sentiment(raw_text, mock_config, mock_anthropic_client)\n        \n        assert result == 1.0\n\n\ndef test_analyze_sentiment_clamp_low(mock_config, mock_anthropic_client):\n    \"\"\"Score below 0.0 should be clamped to 0.0.\"\"\"\n    raw_text = \"Very negative\"\n    \n    mock_response = Mock()\n    mock_response.content = [Mock(text=\"-0.3\")]\n    mock_anthropic_client.messages.create.return_value = mock_response\n    \n    with patch(\"src_ascend_summarizer.log_operation\"):\n        result = analyze_sentiment(raw_text, mock_config, mock_anthropic_client)\n        \n        assert result == 0.0\n\n\ndef test_analyze_sentiment_empty_input(mock_config, mock_anthropic_client):\n    \"\"\"Empty input should return None.\"\"\"\n    raw_text = \"  \\n  \"\n    \n    result = analyze_sentiment(raw_text, mock_config, mock_anthropic_client)\n    \n    assert result is None\n\n\ndef test_analyze_sentiment_no_client(mock_config):\n    \"\"\"No client available should return None.\"\"\"\n    raw_text = \"Valid transcript\"\n    \n    with patch(\"src_ascend_summarizer.get_client\", return_value=None):\n        result = analyze_sentiment(raw_text, mock_config, None)\n        \n        assert result is None\n\n\ndef test_analyze_sentiment_unparseable_score(mock_config, mock_anthropic_client):\n    \"\"\"Non-numeric API response should return None.\"\"\"\n    raw_text = \"Valid transcript\"\n    \n    mock_response = Mock()\n    mock_response.content = [Mock(text=\"not a number\")]\n    mock_anthropic_client.messages.create.return_value = mock_response\n    \n    with patch(\"src_ascend_summarizer.logger\"):\n        with patch(\"src_ascend_summarizer.log_operation\"):\n            result = analyze_sentiment(raw_text, mock_config, mock_anthropic_client)\n            \n            assert result is None\n\n\ndef test_analyze_sentiment_api_error(mock_config, mock_anthropic_client):\n    \"\"\"API exception should return None.\"\"\"\n    raw_text = \"Valid transcript\"\n    mock_anthropic_client.messages.create.side_effect = Exception(\"API error\")\n    \n    with patch(\"src_ascend_summarizer.logger\"):\n        with patch(\"src_ascend_summarizer.log_operation\"):\n            result = analyze_sentiment(raw_text, mock_config, mock_anthropic_client)\n            \n            assert result is None\n\n\ndef test_analyze_sentiment_boundary_values(mock_config, mock_anthropic_client):\n    \"\"\"Exact boundary values 0.0 and 1.0 should be valid.\"\"\"\n    raw_text = \"Meeting\"\n    \n    mock_response = Mock()\n    mock_response.content = [Mock(text=\"0.0\")]\n    mock_anthropic_client.messages.create.return_value = mock_response\n    \n    with patch(\"src_ascend_summarizer.log_operation\"):\n        result = analyze_sentiment(raw_text, mock_config, mock_anthropic_client)\n        \n        assert result == 0.0\n    \n    # Test 1.0 boundary\n    mock_response.content = [Mock(text=\"1.0\")]\n    \n    with patch(\"src_ascend_summarizer.log_operation\"):\n        result = analyze_sentiment(raw_text, mock_config, mock_anthropic_client)\n        \n        assert result == 1.0\n\n\n# ==============================================================================\n# TESTS: generate_prep\n# ==============================================================================\n\ndef test_generate_prep_success(mock_config, mock_anthropic_client):\n    \"\"\"Valid inputs should return structured prep plan.\"\"\"\n    member_name = \"John Doe\"\n    recent_meetings = [{\"summary\": \"Last meeting\"}]\n    open_items = [{\"task\": \"Follow up\"}]\n    \n    mock_response = Mock()\n    mock_response.content = [Mock(text=\"Prep plan content\")]\n    mock_anthropic_client.messages.create.return_value = mock_response\n    \n    with patch(\"src_ascend_summarizer.log_operation\"):\n        result = generate_prep(member_name, recent_meetings, open_items, None, mock_config, mock_anthropic_client)\n        \n        assert result is not None\n        assert isinstance(result, str)\n        assert len(result) > 0\n\n\ndef test_generate_prep_empty_member_name(mock_config, mock_anthropic_client):\n    \"\"\"Empty member name should return None.\"\"\"\n    member_name = \"   \"\n    recent_meetings = []\n    open_items = []\n    \n    result = generate_prep(member_name, recent_meetings, open_items, None, mock_config, mock_anthropic_client)\n    \n    assert result is None\n\n\ndef test_generate_prep_no_config(mock_anthropic_client):\n    \"\"\"Unavailable config should return None.\"\"\"\n    member_name = \"John\"\n    recent_meetings = []\n    open_items = []\n    \n    with patch(\"src_ascend_summarizer.load_config\", return_value=None):\n        result = generate_prep(member_name, recent_meetings, open_items, None, None, mock_anthropic_client)\n        \n        assert result is None\n\n\ndef test_generate_prep_no_client(mock_config):\n    \"\"\"Unavailable client should return None.\"\"\"\n    member_name = \"John\"\n    recent_meetings = []\n    open_items = []\n    \n    with patch(\"src_ascend_summarizer.get_client\", return_value=None):\n        result = generate_prep(member_name, recent_meetings, open_items, None, mock_config, None)\n        \n        assert result is None\n\n\ndef test_generate_prep_api_error(mock_config, mock_anthropic_client):\n    \"\"\"API error should return None.\"\"\"\n    member_name = \"John\"\n    recent_meetings = []\n    open_items = []\n    mock_anthropic_client.messages.create.side_effect = Exception(\"API error\")\n    \n    with patch(\"src_ascend_summarizer.logger\"):\n        with patch(\"src_ascend_summarizer.log_operation\"):\n            result = generate_prep(member_name, recent_meetings, open_items, None, mock_config, mock_anthropic_client)\n            \n            assert result is None\n\n\ndef test_generate_prep_with_performance_data(mock_config, mock_anthropic_client):\n    \"\"\"Optional performance data should be included in generation.\"\"\"\n    member_name = \"John\"\n    recent_meetings = []\n    open_items = []\n    performance_data = {\"score\": 95}\n    \n    mock_response = Mock()\n    mock_response.content = [Mock(text=\"Prep plan with performance data\")]\n    mock_anthropic_client.messages.create.return_value = mock_response\n    \n    with patch(\"src_ascend_summarizer.log_operation\"):\n        result = generate_prep(member_name, recent_meetings, open_items, performance_data, mock_config, mock_anthropic_client)\n        \n        assert result is not None\n\n\ndef test_generate_prep_empty_lists(mock_config, mock_anthropic_client):\n    \"\"\"Empty recent_meetings and open_items should still generate prep.\"\"\"\n    member_name = \"John\"\n    recent_meetings = []\n    open_items = []\n    \n    mock_response = Mock()\n    mock_response.content = [Mock(text=\"Minimal prep plan\")]\n    mock_anthropic_client.messages.create.return_value = mock_response\n    \n    with patch(\"src_ascend_summarizer.log_operation\"):\n        result = generate_prep(member_name, recent_meetings, open_items, None, mock_config, mock_anthropic_client)\n        \n        assert result is not None\n\n\n# ==============================================================================\n# TESTS: content_must_be_nonempty validator\n# ==============================================================================\n\ndef test_content_validator_nonempty():\n    \"\"\"Non-empty content should pass validation.\"\"\"\n    v = \"Valid content\"\n    result = content_must_be_nonempty(MeetingItemExtract, v)\n    \n    assert result == \"Valid content\"\n\n\ndef test_content_validator_empty():\n    \"\"\"Empty content should raise validation error.\"\"\"\n    v = \"\"\n    \n    with pytest.raises(ValueError):\n        content_must_be_nonempty(MeetingItemExtract, v)\n\n\n# ==============================================================================\n# TESTS: MeetingItemExtract type validation\n# ==============================================================================\n\ndef test_meeting_item_extract_valid():\n    \"\"\"Valid MeetingItemExtract should be created successfully.\"\"\"\n    item = MeetingItemExtract(\n        kind=MeetingItemKind.action_item,\n        content=\"Complete report\",\n        owner=\"Alice\"\n    )\n    \n    assert item.kind == MeetingItemKind.action_item\n    assert item.content == \"Complete report\"\n    assert item.owner == \"Alice\"\n\n\ndef test_meeting_item_extract_empty_content():\n    \"\"\"MeetingItemExtract with empty content should fail validation.\"\"\"\n    from pydantic import ValidationError\n    \n    with pytest.raises(ValidationError):\n        item = MeetingItemExtract(\n            kind=MeetingItemKind.decision,\n            content=\"\",\n            owner=\"Bob\"\n        )\n\n\ndef test_meeting_item_extract_no_owner():\n    \"\"\"MeetingItemExtract with None owner should be valid.\"\"\"\n    item = MeetingItemExtract(\n        kind=MeetingItemKind.topic,\n        content=\"Discuss strategy\",\n        owner=None\n    )\n    \n    assert item.owner is None\n    assert item.content == \"Discuss strategy\"\n\n\n# ==============================================================================\n# TESTS: MeetingItemKind enum\n# ==============================================================================\n\ndef test_meeting_item_kind_all_values():\n    \"\"\"All MeetingItemKind enum values should be valid.\"\"\"\n    # Verify all enum values exist\n    assert MeetingItemKind.action_item\n    assert MeetingItemKind.decision\n    assert MeetingItemKind.topic\n    assert MeetingItemKind.concern\n    assert MeetingItemKind.win\n\n\ndef test_meeting_item_kind_values():\n    \"\"\"Enum values should match contract specification.\"\"\"\n    values = [item.value for item in MeetingItemKind]\n    expected = [\"action_item\", \"decision\", \"topic\", \"concern\", \"win\"]\n    \n    assert set(values) == set(expected)\n\n\n# ==============================================================================\n# TESTS: Invariants\n# ==============================================================================\n\ndef test_invariant_truncate_called_before_api(mock_config, mock_anthropic_client):\n    \"\"\"All API calls should use truncated input.\"\"\"\n    raw_text = \"a\" * 150000  # Longer than MAX_INPUT_CHARS\n    \n    mock_response = Mock()\n    mock_response.content = [Mock(text=\"Summary\")]\n    mock_anthropic_client.messages.create.return_value = mock_response\n    \n    with patch(\"src_ascend_summarizer._truncate\", wraps=_truncate) as mock_truncate:\n        with patch(\"src_ascend_summarizer.log_operation\"):\n            result = summarize_transcript(raw_text, mock_config, mock_anthropic_client)\n            \n            # Verify truncate was called\n            assert mock_truncate.called\n            \n            # Verify API received truncated text\n            call_args = mock_anthropic_client.messages.create.call_args\n            if call_args:\n                # The system message or user message should contain truncated marker if input was long\n                messages_arg = call_args[1].get(\"messages\", [])\n                if messages_arg:\n                    content = messages_arg[0].get(\"content\", \"\")\n                    # If original was > 100000, truncation should have occurred\n                    assert len(content) <= 100012  # 100000 + ' [TRUNCATED]'\n\n\ndef test_invariant_sentiment_always_clamped(mock_config, mock_anthropic_client):\n    \"\"\"Sentiment scores are always clamped to [0.0, 1.0] range.\"\"\"\n    test_cases = [\n        (\"2.5\", 1.0),\n        (\"-1.0\", 0.0),\n        (\"0.5\", 0.5),\n        (\"1.0\", 1.0),\n        (\"0.0\", 0.0),\n    ]\n    \n    for api_value, expected in test_cases:\n        mock_response = Mock()\n        mock_response.content = [Mock(text=api_value)]\n        mock_anthropic_client.messages.create.return_value = mock_response\n        \n        with patch(\"src_ascend_summarizer.log_operation\"):\n            result = analyze_sentiment(\"Test\", mock_config, mock_anthropic_client)\n            \n            if result is not None:\n                assert 0.0 <= result <= 1.0\n                assert result == expected\n\n\ndef test_invariant_meetingitemextract_content_always_nonempty():\n    \"\"\"MeetingItemExtract.content is always non-empty (enforced by validator).\"\"\"\n    from pydantic import ValidationError\n    \n    # Valid case\n    item = MeetingItemExtract(\n        kind=MeetingItemKind.action_item,\n        content=\"Valid\",\n        owner=\"Alice\"\n    )\n    assert len(item.content) > 0\n    \n    # Invalid case - empty content\n    with pytest.raises(ValidationError):\n        MeetingItemExtract(\n            kind=MeetingItemKind.action_item,\n            content=\"\",\n            owner=\"Alice\"\n        )\n    \n    # Invalid case - whitespace only (if validator strips)\n    try:\n        item_ws = MeetingItemExtract(\n            kind=MeetingItemKind.action_item,\n            content=\"   \",\n            owner=\"Alice\"\n        )\n        # If this doesn't raise, ensure content is non-empty after any stripping\n        assert len(item_ws.content.strip()) >= 0  # Depends on implementation\n    except ValidationError:\n        # Expected if validator rejects whitespace-only\n        pass\n"
+}

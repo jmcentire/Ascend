@@ -1,0 +1,439 @@
+{
+  "component_id": "contracts_src_ascend_config_interface",
+  "name": "Ascend Configuration Management",
+  "description": "Two-tier configuration system for Ascend that manages defaults and user overrides in ~/.ascend/config.yaml. Provides loading, saving, and individual key access to configuration values with type coercion support for integration settings, API keys, model selection, and directory paths.",
+  "version": 1,
+  "types": [
+    {
+      "name": "AscendConfig",
+      "kind": "struct",
+      "fields": [
+        {
+          "name": "repos_dir",
+          "type_ref": "Optional[str]",
+          "required": false,
+          "default": "",
+          "description": "Directory for repository storage",
+          "validators": []
+        },
+        {
+          "name": "reports_dir",
+          "type_ref": "Optional[str]",
+          "required": false,
+          "default": "",
+          "description": "Directory for reports storage",
+          "validators": []
+        },
+        {
+          "name": "config_dir",
+          "type_ref": "Optional[str]",
+          "required": false,
+          "default": "",
+          "description": "Directory for configuration files",
+          "validators": []
+        },
+        {
+          "name": "anthropic_api_key_env",
+          "type_ref": "Optional[str]",
+          "required": false,
+          "default": "",
+          "description": "Environment variable name for Anthropic API key",
+          "validators": []
+        },
+        {
+          "name": "model",
+          "type_ref": "Optional[str]",
+          "required": false,
+          "default": "",
+          "description": "Claude model identifier",
+          "validators": []
+        },
+        {
+          "name": "default_lookback_hours",
+          "type_ref": "Optional[int]",
+          "required": false,
+          "default": "",
+          "description": "Default lookback hours for data queries",
+          "validators": []
+        },
+        {
+          "name": "linear_team_id",
+          "type_ref": "Optional[str]",
+          "required": false,
+          "default": "",
+          "description": "Primary Linear team ID",
+          "validators": []
+        },
+        {
+          "name": "linear_api_key_env",
+          "type_ref": "Optional[str]",
+          "required": false,
+          "default": "",
+          "description": "Environment variable name for Linear API key",
+          "validators": []
+        },
+        {
+          "name": "linear_team_ids",
+          "type_ref": "Optional[list[str]]",
+          "required": false,
+          "default": "",
+          "description": "List of Linear team IDs",
+          "validators": []
+        },
+        {
+          "name": "slack_channels",
+          "type_ref": "Optional[list[str]]",
+          "required": false,
+          "default": "",
+          "description": "List of Slack channels to monitor",
+          "validators": []
+        },
+        {
+          "name": "slack_bot_token_env",
+          "type_ref": "Optional[str]",
+          "required": false,
+          "default": "",
+          "description": "Environment variable name for Slack bot token",
+          "validators": []
+        },
+        {
+          "name": "github_org",
+          "type_ref": "Optional[str]",
+          "required": false,
+          "default": "",
+          "description": "GitHub organization name",
+          "validators": []
+        },
+        {
+          "name": "manager_name",
+          "type_ref": "Optional[str]",
+          "required": false,
+          "default": "",
+          "description": "Manager name for reporting",
+          "validators": []
+        }
+      ],
+      "item_type": "",
+      "variants": [],
+      "inner_types": [],
+      "description": "Pydantic model representing Ascend configuration with defaults for directories, API keys, model selection, and integration settings",
+      "owner_component": ""
+    },
+    {
+      "name": "Path",
+      "kind": "primitive",
+      "fields": [],
+      "item_type": "",
+      "variants": [],
+      "inner_types": [],
+      "description": "pathlib.Path for filesystem paths",
+      "owner_component": ""
+    },
+    {
+      "name": "Optional",
+      "kind": "union",
+      "fields": [],
+      "item_type": "",
+      "variants": [],
+      "inner_types": [
+        "Any",
+        "None"
+      ],
+      "description": "Any | None type alias",
+      "owner_component": ""
+    }
+  ],
+  "functions": [
+    {
+      "name": "load_config",
+      "description": "Load configuration from YAML file or return default AscendConfig if file does not exist. Filters out None values from loaded YAML.",
+      "inputs": [
+        {
+          "name": "config_path",
+          "type_ref": "Optional[Path]",
+          "required": false,
+          "default": "None",
+          "description": "Path to YAML configuration file. If None, uses default CONFIG_PATH",
+          "validators": []
+        }
+      ],
+      "output_type": "AscendConfig",
+      "error_cases": [
+        {
+          "name": "yaml_parse_error",
+          "condition": "YAML file contains invalid syntax",
+          "error_type": "yaml.YAMLError",
+          "error_data": {}
+        },
+        {
+          "name": "pydantic_validation_error",
+          "condition": "Loaded data fails AscendConfig validation",
+          "error_type": "pydantic.ValidationError",
+          "error_data": {}
+        },
+        {
+          "name": "io_error",
+          "condition": "File exists but cannot be read due to permissions or IO issues",
+          "error_type": "IOError",
+          "error_data": {}
+        }
+      ],
+      "preconditions": [],
+      "postconditions": [
+        "Returns valid AscendConfig instance",
+        "If config_path exists, loads YAML and merges with defaults",
+        "If config_path does not exist, returns AscendConfig with all defaults"
+      ],
+      "idempotent": true,
+      "is_async": false,
+      "side_effects": [
+        "reads_file"
+      ],
+      "structured_side_effects": [
+        {
+          "kind": "reads_file",
+          "target": "config_path (YAML configuration file)",
+          "description": "Reads YAML configuration from disk if file exists"
+        }
+      ],
+      "performance_budget": null
+    },
+    {
+      "name": "save_config",
+      "description": "Save AscendConfig instance to YAML file. Creates parent directories if they don't exist.",
+      "inputs": [
+        {
+          "name": "cfg",
+          "type_ref": "AscendConfig",
+          "required": true,
+          "default": "",
+          "description": "Valid AscendConfig instance to serialize and save",
+          "validators": []
+        },
+        {
+          "name": "config_path",
+          "type_ref": "Optional[Path]",
+          "required": false,
+          "default": "None",
+          "description": "Path to YAML configuration file. If None, uses default CONFIG_PATH",
+          "validators": []
+        }
+      ],
+      "output_type": "None",
+      "error_cases": [
+        {
+          "name": "io_error",
+          "condition": "Cannot write to file due to permissions or IO issues",
+          "error_type": "IOError",
+          "error_data": {}
+        },
+        {
+          "name": "os_error",
+          "condition": "Cannot create parent directories",
+          "error_type": "OSError",
+          "error_data": {}
+        }
+      ],
+      "preconditions": [
+        "cfg must be valid AscendConfig instance"
+      ],
+      "postconditions": [
+        "Config file exists at specified path",
+        "Parent directories are created if they did not exist",
+        "YAML file contains serialized configuration with no flow style and unsorted keys"
+      ],
+      "idempotent": true,
+      "is_async": false,
+      "side_effects": [
+        "writes_file"
+      ],
+      "structured_side_effects": [
+        {
+          "kind": "writes_file",
+          "target": "config_path (YAML configuration file)",
+          "description": "Writes YAML configuration to disk and creates parent directories"
+        }
+      ],
+      "performance_budget": null
+    },
+    {
+      "name": "get_config_value",
+      "description": "Get a single configuration value by key. Loads config if not provided. Returns string representation of the value.",
+      "inputs": [
+        {
+          "name": "key",
+          "type_ref": "str",
+          "required": true,
+          "default": "",
+          "description": "Configuration key name corresponding to AscendConfig field",
+          "validators": []
+        },
+        {
+          "name": "cfg",
+          "type_ref": "Optional[AscendConfig]",
+          "required": false,
+          "default": "None",
+          "description": "Existing AscendConfig instance. If None, loads from default path",
+          "validators": []
+        }
+      ],
+      "output_type": "str",
+      "error_cases": [
+        {
+          "name": "unknown_key",
+          "condition": "key is not a valid field in AscendConfig",
+          "error_type": "KeyError",
+          "error_data": {
+            "message": "Unknown config key: {key}"
+          }
+        },
+        {
+          "name": "load_errors",
+          "condition": "cfg is None and load_config fails",
+          "error_type": "yaml.YAMLError | pydantic.ValidationError | IOError",
+          "error_data": {
+            "context": "Propagated from load_config()"
+          }
+        }
+      ],
+      "preconditions": [
+        "key must exist in AscendConfig model"
+      ],
+      "postconditions": [
+        "Returns string representation of config value"
+      ],
+      "idempotent": true,
+      "is_async": false,
+      "side_effects": [
+        "reads_file"
+      ],
+      "structured_side_effects": [
+        {
+          "kind": "reads_file",
+          "target": "config_path (YAML configuration file)",
+          "description": "Reads configuration file if cfg is None"
+        }
+      ],
+      "performance_budget": null
+    },
+    {
+      "name": "set_config_value",
+      "description": "Set a single configuration value by key with automatic type coercion (int, list, or string), then save to file. Returns updated config.",
+      "inputs": [
+        {
+          "name": "key",
+          "type_ref": "str",
+          "required": true,
+          "default": "",
+          "description": "Configuration key name corresponding to AscendConfig field",
+          "validators": []
+        },
+        {
+          "name": "value",
+          "type_ref": "str",
+          "required": true,
+          "default": "",
+          "description": "String value to set, will be coerced to appropriate type",
+          "validators": []
+        },
+        {
+          "name": "config_path",
+          "type_ref": "Optional[Path]",
+          "required": false,
+          "default": "None",
+          "description": "Path to YAML configuration file. If None, uses default CONFIG_PATH",
+          "validators": []
+        }
+      ],
+      "output_type": "AscendConfig",
+      "error_cases": [
+        {
+          "name": "unknown_key",
+          "condition": "key is not a valid field in AscendConfig",
+          "error_type": "KeyError",
+          "error_data": {
+            "message": "Unknown config key: {key}"
+          }
+        },
+        {
+          "name": "type_coercion_error",
+          "condition": "Cannot coerce value to target type (e.g., int() fails)",
+          "error_type": "ValueError",
+          "error_data": {}
+        },
+        {
+          "name": "pydantic_validation_error",
+          "condition": "Updated data fails AscendConfig validation",
+          "error_type": "pydantic.ValidationError",
+          "error_data": {}
+        },
+        {
+          "name": "io_error",
+          "condition": "Cannot read or write config file",
+          "error_type": "IOError",
+          "error_data": {}
+        }
+      ],
+      "preconditions": [
+        "key must exist in AscendConfig model"
+      ],
+      "postconditions": [
+        "Config value is updated and persisted to disk",
+        "Returns updated AscendConfig instance",
+        "Integer values are coerced from string using int()",
+        "List values are coerced by splitting on comma and stripping whitespace",
+        "Other types remain as strings"
+      ],
+      "idempotent": false,
+      "is_async": false,
+      "side_effects": [
+        "reads_file",
+        "writes_file"
+      ],
+      "structured_side_effects": [
+        {
+          "kind": "reads_file",
+          "target": "config_path (YAML configuration file)",
+          "description": "Reads existing configuration from disk"
+        },
+        {
+          "kind": "writes_file",
+          "target": "config_path (YAML configuration file)",
+          "description": "Writes updated configuration to disk"
+        }
+      ],
+      "performance_budget": null
+    }
+  ],
+  "dependencies": [
+    "pathlib",
+    "typing",
+    "yaml",
+    "pydantic"
+  ],
+  "dependency_contracts": {},
+  "invariants": [
+    "ASCEND_HOME is always Path.home() / '.ascend'",
+    "CONFIG_PATH is always ASCEND_HOME / 'config.yaml'",
+    "DB_PATH is always ASCEND_HOME / 'ascend.db'",
+    "HISTORY_DIR is always ASCEND_HOME / 'history'",
+    "TRANSCRIPTS_DIR is always ASCEND_HOME / 'transcripts'",
+    "SCHEDULES_DIR is always ASCEND_HOME / 'schedules'",
+    "_DEFAULTS dictionary contains immutable default values for config keys",
+    "AscendConfig always validates fields through Pydantic BaseModel",
+    "Config files are always stored as YAML",
+    "Type coercion in set_config_value follows pattern: int → int(), list → comma-split, other → str"
+  ],
+  "requires": [],
+  "processing_register": "",
+  "data_access": {
+    "reads": [],
+    "writes": [],
+    "rationale": "",
+    "side_effects": []
+  },
+  "authority": {
+    "domains": [],
+    "rationale": null
+  }
+}

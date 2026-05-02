@@ -1,0 +1,201 @@
+{
+  "id": "7f1418f79645",
+  "project_dir": "/Users/jmcentire/Code/Ascend",
+  "status": "paused",
+  "phase": "interview",
+  "component_tasks": [
+    {
+      "component_id": "src_ascend_audit",
+      "status": "pending",
+      "attempts": 0,
+      "last_error": ""
+    },
+    {
+      "component_id": "src_ascend_cli",
+      "status": "pending",
+      "attempts": 0,
+      "last_error": ""
+    },
+    {
+      "component_id": "src_ascend_config",
+      "status": "pending",
+      "attempts": 0,
+      "last_error": ""
+    },
+    {
+      "component_id": "src_ascend_db",
+      "status": "pending",
+      "attempts": 0,
+      "last_error": ""
+    },
+    {
+      "component_id": "src_ascend_output",
+      "status": "pending",
+      "attempts": 0,
+      "last_error": ""
+    },
+    {
+      "component_id": "src_ascend_scheduler",
+      "status": "pending",
+      "attempts": 0,
+      "last_error": ""
+    },
+    {
+      "component_id": "src_ascend_summarizer",
+      "status": "pending",
+      "attempts": 0,
+      "last_error": ""
+    },
+    {
+      "component_id": "src_ascend_transcript",
+      "status": "pending",
+      "attempts": 0,
+      "last_error": ""
+    },
+    {
+      "component_id": "src_ascend_tui_app",
+      "status": "pending",
+      "attempts": 0,
+      "last_error": ""
+    },
+    {
+      "component_id": "src_ascend_tui_screens_coaching",
+      "status": "pending",
+      "attempts": 0,
+      "last_error": ""
+    },
+    {
+      "component_id": "src_ascend_tui_screens_dashboard",
+      "status": "pending",
+      "attempts": 0,
+      "last_error": ""
+    },
+    {
+      "component_id": "src_ascend_tui_screens_meetings",
+      "status": "pending",
+      "attempts": 0,
+      "last_error": ""
+    },
+    {
+      "component_id": "src_ascend_tui_screens_reports",
+      "status": "pending",
+      "attempts": 0,
+      "last_error": ""
+    },
+    {
+      "component_id": "src_ascend_tui_screens_roster",
+      "status": "pending",
+      "attempts": 0,
+      "last_error": ""
+    },
+    {
+      "component_id": "src_ascend_tui_screens_schedules",
+      "status": "pending",
+      "attempts": 0,
+      "last_error": ""
+    },
+    {
+      "component_id": "src_ascend_tui_widgets_member_card",
+      "status": "pending",
+      "attempts": 0,
+      "last_error": ""
+    },
+    {
+      "component_id": "src_ascend_tui_widgets_metric_bar",
+      "status": "pending",
+      "attempts": 0,
+      "last_error": ""
+    },
+    {
+      "component_id": "src_ascend_integrations_github",
+      "status": "pending",
+      "attempts": 0,
+      "last_error": ""
+    },
+    {
+      "component_id": "src_ascend_integrations_linear",
+      "status": "pending",
+      "attempts": 0,
+      "last_error": ""
+    },
+    {
+      "component_id": "src_ascend_integrations_slack",
+      "status": "pending",
+      "attempts": 0,
+      "last_error": ""
+    },
+    {
+      "component_id": "src_ascend_integrations_snapshot",
+      "status": "pending",
+      "attempts": 0,
+      "last_error": ""
+    },
+    {
+      "component_id": "src_ascend_commands_coach",
+      "status": "pending",
+      "attempts": 0,
+      "last_error": ""
+    },
+    {
+      "component_id": "src_ascend_commands_init",
+      "status": "pending",
+      "attempts": 0,
+      "last_error": ""
+    },
+    {
+      "component_id": "src_ascend_commands_meeting",
+      "status": "pending",
+      "attempts": 0,
+      "last_error": ""
+    },
+    {
+      "component_id": "src_ascend_commands_plan",
+      "status": "pending",
+      "attempts": 0,
+      "last_error": ""
+    },
+    {
+      "component_id": "src_ascend_commands_report",
+      "status": "pending",
+      "attempts": 0,
+      "last_error": ""
+    },
+    {
+      "component_id": "src_ascend_commands_roster",
+      "status": "pending",
+      "attempts": 0,
+      "last_error": ""
+    },
+    {
+      "component_id": "src_ascend_commands_schedule",
+      "status": "pending",
+      "attempts": 0,
+      "last_error": ""
+    },
+    {
+      "component_id": "src_ascend_commands_sync",
+      "status": "pending",
+      "attempts": 0,
+      "last_error": ""
+    },
+    {
+      "component_id": "src_ascend_commands_team",
+      "status": "pending",
+      "attempts": 0,
+      "last_error": ""
+    }
+  ],
+  "interview_result": null,
+  "total_cost_usd": 0.0,
+  "total_tokens": 0,
+  "last_check_in": "",
+  "created_at": "2026-03-22T20:14:14.407848",
+  "completed_at": "",
+  "pause_reason": "Dry run — adoption not finalized",
+  "phase_cycles": 0,
+  "health_snapshot": {},
+  "processing_register": "",
+  "audit_commit": "",
+  "arbiter_response": {},
+  "constrain_context": {}
+}

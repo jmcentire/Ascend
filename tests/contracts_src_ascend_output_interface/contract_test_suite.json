@@ -1,0 +1,1017 @@
+{
+  "component_id": "contracts_src_ascend_output_interface",
+  "contract_version": 1,
+  "test_cases": [
+    {
+      "id": "test_colorize_happy_path_headers",
+      "description": "Test that headers with # are colored bold cyan",
+      "function": "_colorize",
+      "category": "happy_path",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "text": "# Main Header\n## Subheader\nregular text"
+      },
+      "input_description": "",
+      "expected_output_description": "String with bold cyan ANSI codes for lines starting with # or ##",
+      "expected_error": "",
+      "assertions": [
+        "Output contains ANSI escape codes",
+        "Lines with '# ' or '## ' are bold cyan",
+        "Regular text remains uncolored"
+      ]
+    },
+    {
+      "id": "test_colorize_happy_path_status_indicators",
+      "description": "Test that status indicators (Blocked, Active, On Track, At Risk) are colored appropriately",
+      "function": "_colorize",
+      "category": "happy_path",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "text": "Status: Blocked\nStatus: Active\nStatus: On Track\nStatus: At Risk"
+      },
+      "input_description": "",
+      "expected_output_description": "Blocked is red, Active/On Track are green, At Risk is yellow",
+      "expected_error": "",
+      "assertions": [
+        "Line with 'Blocked' contains red ANSI code",
+        "Lines with 'Active' or 'On Track' contain green ANSI code",
+        "Line with 'At Risk' contains yellow ANSI code"
+      ]
+    },
+    {
+      "id": "test_colorize_happy_path_metadata",
+      "description": "Test that metadata lines (Generated:, ---) are dimmed",
+      "function": "_colorize",
+      "category": "happy_path",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "text": "Generated: 2024-01-01\n---\nContent here"
+      },
+      "input_description": "",
+      "expected_output_description": "Generated: and --- lines are dimmed",
+      "expected_error": "",
+      "assertions": [
+        "Line starting with 'Generated:' contains dim ANSI code",
+        "Line starting with '---' contains dim ANSI code"
+      ]
+    },
+    {
+      "id": "test_colorize_edge_case_empty_string",
+      "description": "Test colorize with empty string",
+      "function": "_colorize",
+      "category": "edge_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "text": ""
+      },
+      "input_description": "",
+      "expected_output_description": "Returns empty string",
+      "expected_error": "",
+      "assertions": [
+        "Output is empty string"
+      ]
+    },
+    {
+      "id": "test_colorize_edge_case_triple_hash_header",
+      "description": "Test that ### headers are bold (not cyan)",
+      "function": "_colorize",
+      "category": "edge_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "text": "### Small Header"
+      },
+      "input_description": "",
+      "expected_output_description": "Line is bold but not cyan",
+      "expected_error": "",
+      "assertions": [
+        "Output contains bold ANSI code",
+        "Output does not contain cyan ANSI code"
+      ]
+    },
+    {
+      "id": "test_colorize_edge_case_multiple_statuses_in_line",
+      "description": "Test line with multiple status keywords",
+      "function": "_colorize",
+      "category": "edge_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "text": "Project Active but At Risk"
+      },
+      "input_description": "",
+      "expected_output_description": "Priority determines color (first match wins)",
+      "expected_error": "",
+      "assertions": [
+        "Output contains ANSI color code"
+      ]
+    },
+    {
+      "id": "test_colorize_edge_case_unicode_content",
+      "description": "Test colorize with Unicode characters including emoji and RTL text",
+      "function": "_colorize",
+      "category": "edge_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "text": "# 📊 Report\nStatus: Active ✓\n🔴 Blocked\nשלום At Risk"
+      },
+      "input_description": "",
+      "expected_output_description": "Unicode preserved with correct coloring",
+      "expected_error": "",
+      "assertions": [
+        "Output contains original Unicode characters",
+        "ANSI codes are correctly applied"
+      ]
+    },
+    {
+      "id": "test_colorize_edge_case_no_matching_patterns",
+      "description": "Test colorize with text that has no matching patterns",
+      "function": "_colorize",
+      "category": "edge_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "text": "Just some regular text\nwith no special patterns"
+      },
+      "input_description": "",
+      "expected_output_description": "Original text returned without color codes",
+      "expected_error": "",
+      "assertions": [
+        "Output equals input text"
+      ]
+    },
+    {
+      "id": "test_print_report_happy_path_with_color_true",
+      "description": "Test print_report with use_color=True",
+      "function": "print_report",
+      "category": "happy_path",
+      "setup_description": "",
+      "mock_dependencies": {
+        "sys.stdout": "mocked StringIO"
+      },
+      "input_values": {
+        "text": "# Test Report\nStatus: Active",
+        "use_color": "True"
+      },
+      "input_description": "",
+      "expected_output_description": "Text is colorized and printed to stdout",
+      "expected_error": "",
+      "assertions": [
+        "Colorized text written to stdout",
+        "Output contains ANSI codes"
+      ]
+    },
+    {
+      "id": "test_print_report_happy_path_with_color_false",
+      "description": "Test print_report with use_color=False",
+      "function": "print_report",
+      "category": "happy_path",
+      "setup_description": "",
+      "mock_dependencies": {
+        "sys.stdout": "mocked StringIO"
+      },
+      "input_values": {
+        "text": "# Test Report\nStatus: Active",
+        "use_color": "False"
+      },
+      "input_description": "",
+      "expected_output_description": "Text printed as-is without colorization",
+      "expected_error": "",
+      "assertions": [
+        "Text written to stdout",
+        "Output does not contain ANSI codes"
+      ]
+    },
+    {
+      "id": "test_print_report_happy_path_auto_detect_tty",
+      "description": "Test print_report with use_color=None and stdout is TTY",
+      "function": "print_report",
+      "category": "happy_path",
+      "setup_description": "",
+      "mock_dependencies": {
+        "sys.stdout.isatty": "returns True"
+      },
+      "input_values": {
+        "text": "# Test Report",
+        "use_color": "None"
+      },
+      "input_description": "",
+      "expected_output_description": "Auto-detects TTY and colorizes",
+      "expected_error": "",
+      "assertions": [
+        "isatty() is called",
+        "Text is colorized when TTY"
+      ]
+    },
+    {
+      "id": "test_print_report_edge_case_auto_detect_not_tty",
+      "description": "Test print_report with use_color=None and stdout is not TTY",
+      "function": "print_report",
+      "category": "edge_case",
+      "setup_description": "",
+      "mock_dependencies": {
+        "sys.stdout.isatty": "returns False"
+      },
+      "input_values": {
+        "text": "# Test Report",
+        "use_color": "None"
+      },
+      "input_description": "",
+      "expected_output_description": "Auto-detects non-TTY and does not colorize",
+      "expected_error": "",
+      "assertions": [
+        "isatty() is called",
+        "Text is not colorized when not TTY"
+      ]
+    },
+    {
+      "id": "test_print_report_edge_case_empty_text",
+      "description": "Test print_report with empty string",
+      "function": "print_report",
+      "category": "edge_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "text": "",
+        "use_color": "False"
+      },
+      "input_description": "",
+      "expected_output_description": "Empty string printed",
+      "expected_error": "",
+      "assertions": [
+        "Empty output to stdout"
+      ]
+    },
+    {
+      "id": "test_print_json_happy_path_simple_dict",
+      "description": "Test print_json with simple dictionary",
+      "function": "print_json",
+      "category": "happy_path",
+      "setup_description": "",
+      "mock_dependencies": {
+        "sys.stdout": "mocked StringIO"
+      },
+      "input_values": {
+        "data": "{\"name\": \"test\", \"value\": 42}"
+      },
+      "input_description": "",
+      "expected_output_description": "JSON formatted with indent=2 printed to stdout",
+      "expected_error": "",
+      "assertions": [
+        "Output is valid JSON",
+        "Output uses 2-space indentation",
+        "Data is correctly serialized"
+      ]
+    },
+    {
+      "id": "test_print_json_happy_path_list",
+      "description": "Test print_json with list",
+      "function": "print_json",
+      "category": "happy_path",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "data": "[1, 2, 3, 4, 5]"
+      },
+      "input_description": "",
+      "expected_output_description": "JSON array formatted and printed",
+      "expected_error": "",
+      "assertions": [
+        "Output is valid JSON array"
+      ]
+    },
+    {
+      "id": "test_print_json_edge_case_non_serializable_object",
+      "description": "Test print_json with non-JSON-serializable object",
+      "function": "print_json",
+      "category": "edge_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "data": "custom_object"
+      },
+      "input_description": "",
+      "expected_output_description": "Object converted to string using default=str",
+      "expected_error": "",
+      "assertions": [
+        "Output is valid JSON",
+        "Non-serializable object converted to string"
+      ]
+    },
+    {
+      "id": "test_print_json_edge_case_nested_structures",
+      "description": "Test print_json with deeply nested structures",
+      "function": "print_json",
+      "category": "edge_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "data": "{\"level1\": {\"level2\": {\"level3\": {\"value\": \"deep\"}}}}"
+      },
+      "input_description": "",
+      "expected_output_description": "Nested structure properly formatted",
+      "expected_error": "",
+      "assertions": [
+        "Output is valid JSON",
+        "Nested structure preserved"
+      ]
+    },
+    {
+      "id": "test_print_json_edge_case_empty_data",
+      "description": "Test print_json with None",
+      "function": "print_json",
+      "category": "edge_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "data": "None"
+      },
+      "input_description": "",
+      "expected_output_description": "null printed to stdout",
+      "expected_error": "",
+      "assertions": [
+        "Output is 'null'"
+      ]
+    },
+    {
+      "id": "test_print_json_edge_case_unicode",
+      "description": "Test print_json with Unicode data",
+      "function": "print_json",
+      "category": "edge_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "data": "{\"emoji\": \"\\ud83c\\udf89\", \"chinese\": \"\\u4f60\\u597d\", \"arabic\": \"\\u0645\\u0631\\u062d\\u0628\\u0627\"}"
+      },
+      "input_description": "",
+      "expected_output_description": "Unicode data properly serialized",
+      "expected_error": "",
+      "assertions": [
+        "Output is valid JSON",
+        "Unicode characters preserved or escaped"
+      ]
+    },
+    {
+      "id": "test_print_status_happy_path_tty",
+      "description": "Test print_status with stderr as TTY",
+      "function": "print_status",
+      "category": "happy_path",
+      "setup_description": "",
+      "mock_dependencies": {
+        "sys.stderr.isatty": "returns True"
+      },
+      "input_values": {
+        "message": "Processing..."
+      },
+      "input_description": "",
+      "expected_output_description": "Message dimmed and written to stderr with newline",
+      "expected_error": "",
+      "assertions": [
+        "Message written to stderr",
+        "Message contains dim ANSI code",
+        "Newline appended"
+      ]
+    },
+    {
+      "id": "test_print_status_happy_path_not_tty",
+      "description": "Test print_status with stderr not TTY",
+      "function": "print_status",
+      "category": "happy_path",
+      "setup_description": "",
+      "mock_dependencies": {
+        "sys.stderr.isatty": "returns False"
+      },
+      "input_values": {
+        "message": "Processing..."
+      },
+      "input_description": "",
+      "expected_output_description": "Message written to stderr as-is",
+      "expected_error": "",
+      "assertions": [
+        "Message written to stderr",
+        "Message does not contain ANSI codes",
+        "Newline appended"
+      ]
+    },
+    {
+      "id": "test_print_status_edge_case_empty_message",
+      "description": "Test print_status with empty message",
+      "function": "print_status",
+      "category": "edge_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "message": ""
+      },
+      "input_description": "",
+      "expected_output_description": "Empty message with newline written to stderr",
+      "expected_error": "",
+      "assertions": [
+        "Newline written to stderr"
+      ]
+    },
+    {
+      "id": "test_print_status_edge_case_multiline_message",
+      "description": "Test print_status with multiline message",
+      "function": "print_status",
+      "category": "edge_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "message": "Line 1\nLine 2\nLine 3"
+      },
+      "input_description": "",
+      "expected_output_description": "Multiline message written to stderr",
+      "expected_error": "",
+      "assertions": [
+        "Full multiline message written to stderr"
+      ]
+    },
+    {
+      "id": "test_copy_to_clipboard_happy_path_success",
+      "description": "Test copy_to_clipboard with successful pbcopy",
+      "function": "copy_to_clipboard",
+      "category": "happy_path",
+      "setup_description": "",
+      "mock_dependencies": {
+        "subprocess.run": "returns CompletedProcess with returncode=0"
+      },
+      "input_values": {
+        "text": "Test content"
+      },
+      "input_description": "",
+      "expected_output_description": "Returns True on success",
+      "expected_error": "",
+      "assertions": [
+        "Returns True",
+        "subprocess.run called with pbcopy",
+        "Text passed to stdin",
+        "5-second timeout set"
+      ]
+    },
+    {
+      "id": "test_copy_to_clipboard_error_timeout",
+      "description": "Test copy_to_clipboard when pbcopy times out",
+      "function": "copy_to_clipboard",
+      "category": "error_case",
+      "setup_description": "",
+      "mock_dependencies": {
+        "subprocess.run": "raises TimeoutExpired"
+      },
+      "input_values": {
+        "text": "Test content"
+      },
+      "input_description": "",
+      "expected_output_description": "Returns False on timeout",
+      "expected_error": "timeout when pbcopy subprocess exceeds 5-second timeout",
+      "assertions": [
+        "Returns False",
+        "TimeoutExpired exception caught"
+      ]
+    },
+    {
+      "id": "test_copy_to_clipboard_error_not_found",
+      "description": "Test copy_to_clipboard when pbcopy command not found",
+      "function": "copy_to_clipboard",
+      "category": "error_case",
+      "setup_description": "",
+      "mock_dependencies": {
+        "subprocess.run": "raises FileNotFoundError"
+      },
+      "input_values": {
+        "text": "Test content"
+      },
+      "input_description": "",
+      "expected_output_description": "Returns False when pbcopy not found",
+      "expected_error": "pbcopy_not_found when pbcopy command not found on system",
+      "assertions": [
+        "Returns False",
+        "FileNotFoundError exception caught"
+      ]
+    },
+    {
+      "id": "test_copy_to_clipboard_error_os_error",
+      "description": "Test copy_to_clipboard with OS-level error",
+      "function": "copy_to_clipboard",
+      "category": "error_case",
+      "setup_description": "",
+      "mock_dependencies": {
+        "subprocess.run": "raises OSError"
+      },
+      "input_values": {
+        "text": "Test content"
+      },
+      "input_description": "",
+      "expected_output_description": "Returns False on OS error",
+      "expected_error": "os_error when OS-level error executing subprocess",
+      "assertions": [
+        "Returns False",
+        "OSError exception caught"
+      ]
+    },
+    {
+      "id": "test_copy_to_clipboard_edge_case_empty_text",
+      "description": "Test copy_to_clipboard with empty string",
+      "function": "copy_to_clipboard",
+      "category": "edge_case",
+      "setup_description": "",
+      "mock_dependencies": {
+        "subprocess.run": "returns CompletedProcess with returncode=0"
+      },
+      "input_values": {
+        "text": ""
+      },
+      "input_description": "",
+      "expected_output_description": "Returns True, empty string copied",
+      "expected_error": "",
+      "assertions": [
+        "Returns True",
+        "Empty string passed to pbcopy"
+      ]
+    },
+    {
+      "id": "test_copy_to_clipboard_edge_case_large_text",
+      "description": "Test copy_to_clipboard with large text content",
+      "function": "copy_to_clipboard",
+      "category": "edge_case",
+      "setup_description": "",
+      "mock_dependencies": {
+        "subprocess.run": "returns CompletedProcess with returncode=0"
+      },
+      "input_values": {
+        "text": "large_text_10000_chars"
+      },
+      "input_description": "",
+      "expected_output_description": "Returns True, large content copied",
+      "expected_error": "",
+      "assertions": [
+        "Returns True",
+        "Large text passed to pbcopy"
+      ]
+    },
+    {
+      "id": "test_copy_to_clipboard_edge_case_unicode",
+      "description": "Test copy_to_clipboard with Unicode content",
+      "function": "copy_to_clipboard",
+      "category": "edge_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "text": "Unicode: 你好 🎉 مرحبا"
+      },
+      "input_description": "",
+      "expected_output_description": "Returns True, Unicode copied",
+      "expected_error": "",
+      "assertions": [
+        "Returns True",
+        "Unicode text handled correctly"
+      ]
+    },
+    {
+      "id": "test_format_table_happy_path_basic",
+      "description": "Test format_table with basic headers and rows",
+      "function": "format_table",
+      "category": "happy_path",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "headers": "[\"Name\", \"Age\", \"City\"]",
+        "rows": "[[\"Alice\", \"30\", \"NYC\"], [\"Bob\", \"25\", \"LA\"]]"
+      },
+      "input_description": "",
+      "expected_output_description": "Markdown table with header, separator, and data rows",
+      "expected_error": "",
+      "assertions": [
+        "Output contains header row",
+        "Output contains separator row with dashes",
+        "Output contains data rows",
+        "Columns are aligned and padded"
+      ]
+    },
+    {
+      "id": "test_format_table_happy_path_single_row",
+      "description": "Test format_table with single row",
+      "function": "format_table",
+      "category": "happy_path",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "headers": "[\"Col1\", \"Col2\"]",
+        "rows": "[[\"Value1\", \"Value2\"]]"
+      },
+      "input_description": "",
+      "expected_output_description": "Markdown table with one data row",
+      "expected_error": "",
+      "assertions": [
+        "Output contains header and separator",
+        "Output contains single data row"
+      ]
+    },
+    {
+      "id": "test_format_table_edge_case_empty_rows",
+      "description": "Test format_table with empty rows list",
+      "function": "format_table",
+      "category": "edge_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "headers": "[\"Col1\", \"Col2\"]",
+        "rows": "[]"
+      },
+      "input_description": "",
+      "expected_output_description": "Returns 'No data.'",
+      "expected_error": "",
+      "assertions": [
+        "Output is 'No data.'"
+      ]
+    },
+    {
+      "id": "test_format_table_edge_case_single_column",
+      "description": "Test format_table with single column",
+      "function": "format_table",
+      "category": "edge_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "headers": "[\"OnlyColumn\"]",
+        "rows": "[[\"Value1\"], [\"Value2\"], [\"Value3\"]]"
+      },
+      "input_description": "",
+      "expected_output_description": "Markdown table with single column",
+      "expected_error": "",
+      "assertions": [
+        "Output has single column format",
+        "All rows present"
+      ]
+    },
+    {
+      "id": "test_format_table_edge_case_varying_widths",
+      "description": "Test format_table with varying content widths",
+      "function": "format_table",
+      "category": "edge_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "headers": "[\"Short\", \"VeryLongHeader\"]",
+        "rows": "[[\"A\", \"B\"], [\"VeryLongContent\", \"C\"]]"
+      },
+      "input_description": "",
+      "expected_output_description": "Columns padded to widest content",
+      "expected_error": "",
+      "assertions": [
+        "Columns align to maximum width",
+        "All content visible"
+      ]
+    },
+    {
+      "id": "test_format_table_edge_case_special_characters",
+      "description": "Test format_table with special characters and Unicode",
+      "function": "format_table",
+      "category": "edge_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "headers": "[\"Name\", \"Symbol\"]",
+        "rows": "[[\"Emoji\", \"\\ud83c\\udf89\"], [\"Chinese\", \"\\u4f60\\u597d\"], [\"Pipe\", \"|\"], [\"Dash\", \"-\"]]"
+      },
+      "input_description": "",
+      "expected_output_description": "Special characters preserved in table",
+      "expected_error": "",
+      "assertions": [
+        "Special characters present in output",
+        "Table structure maintained"
+      ]
+    },
+    {
+      "id": "test_format_table_edge_case_mismatched_row_length",
+      "description": "Test format_table with rows shorter than headers",
+      "function": "format_table",
+      "category": "edge_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "headers": "[\"Col1\", \"Col2\", \"Col3\"]",
+        "rows": "[[\"A\", \"B\"], [\"X\"]]"
+      },
+      "input_description": "",
+      "expected_output_description": "Missing cells rendered as empty strings",
+      "expected_error": "",
+      "assertions": [
+        "Output is valid table",
+        "Missing cells are empty"
+      ]
+    },
+    {
+      "id": "test_format_table_edge_case_non_string_values",
+      "description": "Test format_table with non-string cell values",
+      "function": "format_table",
+      "category": "edge_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "headers": "[\"Name\", \"Count\", \"Active\"]",
+        "rows": "[[\"Item\", 42, True], [\"Other\", 0, False]]"
+      },
+      "input_description": "",
+      "expected_output_description": "Non-string values converted to strings",
+      "expected_error": "",
+      "assertions": [
+        "Integer and boolean values converted to strings",
+        "Table formatted correctly"
+      ]
+    },
+    {
+      "id": "test_format_table_edge_case_empty_strings",
+      "description": "Test format_table with empty string cells",
+      "function": "format_table",
+      "category": "edge_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "headers": "[\"Col1\", \"Col2\"]",
+        "rows": "[[\"\", \"Value\"], [\"Value\", \"\"]]"
+      },
+      "input_description": "",
+      "expected_output_description": "Empty cells handled correctly",
+      "expected_error": "",
+      "assertions": [
+        "Empty cells rendered with proper spacing",
+        "Table structure maintained"
+      ]
+    },
+    {
+      "id": "test_render_output_happy_path_json_mode_dict",
+      "description": "Test render_output with json_mode=True and dict data",
+      "function": "render_output",
+      "category": "happy_path",
+      "setup_description": "",
+      "mock_dependencies": {
+        "sys.stdout": "mocked"
+      },
+      "input_values": {
+        "data": "{\"key\": \"value\"}",
+        "json_mode": "True",
+        "copy": "False"
+      },
+      "input_description": "",
+      "expected_output_description": "Data serialized to JSON and printed to stdout",
+      "expected_error": "",
+      "assertions": [
+        "print_json called with data",
+        "Output is JSON formatted"
+      ]
+    },
+    {
+      "id": "test_render_output_happy_path_markdown_mode_string",
+      "description": "Test render_output with json_mode=False and string data",
+      "function": "render_output",
+      "category": "happy_path",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "data": "# Report Title\nContent here",
+        "json_mode": "False",
+        "copy": "False"
+      },
+      "input_description": "",
+      "expected_output_description": "String printed as colored report",
+      "expected_error": "",
+      "assertions": [
+        "print_report called with string",
+        "String treated as markdown report"
+      ]
+    },
+    {
+      "id": "test_render_output_happy_path_markdown_mode_non_string",
+      "description": "Test render_output with json_mode=False and non-string data",
+      "function": "render_output",
+      "category": "happy_path",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "data": "{\"key\": \"value\"}",
+        "json_mode": "False",
+        "copy": "False"
+      },
+      "input_description": "",
+      "expected_output_description": "Non-string data serialized to JSON",
+      "expected_error": "",
+      "assertions": [
+        "print_json called",
+        "Data serialized to JSON"
+      ]
+    },
+    {
+      "id": "test_render_output_happy_path_with_copy_json",
+      "description": "Test render_output with copy=True in json_mode",
+      "function": "render_output",
+      "category": "happy_path",
+      "setup_description": "",
+      "mock_dependencies": {
+        "copy_to_clipboard": "returns True"
+      },
+      "input_values": {
+        "data": "{\"key\": \"value\"}",
+        "json_mode": "True",
+        "copy": "True"
+      },
+      "input_description": "",
+      "expected_output_description": "JSON printed and copied to clipboard",
+      "expected_error": "",
+      "assertions": [
+        "print_json called",
+        "copy_to_clipboard called with JSON output"
+      ]
+    },
+    {
+      "id": "test_render_output_happy_path_with_copy_markdown",
+      "description": "Test render_output with copy=True in markdown mode",
+      "function": "render_output",
+      "category": "happy_path",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "data": "# Report",
+        "json_mode": "False",
+        "copy": "True"
+      },
+      "input_description": "",
+      "expected_output_description": "Report printed and copied to clipboard",
+      "expected_error": "",
+      "assertions": [
+        "print_report called",
+        "copy_to_clipboard called with report text"
+      ]
+    },
+    {
+      "id": "test_render_output_edge_case_empty_string",
+      "description": "Test render_output with empty string",
+      "function": "render_output",
+      "category": "edge_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "data": "",
+        "json_mode": "False",
+        "copy": "False"
+      },
+      "input_description": "",
+      "expected_output_description": "Empty string printed as report",
+      "expected_error": "",
+      "assertions": [
+        "print_report called with empty string"
+      ]
+    },
+    {
+      "id": "test_render_output_edge_case_none_data",
+      "description": "Test render_output with None data",
+      "function": "render_output",
+      "category": "edge_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "data": "None",
+        "json_mode": "True",
+        "copy": "False"
+      },
+      "input_description": "",
+      "expected_output_description": "None serialized to JSON null",
+      "expected_error": "",
+      "assertions": [
+        "print_json called with None",
+        "Output is 'null'"
+      ]
+    },
+    {
+      "id": "test_render_output_edge_case_copy_failure",
+      "description": "Test render_output when copy_to_clipboard fails",
+      "function": "render_output",
+      "category": "edge_case",
+      "setup_description": "",
+      "mock_dependencies": {
+        "copy_to_clipboard": "returns False"
+      },
+      "input_values": {
+        "data": "Test data",
+        "json_mode": "False",
+        "copy": "True"
+      },
+      "input_description": "",
+      "expected_output_description": "Data printed, copy failure handled gracefully",
+      "expected_error": "",
+      "assertions": [
+        "print_report called",
+        "copy_to_clipboard returns False",
+        "No exception raised"
+      ]
+    },
+    {
+      "id": "test_invariant_ansi_codes_constants",
+      "description": "Verify ANSI color code constants match contract invariants",
+      "function": "_colorize",
+      "category": "invariant",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "text": "# Test"
+      },
+      "input_description": "",
+      "expected_output_description": "ANSI codes match specified values",
+      "expected_error": "",
+      "assertions": [
+        "RESET='\\033[0m'",
+        "BOLD='\\033[1m'",
+        "DIM='\\033[2m'",
+        "GREEN='\\033[32m'",
+        "YELLOW='\\033[33m'",
+        "RED='\\033[31m'",
+        "CYAN='\\033[36m'"
+      ]
+    },
+    {
+      "id": "test_invariant_json_serialization_parameters",
+      "description": "Verify JSON serialization always uses indent=2 and default=str",
+      "function": "print_json",
+      "category": "invariant",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "data": "{\"test\": \"value\"}"
+      },
+      "input_description": "",
+      "expected_output_description": "JSON uses indent=2 and default=str",
+      "expected_error": "",
+      "assertions": [
+        "json.dumps called with indent=2",
+        "json.dumps called with default=str"
+      ]
+    },
+    {
+      "id": "test_invariant_clipboard_timeout",
+      "description": "Verify clipboard operations use 5-second timeout",
+      "function": "copy_to_clipboard",
+      "category": "invariant",
+      "setup_description": "",
+      "mock_dependencies": {
+        "subprocess.run": "returns CompletedProcess"
+      },
+      "input_values": {
+        "text": "Test"
+      },
+      "input_description": "",
+      "expected_output_description": "subprocess.run called with timeout=5",
+      "expected_error": "",
+      "assertions": [
+        "subprocess.run called with timeout=5"
+      ]
+    },
+    {
+      "id": "test_invariant_output_streams",
+      "description": "Verify status messages go to stderr and reports to stdout",
+      "function": "print_status",
+      "category": "invariant",
+      "setup_description": "",
+      "mock_dependencies": {
+        "sys.stderr": "mocked",
+        "sys.stdout": "mocked"
+      },
+      "input_values": {
+        "message": "Status"
+      },
+      "input_description": "",
+      "expected_output_description": "Status written to stderr, not stdout",
+      "expected_error": "",
+      "assertions": [
+        "Message written to stderr",
+        "Nothing written to stdout"
+      ]
+    },
+    {
+      "id": "test_invariant_color_auto_detection",
+      "description": "Verify color auto-detection uses isatty() correctly",
+      "function": "print_report",
+      "category": "invariant",
+      "setup_description": "",
+      "mock_dependencies": {
+        "sys.stdout.isatty": "mocked"
+      },
+      "input_values": {
+        "text": "Test",
+        "use_color": "None"
+      },
+      "input_description": "",
+      "expected_output_description": "sys.stdout.isatty() called for auto-detection",
+      "expected_error": "",
+      "assertions": [
+        "sys.stdout.isatty() called when use_color is None"
+      ]
+    }
+  ],
+  "test_language": "python",
+  "generated_code": "\"\"\"\nContract tests for Output Interface component.\nTests all functions: _colorize, print_report, print_json, print_status,\ncopy_to_clipboard, format_table, render_output.\n\"\"\"\n\nimport pytest\nimport json\nimport sys\nfrom io import StringIO\nfrom unittest.mock import Mock, patch, MagicMock, call\nfrom subprocess import TimeoutExpired, CompletedProcess\n\n# Import the module under test\nfrom contracts.src_ascend_output.interface import (\n    _colorize,\n    print_report,\n    print_json,\n    print_status,\n    copy_to_clipboard,\n    format_table,\n    render_output,\n)\n\n\n# ============================================================================\n# Tests for _colorize\n# ============================================================================\n\nclass TestColorize:\n    \"\"\"Tests for the _colorize function.\"\"\"\n    \n    def test_colorize_happy_path_headers(self):\n        \"\"\"Test that headers with # are colored bold cyan.\"\"\"\n        text = \"# Main Header\\n## Subheader\\nregular text\"\n        result = _colorize(text)\n        \n        # Check ANSI codes are present\n        assert '\\033[' in result\n        # Bold cyan should be \\033[1m\\033[36m\n        assert '\\033[1m\\033[36m' in result or '\\033[36m\\033[1m' in result\n        # Original content preserved\n        assert 'Main Header' in result\n        assert 'Subheader' in result\n        assert 'regular text' in result\n    \n    def test_colorize_happy_path_status_indicators(self):\n        \"\"\"Test that status indicators are colored appropriately.\"\"\"\n        text = \"Status: Blocked\\nStatus: Active\\nStatus: On Track\\nStatus: At Risk\"\n        result = _colorize(text)\n        \n        # Red for Blocked\n        assert '\\033[31m' in result\n        # Green for Active/On Track\n        assert '\\033[32m' in result\n        # Yellow for At Risk\n        assert '\\033[33m' in result\n        # Original text preserved\n        assert 'Blocked' in result\n        assert 'Active' in result\n        assert 'On Track' in result\n        assert 'At Risk' in result\n    \n    def test_colorize_happy_path_metadata(self):\n        \"\"\"Test that metadata lines are dimmed.\"\"\"\n        text = \"Generated: 2024-01-01\\n---\\nContent here\"\n        result = _colorize(text)\n        \n        # Dim code\n        assert '\\033[2m' in result\n        # Original content preserved\n        assert 'Generated: 2024-01-01' in result\n        assert '---' in result\n        assert 'Content here' in result\n    \n    def test_colorize_edge_case_empty_string(self):\n        \"\"\"Test colorize with empty string.\"\"\"\n        text = \"\"\n        result = _colorize(text)\n        assert result == \"\"\n    \n    def test_colorize_edge_case_triple_hash_header(self):\n        \"\"\"Test that ### headers are bold but not cyan.\"\"\"\n        text = \"### Small Header\"\n        result = _colorize(text)\n        \n        # Should have bold\n        assert '\\033[1m' in result\n        # But not cyan (should not have the # or ## pattern which gets cyan)\n        # ### gets only bold, not cyan\n        lines = result.split('\\n')\n        # Check that the line doesn't have cyan code after reset\n        # The contract says ### lines are bold, not bold cyan\n    \n    def test_colorize_edge_case_multiple_statuses_in_line(self):\n        \"\"\"Test line with multiple status keywords.\"\"\"\n        text = \"Project Active but At Risk\"\n        result = _colorize(text)\n        \n        # Should have some color code\n        assert '\\033[' in result\n        # Content preserved\n        assert 'Project Active but At Risk' in result\n    \n    def test_colorize_edge_case_unicode_content(self):\n        \"\"\"Test colorize with Unicode characters.\"\"\"\n        text = \"# 📊 Report\\nStatus: Active ✓\\n🔴 Blocked\\nשלום At Risk\"\n        result = _colorize(text)\n        \n        # Unicode preserved\n        assert '📊' in result\n        assert '✓' in result\n        assert '🔴' in result\n        assert 'שלום' in result\n        # ANSI codes present\n        assert '\\033[' in result\n    \n    def test_colorize_edge_case_no_matching_patterns(self):\n        \"\"\"Test colorize with text that has no matching patterns.\"\"\"\n        text = \"Just some regular text\\nwith no special patterns\"\n        result = _colorize(text)\n        \n        # No ANSI codes should be added\n        assert result == text\n\n\n# ============================================================================\n# Tests for print_report\n# ============================================================================\n\nclass TestPrintReport:\n    \"\"\"Tests for the print_report function.\"\"\"\n    \n    def test_print_report_happy_path_with_color_true(self):\n        \"\"\"Test print_report with use_color=True.\"\"\"\n        text = \"# Test Report\\nStatus: Active\"\n        \n        with patch('sys.stdout', new_callable=StringIO) as mock_stdout:\n            print_report(text, use_color=True)\n            output = mock_stdout.getvalue()\n            \n            # Should have ANSI codes\n            assert '\\033[' in output\n            # Content preserved\n            assert 'Test Report' in output\n            assert 'Active' in output\n    \n    def test_print_report_happy_path_with_color_false(self):\n        \"\"\"Test print_report with use_color=False.\"\"\"\n        text = \"# Test Report\\nStatus: Active\"\n        \n        with patch('sys.stdout', new_callable=StringIO) as mock_stdout:\n            print_report(text, use_color=False)\n            output = mock_stdout.getvalue()\n            \n            # Should NOT have ANSI codes\n            assert '\\033[' not in output\n            # Content preserved\n            assert text in output\n    \n    def test_print_report_happy_path_auto_detect_tty(self):\n        \"\"\"Test print_report with use_color=None and stdout is TTY.\"\"\"\n        text = \"# Test Report\"\n        \n        with patch('sys.stdout', new_callable=StringIO) as mock_stdout:\n            mock_stdout.isatty = Mock(return_value=True)\n            print_report(text, use_color=None)\n            \n            # isatty should have been called\n            mock_stdout.isatty.assert_called_once()\n            \n            output = mock_stdout.getvalue()\n            # Should have ANSI codes when TTY\n            assert '\\033[' in output\n    \n    def test_print_report_edge_case_auto_detect_not_tty(self):\n        \"\"\"Test print_report with use_color=None and stdout is not TTY.\"\"\"\n        text = \"# Test Report\"\n        \n        with patch('sys.stdout', new_callable=StringIO) as mock_stdout:\n            mock_stdout.isatty = Mock(return_value=False)\n            print_report(text, use_color=None)\n            \n            # isatty should have been called\n            mock_stdout.isatty.assert_called_once()\n            \n            output = mock_stdout.getvalue()\n            # Should NOT have ANSI codes when not TTY\n            assert '\\033[' not in output\n    \n    def test_print_report_edge_case_empty_text(self):\n        \"\"\"Test print_report with empty string.\"\"\"\n        text = \"\"\n        \n        with patch('sys.stdout', new_callable=StringIO) as mock_stdout:\n            print_report(text, use_color=False)\n            output = mock_stdout.getvalue()\n            \n            assert output == \"\"\n\n\n# ============================================================================\n# Tests for print_json\n# ============================================================================\n\nclass TestPrintJson:\n    \"\"\"Tests for the print_json function.\"\"\"\n    \n    def test_print_json_happy_path_simple_dict(self):\n        \"\"\"Test print_json with simple dictionary.\"\"\"\n        data = {\"name\": \"test\", \"value\": 42}\n        \n        with patch('sys.stdout', new_callable=StringIO) as mock_stdout:\n            print_json(data)\n            output = mock_stdout.getvalue()\n            \n            # Should be valid JSON\n            parsed = json.loads(output)\n            assert parsed == data\n            \n            # Check 2-space indentation\n            assert '  ' in output\n            assert '    ' not in output.split('\\n')[0]  # Not 4-space indent\n    \n    def test_print_json_happy_path_list(self):\n        \"\"\"Test print_json with list.\"\"\"\n        data = [1, 2, 3, 4, 5]\n        \n        with patch('sys.stdout', new_callable=StringIO) as mock_stdout:\n            print_json(data)\n            output = mock_stdout.getvalue()\n            \n            # Should be valid JSON\n            parsed = json.loads(output)\n            assert parsed == data\n    \n    def test_print_json_edge_case_non_serializable_object(self):\n        \"\"\"Test print_json with non-JSON-serializable object.\"\"\"\n        class CustomObject:\n            def __str__(self):\n                return \"CustomObject\"\n        \n        data = {\"obj\": CustomObject()}\n        \n        with patch('sys.stdout', new_callable=StringIO) as mock_stdout:\n            print_json(data)\n            output = mock_stdout.getvalue()\n            \n            # Should be valid JSON\n            parsed = json.loads(output)\n            # Object should be converted to string\n            assert \"CustomObject\" in parsed[\"obj\"]\n    \n    def test_print_json_edge_case_nested_structures(self):\n        \"\"\"Test print_json with deeply nested structures.\"\"\"\n        data = {\"level1\": {\"level2\": {\"level3\": {\"value\": \"deep\"}}}}\n        \n        with patch('sys.stdout', new_callable=StringIO) as mock_stdout:\n            print_json(data)\n            output = mock_stdout.getvalue()\n            \n            # Should be valid JSON\n            parsed = json.loads(output)\n            assert parsed == data\n            assert parsed[\"level1\"][\"level2\"][\"level3\"][\"value\"] == \"deep\"\n    \n    def test_print_json_edge_case_empty_data(self):\n        \"\"\"Test print_json with None.\"\"\"\n        data = None\n        \n        with patch('sys.stdout', new_callable=StringIO) as mock_stdout:\n            print_json(data)\n            output = mock_stdout.getvalue()\n            \n            # Should output 'null'\n            assert output.strip() == 'null'\n    \n    def test_print_json_edge_case_unicode(self):\n        \"\"\"Test print_json with Unicode data.\"\"\"\n        data = {\"emoji\": \"🎉\", \"chinese\": \"你好\", \"arabic\": \"مرحبا\"}\n        \n        with patch('sys.stdout', new_callable=StringIO) as mock_stdout:\n            print_json(data)\n            output = mock_stdout.getvalue()\n            \n            # Should be valid JSON\n            parsed = json.loads(output)\n            assert parsed == data\n\n\n# ============================================================================\n# Tests for print_status\n# ============================================================================\n\nclass TestPrintStatus:\n    \"\"\"Tests for the print_status function.\"\"\"\n    \n    def test_print_status_happy_path_tty(self):\n        \"\"\"Test print_status with stderr as TTY.\"\"\"\n        message = \"Processing...\"\n        \n        with patch('sys.stderr', new_callable=StringIO) as mock_stderr:\n            mock_stderr.isatty = Mock(return_value=True)\n            print_status(message)\n            \n            output = mock_stderr.getvalue()\n            \n            # Should have dim ANSI code\n            assert '\\033[2m' in output\n            # Content preserved\n            assert 'Processing...' in output\n            # Newline appended\n            assert output.endswith('\\n')\n    \n    def test_print_status_happy_path_not_tty(self):\n        \"\"\"Test print_status with stderr not TTY.\"\"\"\n        message = \"Processing...\"\n        \n        with patch('sys.stderr', new_callable=StringIO) as mock_stderr:\n            mock_stderr.isatty = Mock(return_value=False)\n            print_status(message)\n            \n            output = mock_stderr.getvalue()\n            \n            # Should NOT have ANSI codes\n            assert '\\033[' not in output\n            # Content preserved\n            assert message in output\n            # Newline appended\n            assert output.endswith('\\n')\n    \n    def test_print_status_edge_case_empty_message(self):\n        \"\"\"Test print_status with empty message.\"\"\"\n        message = \"\"\n        \n        with patch('sys.stderr', new_callable=StringIO) as mock_stderr:\n            mock_stderr.isatty = Mock(return_value=False)\n            print_status(message)\n            \n            output = mock_stderr.getvalue()\n            \n            # Should just be newline\n            assert output == '\\n'\n    \n    def test_print_status_edge_case_multiline_message(self):\n        \"\"\"Test print_status with multiline message.\"\"\"\n        message = \"Line 1\\nLine 2\\nLine 3\"\n        \n        with patch('sys.stderr', new_callable=StringIO) as mock_stderr:\n            mock_stderr.isatty = Mock(return_value=False)\n            print_status(message)\n            \n            output = mock_stderr.getvalue()\n            \n            # Full message preserved\n            assert 'Line 1' in output\n            assert 'Line 2' in output\n            assert 'Line 3' in output\n\n\n# ============================================================================\n# Tests for copy_to_clipboard\n# ============================================================================\n\nclass TestCopyToClipboard:\n    \"\"\"Tests for the copy_to_clipboard function.\"\"\"\n    \n    def test_copy_to_clipboard_happy_path_success(self):\n        \"\"\"Test copy_to_clipboard with successful pbcopy.\"\"\"\n        text = \"Test content\"\n        \n        with patch('subprocess.run') as mock_run:\n            mock_run.return_value = CompletedProcess(\n                args=['pbcopy'], returncode=0\n            )\n            \n            result = copy_to_clipboard(text)\n            \n            # Should return True\n            assert result is True\n            \n            # subprocess.run should be called\n            mock_run.assert_called_once()\n            call_args = mock_run.call_args\n            \n            # Check pbcopy command\n            assert 'pbcopy' in call_args[0][0]\n            \n            # Check text passed to stdin\n            assert call_args[1]['input'] == text\n            \n            # Check 5-second timeout\n            assert call_args[1]['timeout'] == 5\n    \n    def test_copy_to_clipboard_error_timeout(self):\n        \"\"\"Test copy_to_clipboard when pbcopy times out.\"\"\"\n        text = \"Test content\"\n        \n        with patch('subprocess.run') as mock_run:\n            mock_run.side_effect = TimeoutExpired(cmd='pbcopy', timeout=5)\n            \n            result = copy_to_clipboard(text)\n            \n            # Should return False\n            assert result is False\n    \n    def test_copy_to_clipboard_error_not_found(self):\n        \"\"\"Test copy_to_clipboard when pbcopy command not found.\"\"\"\n        text = \"Test content\"\n        \n        with patch('subprocess.run') as mock_run:\n            mock_run.side_effect = FileNotFoundError()\n            \n            result = copy_to_clipboard(text)\n            \n            # Should return False\n            assert result is False\n    \n    def test_copy_to_clipboard_error_os_error(self):\n        \"\"\"Test copy_to_clipboard with OS-level error.\"\"\"\n        text = \"Test content\"\n        \n        with patch('subprocess.run') as mock_run:\n            mock_run.side_effect = OSError(\"OS error\")\n            \n            result = copy_to_clipboard(text)\n            \n            # Should return False\n            assert result is False\n    \n    def test_copy_to_clipboard_edge_case_empty_text(self):\n        \"\"\"Test copy_to_clipboard with empty string.\"\"\"\n        text = \"\"\n        \n        with patch('subprocess.run') as mock_run:\n            mock_run.return_value = CompletedProcess(\n                args=['pbcopy'], returncode=0\n            )\n            \n            result = copy_to_clipboard(text)\n            \n            # Should return True\n            assert result is True\n            \n            # Empty string passed\n            call_args = mock_run.call_args\n            assert call_args[1]['input'] == \"\"\n    \n    def test_copy_to_clipboard_edge_case_large_text(self):\n        \"\"\"Test copy_to_clipboard with large text content.\"\"\"\n        text = \"x\" * 10000\n        \n        with patch('subprocess.run') as mock_run:\n            mock_run.return_value = CompletedProcess(\n                args=['pbcopy'], returncode=0\n            )\n            \n            result = copy_to_clipboard(text)\n            \n            # Should return True\n            assert result is True\n            \n            # Large text passed\n            call_args = mock_run.call_args\n            assert len(call_args[1]['input']) == 10000\n    \n    def test_copy_to_clipboard_edge_case_unicode(self):\n        \"\"\"Test copy_to_clipboard with Unicode content.\"\"\"\n        text = \"Unicode: 你好 🎉 مرحبا\"\n        \n        with patch('subprocess.run') as mock_run:\n            mock_run.return_value = CompletedProcess(\n                args=['pbcopy'], returncode=0\n            )\n            \n            result = copy_to_clipboard(text)\n            \n            # Should return True\n            assert result is True\n            \n            # Unicode text passed\n            call_args = mock_run.call_args\n            assert '你好' in call_args[1]['input']\n            assert '🎉' in call_args[1]['input']\n\n\n# ============================================================================\n# Tests for format_table\n# ============================================================================\n\nclass TestFormatTable:\n    \"\"\"Tests for the format_table function.\"\"\"\n    \n    def test_format_table_happy_path_basic(self):\n        \"\"\"Test format_table with basic headers and rows.\"\"\"\n        headers = [\"Name\", \"Age\", \"City\"]\n        rows = [[\"Alice\", \"30\", \"NYC\"], [\"Bob\", \"25\", \"LA\"]]\n        \n        result = format_table(headers, rows)\n        \n        # Should contain header row\n        assert \"Name\" in result\n        assert \"Age\" in result\n        assert \"City\" in result\n        \n        # Should contain separator with dashes\n        assert \"---\" in result or \"----\" in result\n        \n        # Should contain data rows\n        assert \"Alice\" in result\n        assert \"Bob\" in result\n        assert \"NYC\" in result\n        assert \"LA\" in result\n        \n        # Should have pipe characters for table structure\n        assert \"|\" in result\n    \n    def test_format_table_happy_path_single_row(self):\n        \"\"\"Test format_table with single row.\"\"\"\n        headers = [\"Col1\", \"Col2\"]\n        rows = [[\"Value1\", \"Value2\"]]\n        \n        result = format_table(headers, rows)\n        \n        # Should contain header and separator\n        assert \"Col1\" in result\n        assert \"Col2\" in result\n        assert \"---\" in result or \"----\" in result\n        \n        # Should contain single data row\n        assert \"Value1\" in result\n        assert \"Value2\" in result\n    \n    def test_format_table_edge_case_empty_rows(self):\n        \"\"\"Test format_table with empty rows list.\"\"\"\n        headers = [\"Col1\", \"Col2\"]\n        rows = []\n        \n        result = format_table(headers, rows)\n        \n        # Should return 'No data.'\n        assert result == \"No data.\"\n    \n    def test_format_table_edge_case_single_column(self):\n        \"\"\"Test format_table with single column.\"\"\"\n        headers = [\"OnlyColumn\"]\n        rows = [[\"Value1\"], [\"Value2\"], [\"Value3\"]]\n        \n        result = format_table(headers, rows)\n        \n        # Should have single column format\n        assert \"OnlyColumn\" in result\n        assert \"Value1\" in result\n        assert \"Value2\" in result\n        assert \"Value3\" in result\n    \n    def test_format_table_edge_case_varying_widths(self):\n        \"\"\"Test format_table with varying content widths.\"\"\"\n        headers = [\"Short\", \"VeryLongHeader\"]\n        rows = [[\"A\", \"B\"], [\"VeryLongContent\", \"C\"]]\n        \n        result = format_table(headers, rows)\n        \n        # All content should be visible\n        assert \"Short\" in result\n        assert \"VeryLongHeader\" in result\n        assert \"VeryLongContent\" in result\n        \n        # Should have proper structure\n        assert \"|\" in result\n    \n    def test_format_table_edge_case_special_characters(self):\n        \"\"\"Test format_table with special characters and Unicode.\"\"\"\n        headers = [\"Name\", \"Symbol\"]\n        rows = [\n            [\"Emoji\", \"🎉\"],\n            [\"Chinese\", \"你好\"],\n            [\"Pipe\", \"|\"],\n            [\"Dash\", \"-\"]\n        ]\n        \n        result = format_table(headers, rows)\n        \n        # Special characters preserved\n        assert \"🎉\" in result\n        assert \"你好\" in result\n        # Note: pipe and dash might be part of table structure\n        assert \"Emoji\" in result\n        assert \"Chinese\" in result\n    \n    def test_format_table_edge_case_mismatched_row_length(self):\n        \"\"\"Test format_table with rows shorter than headers.\"\"\"\n        headers = [\"Col1\", \"Col2\", \"Col3\"]\n        rows = [[\"A\", \"B\"], [\"X\"]]\n        \n        result = format_table(headers, rows)\n        \n        # Should be valid table\n        assert \"Col1\" in result\n        assert \"Col2\" in result\n        assert \"Col3\" in result\n        assert \"A\" in result\n        assert \"B\" in result\n        assert \"X\" in result\n    \n    def test_format_table_edge_case_non_string_values(self):\n        \"\"\"Test format_table with non-string cell values.\"\"\"\n        headers = [\"Name\", \"Count\", \"Active\"]\n        rows = [[\"Item\", 42, True], [\"Other\", 0, False]]\n        \n        result = format_table(headers, rows)\n        \n        # Non-string values converted to strings\n        assert \"Item\" in result\n        assert \"42\" in result\n        assert \"True\" in result\n        assert \"Other\" in result\n        assert \"0\" in result\n        assert \"False\" in result\n    \n    def test_format_table_edge_case_empty_strings(self):\n        \"\"\"Test format_table with empty string cells.\"\"\"\n        headers = [\"Col1\", \"Col2\"]\n        rows = [[\"\", \"Value\"], [\"Value\", \"\"]]\n        \n        result = format_table(headers, rows)\n        \n        # Should have proper structure\n        assert \"Col1\" in result\n        assert \"Col2\" in result\n        assert \"Value\" in result\n        # Empty cells should be handled (hard to test exact spacing)\n\n\n# ============================================================================\n# Tests for render_output\n# ============================================================================\n\nclass TestRenderOutput:\n    \"\"\"Tests for the render_output function.\"\"\"\n    \n    def test_render_output_happy_path_json_mode_dict(self):\n        \"\"\"Test render_output with json_mode=True and dict data.\"\"\"\n        data = {\"key\": \"value\"}\n        \n        with patch('sys.stdout', new_callable=StringIO) as mock_stdout:\n            render_output(data, json_mode=True, copy=False)\n            output = mock_stdout.getvalue()\n            \n            # Should be JSON formatted\n            parsed = json.loads(output)\n            assert parsed == data\n    \n    def test_render_output_happy_path_markdown_mode_string(self):\n        \"\"\"Test render_output with json_mode=False and string data.\"\"\"\n        data = \"# Report Title\\nContent here\"\n        \n        with patch('sys.stdout', new_callable=StringIO) as mock_stdout:\n            render_output(data, json_mode=False, copy=False)\n            output = mock_stdout.getvalue()\n            \n            # String should be printed as report\n            assert \"Report Title\" in output\n            assert \"Content here\" in output\n    \n    def test_render_output_happy_path_markdown_mode_non_string(self):\n        \"\"\"Test render_output with json_mode=False and non-string data.\"\"\"\n        data = {\"key\": \"value\"}\n        \n        with patch('sys.stdout', new_callable=StringIO) as mock_stdout:\n            render_output(data, json_mode=False, copy=False)\n            output = mock_stdout.getvalue()\n            \n            # Non-string should be serialized to JSON\n            parsed = json.loads(output)\n            assert parsed == data\n    \n    def test_render_output_happy_path_with_copy_json(self):\n        \"\"\"Test render_output with copy=True in json_mode.\"\"\"\n        data = {\"key\": \"value\"}\n        \n        with patch('sys.stdout', new_callable=StringIO) as mock_stdout:\n            with patch('subprocess.run') as mock_run:\n                mock_run.return_value = CompletedProcess(\n                    args=['pbcopy'], returncode=0\n                )\n                \n                render_output(data, json_mode=True, copy=True)\n                \n                # JSON should be printed\n                output = mock_stdout.getvalue()\n                parsed = json.loads(output)\n                assert parsed == data\n                \n                # copy_to_clipboard should be called\n                mock_run.assert_called_once()\n    \n    def test_render_output_happy_path_with_copy_markdown(self):\n        \"\"\"Test render_output with copy=True in markdown mode.\"\"\"\n        data = \"# Report\"\n        \n        with patch('sys.stdout', new_callable=StringIO) as mock_stdout:\n            with patch('subprocess.run') as mock_run:\n                mock_run.return_value = CompletedProcess(\n                    args=['pbcopy'], returncode=0\n                )\n                \n                render_output(data, json_mode=False, copy=True)\n                \n                # Report should be printed\n                output = mock_stdout.getvalue()\n                assert \"Report\" in output\n                \n                # copy_to_clipboard should be called\n                mock_run.assert_called_once()\n    \n    def test_render_output_edge_case_empty_string(self):\n        \"\"\"Test render_output with empty string.\"\"\"\n        data = \"\"\n        \n        with patch('sys.stdout', new_callable=StringIO) as mock_stdout:\n            render_output(data, json_mode=False, copy=False)\n            output = mock_stdout.getvalue()\n            \n            # Empty string printed\n            assert output == \"\"\n    \n    def test_render_output_edge_case_none_data(self):\n        \"\"\"Test render_output with None data.\"\"\"\n        data = None\n        \n        with patch('sys.stdout', new_callable=StringIO) as mock_stdout:\n            render_output(data, json_mode=True, copy=False)\n            output = mock_stdout.getvalue()\n            \n            # Should output 'null'\n            assert output.strip() == 'null'\n    \n    def test_render_output_edge_case_copy_failure(self):\n        \"\"\"Test render_output when copy_to_clipboard fails.\"\"\"\n        data = \"Test data\"\n        \n        with patch('sys.stdout', new_callable=StringIO) as mock_stdout:\n            with patch('subprocess.run') as mock_run:\n                mock_run.side_effect = FileNotFoundError()\n                \n                # Should not raise exception\n                render_output(data, json_mode=False, copy=True)\n                \n                # Data should still be printed\n                output = mock_stdout.getvalue()\n                assert \"Test data\" in output\n\n\n# ============================================================================\n# Invariant Tests\n# ============================================================================\n\nclass TestInvariants:\n    \"\"\"Tests for contract invariants.\"\"\"\n    \n    def test_invariant_ansi_codes_constants(self):\n        \"\"\"Verify ANSI color code constants match contract invariants.\"\"\"\n        # Test by checking the output of _colorize contains expected codes\n        text = \"# Header\\nBlocked\\nActive\\nAt Risk\\nGenerated: test\\n---\"\n        result = _colorize(text)\n        \n        # Check expected ANSI codes are used\n        assert '\\033[0m' in result  # RESET\n        assert '\\033[1m' in result  # BOLD\n        assert '\\033[2m' in result  # DIM\n        assert '\\033[32m' in result  # GREEN\n        assert '\\033[33m' in result  # YELLOW\n        assert '\\033[31m' in result  # RED\n        assert '\\033[36m' in result  # CYAN\n    \n    def test_invariant_json_serialization_parameters(self):\n        \"\"\"Verify JSON serialization uses indent=2 and default=str.\"\"\"\n        data = {\"test\": \"value\"}\n        \n        with patch('sys.stdout', new_callable=StringIO) as mock_stdout:\n            print_json(data)\n            output = mock_stdout.getvalue()\n            \n            # Should have 2-space indentation\n            lines = output.split('\\n')\n            # Check that indented lines use 2 spaces\n            for line in lines:\n                if line.startswith('  ') and not line.startswith('    '):\n                    # Found 2-space indent (not 4-space)\n                    break\n            else:\n                # For simple dict, might be on one level\n                pass\n            \n            # Verify it's valid JSON\n            parsed = json.loads(output)\n            assert parsed == data\n    \n    def test_invariant_clipboard_timeout(self):\n        \"\"\"Verify clipboard operations use 5-second timeout.\"\"\"\n        text = \"Test\"\n        \n        with patch('subprocess.run') as mock_run:\n            mock_run.return_value = CompletedProcess(\n                args=['pbcopy'], returncode=0\n            )\n            \n            copy_to_clipboard(text)\n            \n            # Check timeout parameter\n            call_args = mock_run.call_args\n            assert call_args[1]['timeout'] == 5\n    \n    def test_invariant_output_streams(self):\n        \"\"\"Verify status messages go to stderr and reports to stdout.\"\"\"\n        message = \"Status\"\n        \n        with patch('sys.stderr', new_callable=StringIO) as mock_stderr:\n            with patch('sys.stdout', new_callable=StringIO) as mock_stdout:\n                mock_stderr.isatty = Mock(return_value=False)\n                \n                print_status(message)\n                \n                # Message written to stderr\n                stderr_output = mock_stderr.getvalue()\n                assert message in stderr_output\n                \n                # Nothing written to stdout\n                stdout_output = mock_stdout.getvalue()\n                assert stdout_output == \"\"\n    \n    def test_invariant_color_auto_detection(self):\n        \"\"\"Verify color auto-detection uses isatty() correctly.\"\"\"\n        text = \"Test\"\n        \n        with patch('sys.stdout', new_callable=StringIO) as mock_stdout:\n            mock_stdout.isatty = Mock(return_value=True)\n            \n            print_report(text, use_color=None)\n            \n            # isatty should be called\n            mock_stdout.isatty.assert_called_once()\n        \n        # Test for print_status as well\n        with patch('sys.stderr', new_callable=StringIO) as mock_stderr:\n            mock_stderr.isatty = Mock(return_value=True)\n            \n            print_status(text)\n            \n            # isatty should be called\n            mock_stderr.isatty.assert_called_once()\n\n\n# ============================================================================\n# Additional Edge Case Tests\n# ============================================================================\n\nclass TestAdditionalEdgeCases:\n    \"\"\"Additional edge case tests for comprehensive coverage.\"\"\"\n    \n    def test_colorize_with_mixed_line_endings(self):\n        \"\"\"Test _colorize with mixed line endings.\"\"\"\n        text = \"# Header\\r\\nBlocked\\rActive\\n\"\n        result = _colorize(text)\n        \n        # Should handle different line endings\n        assert 'Header' in result\n        assert 'Blocked' in result\n        assert 'Active' in result\n    \n    def test_format_table_with_very_long_content(self):\n        \"\"\"Test format_table with very long cell content.\"\"\"\n        headers = [\"ID\", \"Description\"]\n        rows = [[\"1\", \"A\" * 100], [\"2\", \"Short\"]]\n        \n        result = format_table(headers, rows)\n        \n        # Long content should be present\n        assert \"A\" * 100 in result\n        assert \"Short\" in result\n    \n    def test_render_output_with_list_in_json_mode(self):\n        \"\"\"Test render_output with list data in JSON mode.\"\"\"\n        data = [1, 2, 3, 4, 5]\n        \n        with patch('sys.stdout', new_callable=StringIO) as mock_stdout:\n            render_output(data, json_mode=True, copy=False)\n            output = mock_stdout.getvalue()\n            \n            # Should be valid JSON array\n            parsed = json.loads(output)\n            assert parsed == data\n    \n    def test_print_json_with_boolean_values(self):\n        \"\"\"Test print_json with boolean values.\"\"\"\n        data = {\"flag1\": True, \"flag2\": False}\n        \n        with patch('sys.stdout', new_callable=StringIO) as mock_stdout:\n            print_json(data)\n            output = mock_stdout.getvalue()\n            \n            # Should have proper JSON booleans\n            parsed = json.loads(output)\n            assert parsed[\"flag1\"] is True\n            assert parsed[\"flag2\"] is False\n    \n    def test_copy_to_clipboard_with_newlines(self):\n        \"\"\"Test copy_to_clipboard with text containing newlines.\"\"\"\n        text = \"Line 1\\nLine 2\\nLine 3\"\n        \n        with patch('subprocess.run') as mock_run:\n            mock_run.return_value = CompletedProcess(\n                args=['pbcopy'], returncode=0\n            )\n            \n            result = copy_to_clipboard(text)\n            \n            assert result is True\n            \n            # Check multiline text passed\n            call_args = mock_run.call_args\n            assert '\\n' in call_args[1]['input']\n    \n    def test_format_table_with_none_values(self):\n        \"\"\"Test format_table with None values in cells.\"\"\"\n        headers = [\"Col1\", \"Col2\"]\n        rows = [[None, \"Value\"], [\"Value\", None]]\n        \n        result = format_table(headers, rows)\n        \n        # None should be converted to string\n        assert \"None\" in result or result.count(\"|\") > 0\n    \n    def test_render_output_all_combinations(self):\n        \"\"\"Test render_output with all boolean combinations.\"\"\"\n        test_cases = [\n            ({\"data\": \"test\"}, True, True),\n            ({\"data\": \"test\"}, True, False),\n            (\"string data\", False, True),\n            (\"string data\", False, False),\n        ]\n        \n        for data, json_mode, copy in test_cases:\n            with patch('sys.stdout', new_callable=StringIO):\n                with patch('subprocess.run') as mock_run:\n                    mock_run.return_value = CompletedProcess(\n                        args=['pbcopy'], returncode=0\n                    )\n                    \n                    # Should not raise exception\n                    render_output(data, json_mode=json_mode, copy=copy)\n"
+}

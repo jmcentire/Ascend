@@ -1,0 +1,251 @@
+{
+  "component_id": "src_ascend_cli",
+  "name": "Ascend CLI",
+  "description": "Command-line interface for Ascend, an AI-powered engineering management tool. Provides flat subcommand architecture for managing teams, meetings, performance reports, goals, and integrations. Supports space-separated commands (e.g., 'roster list') by rewriting them to hyphenated form (e.g., 'roster-list'). Handles argument parsing and lazy loading of command handlers.",
+  "version": 1,
+  "types": [],
+  "functions": [
+    {
+      "name": "_build_parser",
+      "description": "Builds and configures the ArgumentParser for the Ascend CLI with all subcommands and their arguments. Creates approximately 50+ subcommands across categories: init, config, roster, team, meeting, sync, report, plan, coach, and schedule.",
+      "inputs": [],
+      "output_type": "argparse.ArgumentParser",
+      "error_cases": [],
+      "preconditions": [],
+      "postconditions": [
+        "Returns a fully configured ArgumentParser with program name 'ascend'",
+        "Parser includes --version flag showing ascend version",
+        "Parser contains subparsers for all CLI commands",
+        "All subcommands have appropriate arguments defined"
+      ],
+      "idempotent": false,
+      "is_async": false,
+      "side_effects": [],
+      "structured_side_effects": [
+        {
+          "kind": "none",
+          "target": "",
+          "description": ""
+        }
+      ],
+      "performance_budget": null
+    },
+    {
+      "name": "_rewrite_args",
+      "description": "Rewrites space-separated command arguments to hyphenated form. Supports both 3-word commands (e.g., 'plan goal create' -> 'plan-goal-create') and 2-word commands (e.g., 'roster list' -> 'roster-list'). Tries longest match first (3-word before 2-word).",
+      "inputs": [
+        {
+          "name": "argv",
+          "type_ref": "list[str]",
+          "required": true,
+          "default": "",
+          "description": "Command line arguments to rewrite",
+          "validators": []
+        }
+      ],
+      "output_type": "list[str]",
+      "error_cases": [],
+      "preconditions": [],
+      "postconditions": [
+        "Returns rewritten arguments if a known multi-word command is found",
+        "Returns original arguments unchanged if no match found",
+        "3-word commands take precedence over 2-word commands"
+      ],
+      "idempotent": false,
+      "is_async": false,
+      "side_effects": [],
+      "structured_side_effects": [
+        {
+          "kind": "none",
+          "target": "",
+          "description": ""
+        }
+      ],
+      "performance_budget": null
+    },
+    {
+      "name": "main",
+      "description": "CLI entry point. Parses command line arguments, rewrites space-separated commands to hyphenated form, and dispatches to appropriate command handler. Imports command handlers lazily to optimize startup time. Exits with code 1 if no command is provided.",
+      "inputs": [
+        {
+          "name": "argv",
+          "type_ref": "list[str] | None",
+          "required": false,
+          "default": "None",
+          "description": "Command line arguments; defaults to sys.argv[1:] if None",
+          "validators": []
+        }
+      ],
+      "output_type": "None",
+      "error_cases": [
+        {
+          "name": "no_command_provided",
+          "condition": "args.command is falsy",
+          "error_type": "SystemExit",
+          "error_data": {
+            "exit_code": "1"
+          }
+        },
+        {
+          "name": "unknown_command",
+          "condition": "args.command does not match any known command",
+          "error_type": "SystemExit",
+          "error_data": {
+            "exit_code": "1"
+          }
+        }
+      ],
+      "preconditions": [],
+      "postconditions": [
+        "Command handler is invoked for valid commands",
+        "Help is printed if no command provided",
+        "Process exits with code 1 for missing or unknown commands"
+      ],
+      "idempotent": false,
+      "is_async": false,
+      "side_effects": [
+        "Lazy imports command handler modules based on command",
+        "Prints help text to stdout if no command given",
+        "Calls sys.exit(1) for error conditions",
+        "Invokes command handlers which may have various side effects"
+      ],
+      "structured_side_effects": [
+        {
+          "kind": "mutates_state",
+          "target": "sys.exit",
+          "description": "Exits process with code 1 on error"
+        },
+        {
+          "kind": "logging",
+          "target": "stdout",
+          "description": "Prints help text via parser.print_help()"
+        }
+      ],
+      "performance_budget": null
+    }
+  ],
+  "dependencies": [
+    "argparse",
+    "sys",
+    "ascend",
+    "ascend.commands.init",
+    "ascend.commands.roster",
+    "ascend.commands.team",
+    "ascend.commands.meeting",
+    "ascend.commands.sync",
+    "ascend.commands.report",
+    "ascend.commands.plan",
+    "ascend.commands.coach",
+    "ascend.commands.schedule",
+    "ascend.tui.app"
+  ],
+  "dependency_contracts": {
+    "argparse": [
+      "ArgumentParser",
+      "add_argument",
+      "add_subparsers",
+      "parse_args",
+      "print_help"
+    ],
+    "sys": [
+      "argv",
+      "exit"
+    ],
+    "ascend": [
+      "__version__"
+    ],
+    "ascend.commands.init": [
+      "cmd_init",
+      "cmd_doctor",
+      "cmd_config_show",
+      "cmd_config_set"
+    ],
+    "ascend.commands.roster": [
+      "cmd_roster_list",
+      "cmd_roster_add",
+      "cmd_roster_edit",
+      "cmd_roster_show",
+      "cmd_roster_flag",
+      "cmd_roster_unflag",
+      "cmd_roster_search",
+      "cmd_roster_import"
+    ],
+    "ascend.commands.team": [
+      "cmd_team_list",
+      "cmd_team_create",
+      "cmd_team_add",
+      "cmd_team_show"
+    ],
+    "ascend.commands.meeting": [
+      "cmd_meeting_ingest",
+      "cmd_meeting_list",
+      "cmd_meeting_show",
+      "cmd_meeting_search",
+      "cmd_meeting_items",
+      "cmd_meeting_item_close",
+      "cmd_meeting_prep"
+    ],
+    "ascend.commands.sync": [
+      "cmd_sync",
+      "cmd_sync_github",
+      "cmd_sync_linear",
+      "cmd_sync_slack",
+      "cmd_sync_snapshot",
+      "cmd_sync_backfill"
+    ],
+    "ascend.commands.report": [
+      "cmd_report_performance",
+      "cmd_report_team",
+      "cmd_report_progress",
+      "cmd_report_git",
+      "cmd_report_dashboard",
+      "cmd_report_stale",
+      "cmd_report_custom"
+    ],
+    "ascend.commands.plan": [
+      "cmd_plan_cycle",
+      "cmd_plan_goal_create",
+      "cmd_plan_goal_list",
+      "cmd_plan_goal_update",
+      "cmd_plan_pip_create",
+      "cmd_plan_pip_show",
+      "cmd_plan_career"
+    ],
+    "ascend.commands.coach": [
+      "cmd_coach_analyze",
+      "cmd_coach_risks",
+      "cmd_coach_star",
+      "cmd_coach_suggest"
+    ],
+    "ascend.commands.schedule": [
+      "cmd_schedule_list",
+      "cmd_schedule_add",
+      "cmd_schedule_remove",
+      "cmd_schedule_run",
+      "cmd_schedule_enable",
+      "cmd_schedule_disable"
+    ],
+    "ascend.tui.app": [
+      "AscendApp"
+    ]
+  },
+  "invariants": [
+    "All multi-word commands must be accessible via both space-separated and hyphenated forms",
+    "Command handlers are always lazy-loaded (imported only when command is invoked)",
+    "All subcommands support --json flag for machine-readable output where applicable",
+    "Parser program name is always 'ascend'",
+    "3-word command matching takes precedence over 2-word matching in _rewrite_args"
+  ],
+  "requires": [],
+  "processing_register": "",
+  "data_access": {
+    "reads": [],
+    "writes": [],
+    "rationale": "",
+    "side_effects": []
+  },
+  "authority": {
+    "domains": [],
+    "rationale": null
+  }
+}

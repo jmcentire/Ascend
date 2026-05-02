@@ -1,0 +1,251 @@
+{
+  "component_id": "src_ascend_audit",
+  "name": "Audit Log",
+  "description": "Append-only JSONL audit log for recording and retrieving operation history. Provides functions to log commands with optional arguments, results, and errors, and to read recent audit entries from disk.",
+  "version": 1,
+  "types": [],
+  "functions": [
+    {
+      "name": "_audit_path",
+      "description": "Returns the Path to the audit log file (audit.jsonl) within the HISTORY_DIR.",
+      "inputs": [],
+      "output_type": "Path",
+      "error_cases": [],
+      "preconditions": [
+        "HISTORY_DIR must be defined in ascend.config"
+      ],
+      "postconditions": [
+        "Returns a Path object pointing to HISTORY_DIR/audit.jsonl"
+      ],
+      "idempotent": true,
+      "is_async": false,
+      "side_effects": [],
+      "structured_side_effects": [
+        {
+          "kind": "none",
+          "target": "",
+          "description": ""
+        }
+      ],
+      "performance_budget": null
+    },
+    {
+      "name": "log_operation",
+      "description": "Appends an operation entry to the audit log with timestamp, command, and optional args, result, and error fields. Creates parent directories if they don't exist.",
+      "inputs": [
+        {
+          "name": "command",
+          "type_ref": "str",
+          "required": true,
+          "default": "",
+          "description": "The command being logged",
+          "validators": []
+        },
+        {
+          "name": "args",
+          "type_ref": "Optional[dict]",
+          "required": false,
+          "default": "None",
+          "description": "Optional dictionary of command arguments",
+          "validators": []
+        },
+        {
+          "name": "result",
+          "type_ref": "Optional[str]",
+          "required": false,
+          "default": "None",
+          "description": "Optional result string",
+          "validators": []
+        },
+        {
+          "name": "error",
+          "type_ref": "Optional[str]",
+          "required": false,
+          "default": "None",
+          "description": "Optional error string",
+          "validators": []
+        }
+      ],
+      "output_type": "None",
+      "error_cases": [
+        {
+          "name": "permission_error",
+          "condition": "Insufficient permissions to create directories or write to file",
+          "error_type": "PermissionError",
+          "error_data": {}
+        },
+        {
+          "name": "os_error",
+          "condition": "Filesystem errors during directory creation or file write",
+          "error_type": "OSError",
+          "error_data": {}
+        },
+        {
+          "name": "json_serialization_error",
+          "condition": "Objects in args cannot be serialized even with default=str",
+          "error_type": "TypeError",
+          "error_data": {}
+        }
+      ],
+      "preconditions": [
+        "command must be a non-empty string",
+        "HISTORY_DIR must be accessible"
+      ],
+      "postconditions": [
+        "A JSONL entry is appended to audit.jsonl",
+        "Entry contains timestamp in ISO format (UTC)",
+        "Entry contains command field",
+        "Entry contains args field if args is provided and truthy",
+        "Entry contains result field if result is provided and truthy",
+        "Entry contains error field if error is provided and truthy",
+        "Parent directories are created if they don't exist"
+      ],
+      "idempotent": false,
+      "is_async": false,
+      "side_effects": [
+        "Creates parent directories (HISTORY_DIR) if they don't exist",
+        "Appends a line to audit.jsonl file",
+        "Writes to filesystem"
+      ],
+      "structured_side_effects": [
+        {
+          "kind": "writes_file",
+          "target": "HISTORY_DIR/audit.jsonl",
+          "description": "Appends JSONL entry to audit log"
+        },
+        {
+          "kind": "mutates_state",
+          "target": "filesystem",
+          "description": "Creates parent directories if missing"
+        }
+      ],
+      "performance_budget": null
+    },
+    {
+      "name": "read_audit",
+      "description": "Reads and returns the last N entries from the audit log. Returns empty list if the audit file doesn't exist. Parses each line as JSON and filters out empty lines.",
+      "inputs": [
+        {
+          "name": "last_n",
+          "type_ref": "int",
+          "required": false,
+          "default": "50",
+          "description": "Number of recent entries to return",
+          "validators": []
+        }
+      ],
+      "output_type": "list[dict[str, Any]]",
+      "error_cases": [
+        {
+          "name": "permission_error",
+          "condition": "Insufficient permissions to read the audit file",
+          "error_type": "PermissionError",
+          "error_data": {}
+        },
+        {
+          "name": "json_decode_error",
+          "condition": "Malformed JSON in audit log line",
+          "error_type": "json.JSONDecodeError",
+          "error_data": {}
+        },
+        {
+          "name": "os_error",
+          "condition": "Filesystem errors during file read",
+          "error_type": "OSError",
+          "error_data": {}
+        }
+      ],
+      "preconditions": [
+        "last_n should be a non-negative integer"
+      ],
+      "postconditions": [
+        "Returns a list of at most last_n dictionaries",
+        "Returns empty list if audit.jsonl doesn't exist",
+        "Each dictionary represents a parsed JSONL entry",
+        "Empty lines are filtered out",
+        "Returns the last last_n entries in order"
+      ],
+      "idempotent": true,
+      "is_async": false,
+      "side_effects": [
+        "Reads from audit.jsonl file"
+      ],
+      "structured_side_effects": [
+        {
+          "kind": "reads_file",
+          "target": "HISTORY_DIR/audit.jsonl",
+          "description": "Reads audit log entries"
+        }
+      ],
+      "performance_budget": null
+    }
+  ],
+  "dependencies": [
+    "json",
+    "datetime",
+    "pathlib",
+    "typing",
+    "ascend.config"
+  ],
+  "dependency_contracts": {
+    "ascend.config": [
+      "HISTORY_DIR"
+    ]
+  },
+  "invariants": [
+    "Audit log is append-only (never modified or deleted by this module)",
+    "Each audit entry contains a UTC ISO-formatted timestamp",
+    "Each audit entry contains a command field",
+    "Audit log file is located at HISTORY_DIR/audit.jsonl",
+    "Each line in audit.jsonl is a valid JSON object followed by newline"
+  ],
+  "requires": [],
+  "processing_register": "",
+  "data_access": {
+    "reads": [
+      "filesystem"
+    ],
+    "writes": [
+      "filesystem"
+    ],
+    "rationale": "Module reads and writes audit log file on disk",
+    "side_effects": [
+      {
+        "type": "file_write",
+        "classification": "audit_log",
+        "fields": [
+          "timestamp",
+          "command",
+          "args",
+          "result",
+          "error"
+        ],
+        "rationale": "Appends operation records to persistent audit log"
+      },
+      {
+        "type": "file_read",
+        "classification": "audit_log",
+        "fields": [
+          "timestamp",
+          "command",
+          "args",
+          "result",
+          "error"
+        ],
+        "rationale": "Reads historical audit entries from persistent log"
+      },
+      {
+        "type": "directory_creation",
+        "classification": "filesystem",
+        "fields": [],
+        "rationale": "Creates HISTORY_DIR if it doesn't exist"
+      }
+    ]
+  },
+  "authority": {
+    "domains": [
+      "audit_log"
+    ],
+    "rationale": "This module owns the audit log file format and access patterns"
+  }
+}

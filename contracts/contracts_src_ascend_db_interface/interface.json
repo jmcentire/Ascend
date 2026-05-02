@@ -1,0 +1,346 @@
+{
+  "component_id": "contracts_src_ascend_db_interface",
+  "name": "Ascend SQLite Database Layer",
+  "description": "SQLite database layer for the Ascend engineering management CLI. Provides connection management, schema initialization with versioning, and health checks for a database storing teams, members, meetings, goals, performance snapshots, coaching entries, and schedules. Implements full-text search on meeting transcripts using FTS5.",
+  "version": 1,
+  "types": [
+    {
+      "name": "Path",
+      "kind": "primitive",
+      "fields": [],
+      "item_type": "",
+      "variants": [],
+      "inner_types": [],
+      "description": "pathlib.Path - filesystem path object",
+      "owner_component": ""
+    },
+    {
+      "name": "Connection",
+      "kind": "primitive",
+      "fields": [],
+      "item_type": "",
+      "variants": [],
+      "inner_types": [],
+      "description": "sqlite3.Connection - database connection object",
+      "owner_component": ""
+    },
+    {
+      "name": "Row",
+      "kind": "primitive",
+      "fields": [],
+      "item_type": "",
+      "variants": [],
+      "inner_types": [],
+      "description": "sqlite3.Row - row factory for dict-like access to query results",
+      "owner_component": ""
+    },
+    {
+      "name": "HealthCheckResult",
+      "kind": "struct",
+      "fields": [
+        {
+          "name": "ok",
+          "type_ref": "bool",
+          "required": true,
+          "default": "",
+          "description": "True if database is healthy, False otherwise",
+          "validators": []
+        },
+        {
+          "name": "error",
+          "type_ref": "str",
+          "required": false,
+          "default": "None",
+          "description": "Error message if ok is False",
+          "validators": []
+        },
+        {
+          "name": "version",
+          "type_ref": "int",
+          "required": false,
+          "default": "None",
+          "description": "Schema version number if ok is True",
+          "validators": []
+        },
+        {
+          "name": "tables",
+          "type_ref": "dict",
+          "required": false,
+          "default": "None",
+          "description": "Dictionary mapping table names to row counts if ok is True",
+          "validators": []
+        }
+      ],
+      "item_type": "",
+      "variants": [],
+      "inner_types": [],
+      "description": "Dictionary returned by check_db with health status",
+      "owner_component": ""
+    }
+  ],
+  "functions": [
+    {
+      "name": "get_connection",
+      "description": "Opens a SQLite connection with Write-Ahead Logging (WAL) mode enabled and foreign key constraints enforced. Sets row_factory to sqlite3.Row for dict-like access to query results.",
+      "inputs": [
+        {
+          "name": "db_path",
+          "type_ref": "Path",
+          "required": true,
+          "default": "",
+          "description": "Filesystem path to the database file",
+          "validators": []
+        }
+      ],
+      "output_type": "Connection",
+      "error_cases": [
+        {
+          "name": "file_access_error",
+          "condition": "db_path directory doesn't exist or insufficient permissions",
+          "error_type": "sqlite3.OperationalError",
+          "error_data": {}
+        },
+        {
+          "name": "invalid_path",
+          "condition": "db_path cannot be converted to string",
+          "error_type": "TypeError",
+          "error_data": {}
+        }
+      ],
+      "preconditions": [
+        "db_path is a valid Path object"
+      ],
+      "postconditions": [
+        "Returns an open sqlite3.Connection",
+        "Connection has WAL journal mode enabled",
+        "Connection has foreign key enforcement enabled",
+        "Connection row_factory is set to sqlite3.Row"
+      ],
+      "idempotent": true,
+      "is_async": false,
+      "side_effects": [
+        "Opens file connection to db_path",
+        "Creates database file if it doesn't exist",
+        "Executes PRAGMA journal_mode=WAL on connection",
+        "Executes PRAGMA foreign_keys=ON on connection"
+      ],
+      "structured_side_effects": [
+        {
+          "kind": "writes_file",
+          "target": "db_path",
+          "description": "Creates database file if it doesn't exist"
+        },
+        {
+          "kind": "mutates_state",
+          "target": "sqlite3.Connection",
+          "description": "Sets connection pragmas and row_factory"
+        }
+      ],
+      "performance_budget": null
+    },
+    {
+      "name": "init_db",
+      "description": "Creates the database file (if needed), applies the schema if not present or outdated, and returns an open connection. Checks current schema version and only applies schema updates if current version is less than SCHEMA_VERSION (2). Creates parent directories if they don't exist.",
+      "inputs": [
+        {
+          "name": "db_path",
+          "type_ref": "Path",
+          "required": true,
+          "default": "",
+          "description": "Filesystem path to the database file",
+          "validators": []
+        }
+      ],
+      "output_type": "Connection",
+      "error_cases": [
+        {
+          "name": "permission_error",
+          "condition": "Insufficient permissions to create directories or database file",
+          "error_type": "PermissionError",
+          "error_data": {}
+        },
+        {
+          "name": "sql_error",
+          "condition": "Invalid SQL in _SCHEMA_SQL or execution failure",
+          "error_type": "sqlite3.Error",
+          "error_data": {}
+        },
+        {
+          "name": "operational_error",
+          "condition": "Database is locked or corrupted during schema application",
+          "error_type": "sqlite3.OperationalError",
+          "error_data": {}
+        }
+      ],
+      "preconditions": [
+        "db_path is a valid Path object"
+      ],
+      "postconditions": [
+        "Database file exists at db_path",
+        "All parent directories of db_path exist",
+        "Schema is at SCHEMA_VERSION (2)",
+        "schema_version table has entry for SCHEMA_VERSION",
+        "All tables, triggers, and FTS5 virtual tables are created",
+        "Returns open connection with WAL mode and foreign keys enabled"
+      ],
+      "idempotent": true,
+      "is_async": false,
+      "side_effects": [
+        "Creates parent directories if missing",
+        "Creates database file if it doesn't exist",
+        "Executes schema SQL script if version is outdated",
+        "Inserts schema version record",
+        "Commits transaction if schema is applied"
+      ],
+      "structured_side_effects": [
+        {
+          "kind": "writes_file",
+          "target": "db_path parent directories",
+          "description": "Creates parent directories if missing"
+        },
+        {
+          "kind": "writes_file",
+          "target": "db_path",
+          "description": "Creates and initializes database file"
+        },
+        {
+          "kind": "mutates_state",
+          "target": "database schema",
+          "description": "Applies schema SQL script and version record"
+        }
+      ],
+      "performance_budget": null
+    },
+    {
+      "name": "check_db",
+      "description": "Performs health check on the database by verifying existence, schema initialization, and returning table row counts. Returns a dictionary with ok status, version, and table counts. If database doesn't exist or schema is uninitialized, returns error state.",
+      "inputs": [
+        {
+          "name": "db_path",
+          "type_ref": "Path",
+          "required": true,
+          "default": "",
+          "description": "Filesystem path to the database file",
+          "validators": []
+        }
+      ],
+      "output_type": "HealthCheckResult",
+      "error_cases": [
+        {
+          "name": "database_not_found",
+          "condition": "db_path.exists() returns False",
+          "error_type": "return value",
+          "error_data": {
+            "ok": "False",
+            "error": "Database not found"
+          }
+        },
+        {
+          "name": "schema_not_initialized",
+          "condition": "schema_version table doesn't exist (sqlite3.OperationalError)",
+          "error_type": "return value",
+          "error_data": {
+            "ok": "False",
+            "error": "Schema not initialized"
+          }
+        },
+        {
+          "name": "sql_error",
+          "condition": "Query execution fails on table count (table doesn't exist)",
+          "error_type": "sqlite3.Error",
+          "error_data": {}
+        }
+      ],
+      "preconditions": [
+        "db_path is a valid Path object"
+      ],
+      "postconditions": [
+        "Returns dict with 'ok' key (bool)",
+        "If ok=False, includes 'error' key with description",
+        "If ok=True, includes 'version' (int) and 'tables' (dict) keys",
+        "Connection is closed before returning"
+      ],
+      "idempotent": true,
+      "is_async": false,
+      "side_effects": [
+        "Opens and closes database connection",
+        "Executes SELECT queries on schema_version and all tables"
+      ],
+      "structured_side_effects": [
+        {
+          "kind": "reads_file",
+          "target": "db_path",
+          "description": "Opens and reads database file"
+        },
+        {
+          "kind": "mutates_state",
+          "target": "sqlite3.Connection",
+          "description": "Opens and closes connection"
+        }
+      ],
+      "performance_budget": null
+    }
+  ],
+  "dependencies": [
+    "sqlite3",
+    "pathlib"
+  ],
+  "dependency_contracts": {},
+  "invariants": [
+    "SCHEMA_VERSION constant is 2",
+    "_SCHEMA_SQL contains CREATE TABLE IF NOT EXISTS statements for: schema_version, teams, members, member_flags, team_members, meetings, meeting_items, goals, performance_snapshots, coaching_entries, schedules",
+    "_SCHEMA_SQL creates FTS5 virtual table meetings_fts for full-text search",
+    "_SCHEMA_SQL creates triggers (meetings_ai, meetings_ad, meetings_au) to sync meetings table with meetings_fts",
+    "All connections use WAL journal mode",
+    "All connections have foreign key constraints enabled",
+    "All connections use sqlite3.Row as row_factory",
+    "check_db expects tables: members, member_flags, teams, team_members, meetings, meeting_items, goals, performance_snapshots, coaching_entries, schedules"
+  ],
+  "requires": [],
+  "processing_register": "",
+  "data_access": {
+    "reads": [
+      "filesystem"
+    ],
+    "writes": [
+      "filesystem"
+    ],
+    "rationale": "This module manages persistent storage for the Ascend engineering management application using SQLite. It creates, reads, and manages database schema and connections.",
+    "side_effects": [
+      {
+        "type": "file_creation",
+        "classification": "database",
+        "fields": [
+          "db_path"
+        ],
+        "rationale": "Creates SQLite database files and parent directories as needed"
+      },
+      {
+        "type": "file_read",
+        "classification": "database",
+        "fields": [
+          "db_path"
+        ],
+        "rationale": "Opens and reads SQLite database files for connection and health checks"
+      },
+      {
+        "type": "schema_modification",
+        "classification": "database",
+        "fields": [
+          "tables",
+          "triggers",
+          "fts5_virtual_tables"
+        ],
+        "rationale": "Applies database schema with tables, triggers, and FTS5 virtual tables when initializing or upgrading"
+      }
+    ]
+  },
+  "authority": {
+    "domains": [
+      "database_connection_management",
+      "database_schema_versioning",
+      "database_health_checks"
+    ],
+    "rationale": "This module is the authoritative source for SQLite connection configuration, schema initialization and versioning, and database health status for the Ascend application"
+  }
+}

@@ -1,0 +1,510 @@
+{
+  "component_id": "src_ascend_config",
+  "contract_version": 1,
+  "test_cases": [
+    {
+      "id": "test_load_config_default_path_no_file",
+      "description": "Load config when no file exists at default path, should return AscendConfig with defaults",
+      "function": "load_config",
+      "category": "happy_path",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "config_path": "None"
+      },
+      "input_description": "",
+      "expected_output_description": "Returns AscendConfig with all default values",
+      "expected_error": "",
+      "assertions": []
+    },
+    {
+      "id": "test_load_config_valid_yaml",
+      "description": "Load config from valid YAML file with partial config",
+      "function": "load_config",
+      "category": "happy_path",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "config_path": "valid_config.yaml"
+      },
+      "input_description": "",
+      "expected_output_description": "Returns AscendConfig with values from file merged with defaults",
+      "expected_error": "",
+      "assertions": []
+    },
+    {
+      "id": "test_load_config_malformed_yaml",
+      "description": "Load config from malformed YAML file",
+      "function": "load_config",
+      "category": "error_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "config_path": "malformed.yaml"
+      },
+      "input_description": "",
+      "expected_output_description": "",
+      "expected_error": "yaml_parse_error",
+      "assertions": []
+    },
+    {
+      "id": "test_load_config_invalid_values",
+      "description": "Load config with invalid field values for Pydantic validation",
+      "function": "load_config",
+      "category": "error_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "config_path": "invalid_values.yaml"
+      },
+      "input_description": "",
+      "expected_output_description": "",
+      "expected_error": "pydantic_validation_error",
+      "assertions": []
+    },
+    {
+      "id": "test_load_config_permission_denied",
+      "description": "Load config when file exists but cannot be read",
+      "function": "load_config",
+      "category": "error_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "config_path": "unreadable.yaml"
+      },
+      "input_description": "",
+      "expected_output_description": "",
+      "expected_error": "io_error",
+      "assertions": []
+    },
+    {
+      "id": "test_load_config_filters_none_values",
+      "description": "Load config with None values in YAML, should filter them out",
+      "function": "load_config",
+      "category": "edge_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "config_path": "config_with_nones.yaml"
+      },
+      "input_description": "",
+      "expected_output_description": "Returns AscendConfig with None values filtered and defaults used",
+      "expected_error": "",
+      "assertions": []
+    },
+    {
+      "id": "test_save_config_default_path",
+      "description": "Save config to default path, creating parent directories",
+      "function": "save_config",
+      "category": "happy_path",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "cfg": "valid_config",
+        "config_path": "None"
+      },
+      "input_description": "",
+      "expected_output_description": "Config file exists at CONFIG_PATH with YAML content",
+      "expected_error": "",
+      "assertions": []
+    },
+    {
+      "id": "test_save_config_custom_path",
+      "description": "Save config to custom path with parent directory creation",
+      "function": "save_config",
+      "category": "happy_path",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "cfg": "valid_config",
+        "config_path": "custom/path/config.yaml"
+      },
+      "input_description": "",
+      "expected_output_description": "Config file exists at custom path with parent dirs created",
+      "expected_error": "",
+      "assertions": []
+    },
+    {
+      "id": "test_save_config_io_error",
+      "description": "Save config when file cannot be written due to permissions",
+      "function": "save_config",
+      "category": "error_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "cfg": "valid_config",
+        "config_path": "unwritable/config.yaml"
+      },
+      "input_description": "",
+      "expected_output_description": "",
+      "expected_error": "io_error",
+      "assertions": []
+    },
+    {
+      "id": "test_save_config_cannot_create_dirs",
+      "description": "Save config when parent directories cannot be created",
+      "function": "save_config",
+      "category": "error_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "cfg": "valid_config",
+        "config_path": "unwritable_dir/config.yaml"
+      },
+      "input_description": "",
+      "expected_output_description": "",
+      "expected_error": "os_error",
+      "assertions": []
+    },
+    {
+      "id": "test_get_config_value_valid_key",
+      "description": "Get config value for valid key with provided config",
+      "function": "get_config_value",
+      "category": "happy_path",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "key": "model",
+        "cfg": "valid_config"
+      },
+      "input_description": "",
+      "expected_output_description": "Returns string representation of model value",
+      "expected_error": "",
+      "assertions": []
+    },
+    {
+      "id": "test_get_config_value_load_from_disk",
+      "description": "Get config value when cfg is None, loads from disk",
+      "function": "get_config_value",
+      "category": "happy_path",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "key": "repos_dir",
+        "cfg": "None"
+      },
+      "input_description": "",
+      "expected_output_description": "Returns string representation of repos_dir from loaded config",
+      "expected_error": "",
+      "assertions": []
+    },
+    {
+      "id": "test_get_config_value_invalid_key",
+      "description": "Get config value with invalid field name",
+      "function": "get_config_value",
+      "category": "error_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "key": "nonexistent_field",
+        "cfg": "valid_config"
+      },
+      "input_description": "",
+      "expected_output_description": "",
+      "expected_error": "key_error",
+      "assertions": []
+    },
+    {
+      "id": "test_get_config_value_malformed_yaml",
+      "description": "Get config value when cfg is None and config file is malformed",
+      "function": "get_config_value",
+      "category": "error_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "key": "model",
+        "cfg": "None"
+      },
+      "input_description": "",
+      "expected_output_description": "",
+      "expected_error": "yaml_parse_error",
+      "assertions": []
+    },
+    {
+      "id": "test_get_config_value_io_error",
+      "description": "Get config value when cfg is None and cannot read config file",
+      "function": "get_config_value",
+      "category": "error_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "key": "model",
+        "cfg": "None"
+      },
+      "input_description": "",
+      "expected_output_description": "",
+      "expected_error": "io_error",
+      "assertions": []
+    },
+    {
+      "id": "test_set_config_value_string_field",
+      "description": "Set config value for string field",
+      "function": "set_config_value",
+      "category": "happy_path",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "key": "model",
+        "value": "claude-3-opus-20240229",
+        "config_path": "None"
+      },
+      "input_description": "",
+      "expected_output_description": "Returns updated AscendConfig with new model value",
+      "expected_error": "",
+      "assertions": []
+    },
+    {
+      "id": "test_set_config_value_int_field",
+      "description": "Set config value for int field with type coercion",
+      "function": "set_config_value",
+      "category": "happy_path",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "key": "default_lookback_hours",
+        "value": "48",
+        "config_path": "None"
+      },
+      "input_description": "",
+      "expected_output_description": "Returns AscendConfig with int value 48",
+      "expected_error": "",
+      "assertions": []
+    },
+    {
+      "id": "test_set_config_value_list_field",
+      "description": "Set config value for list field with comma-separated values",
+      "function": "set_config_value",
+      "category": "happy_path",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "key": "slack_channels",
+        "value": "#general,#dev,#alerts",
+        "config_path": "None"
+      },
+      "input_description": "",
+      "expected_output_description": "Returns AscendConfig with list ['#general', '#dev', '#alerts']",
+      "expected_error": "",
+      "assertions": []
+    },
+    {
+      "id": "test_set_config_value_invalid_key",
+      "description": "Set config value with invalid field name",
+      "function": "set_config_value",
+      "category": "error_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "key": "invalid_field",
+        "value": "test",
+        "config_path": "None"
+      },
+      "input_description": "",
+      "expected_output_description": "",
+      "expected_error": "key_error",
+      "assertions": []
+    },
+    {
+      "id": "test_set_config_value_invalid_int",
+      "description": "Set int field with non-numeric value",
+      "function": "set_config_value",
+      "category": "error_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "key": "default_lookback_hours",
+        "value": "not_a_number",
+        "config_path": "None"
+      },
+      "input_description": "",
+      "expected_output_description": "",
+      "expected_error": "value_error",
+      "assertions": []
+    },
+    {
+      "id": "test_set_config_value_pydantic_validation_fails",
+      "description": "Set value that fails Pydantic validation",
+      "function": "set_config_value",
+      "category": "error_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "key": "default_lookback_hours",
+        "value": "-100",
+        "config_path": "None"
+      },
+      "input_description": "",
+      "expected_output_description": "",
+      "expected_error": "pydantic_validation_error",
+      "assertions": []
+    },
+    {
+      "id": "test_set_config_value_malformed_existing_yaml",
+      "description": "Set value when existing config file has malformed YAML",
+      "function": "set_config_value",
+      "category": "error_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "key": "model",
+        "value": "new-model",
+        "config_path": "None"
+      },
+      "input_description": "",
+      "expected_output_description": "",
+      "expected_error": "yaml_parse_error",
+      "assertions": []
+    },
+    {
+      "id": "test_set_config_value_io_error",
+      "description": "Set value when cannot read or write config file",
+      "function": "set_config_value",
+      "category": "error_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "key": "model",
+        "value": "new-model",
+        "config_path": "None"
+      },
+      "input_description": "",
+      "expected_output_description": "",
+      "expected_error": "io_error",
+      "assertions": []
+    },
+    {
+      "id": "test_invariant_ascend_home",
+      "description": "Verify ASCEND_HOME is always ~/.ascend",
+      "function": "load_config",
+      "category": "invariant",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {},
+      "input_description": "",
+      "expected_output_description": "ASCEND_HOME constant equals Path.home() / '.ascend'",
+      "expected_error": "",
+      "assertions": []
+    },
+    {
+      "id": "test_invariant_config_path",
+      "description": "Verify CONFIG_PATH is always ~/.ascend/config.yaml",
+      "function": "load_config",
+      "category": "invariant",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {},
+      "input_description": "",
+      "expected_output_description": "CONFIG_PATH constant equals ~/.ascend/config.yaml",
+      "expected_error": "",
+      "assertions": []
+    },
+    {
+      "id": "test_invariant_no_none_values",
+      "description": "Verify config values are never None after load_config",
+      "function": "load_config",
+      "category": "invariant",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {},
+      "input_description": "",
+      "expected_output_description": "All required fields in AscendConfig are not None",
+      "expected_error": "",
+      "assertions": []
+    },
+    {
+      "id": "test_round_trip_save_load",
+      "description": "Save and load config preserves all values",
+      "function": "save_config",
+      "category": "edge_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {},
+      "input_description": "",
+      "expected_output_description": "Loaded config equals saved config",
+      "expected_error": "",
+      "assertions": []
+    },
+    {
+      "id": "test_empty_yaml_file",
+      "description": "Load config from empty YAML file",
+      "function": "load_config",
+      "category": "edge_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "config_path": "empty.yaml"
+      },
+      "input_description": "",
+      "expected_output_description": "Returns AscendConfig with all defaults",
+      "expected_error": "",
+      "assertions": []
+    },
+    {
+      "id": "test_get_config_value_list_field",
+      "description": "Get config value for list field returns string representation",
+      "function": "get_config_value",
+      "category": "edge_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "key": "slack_channels",
+        "cfg": "valid_config"
+      },
+      "input_description": "",
+      "expected_output_description": "Returns string representation of list",
+      "expected_error": "",
+      "assertions": []
+    },
+    {
+      "id": "test_set_config_value_empty_list",
+      "description": "Set list field with empty string",
+      "function": "set_config_value",
+      "category": "edge_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "key": "slack_channels",
+        "value": "",
+        "config_path": "None"
+      },
+      "input_description": "",
+      "expected_output_description": "Returns AscendConfig with empty or single-element list",
+      "expected_error": "",
+      "assertions": []
+    },
+    {
+      "id": "test_save_config_yaml_format",
+      "description": "Verify saved YAML uses non-flow style",
+      "function": "save_config",
+      "category": "edge_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "cfg": "valid_config",
+        "config_path": "test.yaml"
+      },
+      "input_description": "",
+      "expected_output_description": "YAML file uses block style, not flow style",
+      "expected_error": "",
+      "assertions": []
+    },
+    {
+      "id": "test_get_config_value_optional_field",
+      "description": "Get config value for optional field (manager_name)",
+      "function": "get_config_value",
+      "category": "edge_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "key": "manager_name",
+        "cfg": "valid_config"
+      },
+      "input_description": "",
+      "expected_output_description": "Returns string representation of optional field value",
+      "expected_error": "",
+      "assertions": []
+    }
+  ],
+  "test_language": "python",
+  "generated_code": "\"\"\"\nContract tests for src_ascend_config module.\n\nTests verify behavior at boundaries including happy paths, edge cases,\nerror cases, and invariants as defined in the contract.\n\"\"\"\n\nimport pytest\nimport yaml\nimport tempfile\nimport shutil\nfrom pathlib import Path\nfrom typing import Optional\nfrom unittest.mock import Mock, patch, mock_open, MagicMock\nfrom pydantic import ValidationError\n\n# Import the component under test\nfrom src.ascend.config import (\n    AscendConfig,\n    load_config,\n    save_config,\n    get_config_value,\n    set_config_value,\n)\n\n\n# ============================================================================\n# Fixtures\n# ============================================================================\n\n@pytest.fixture\ndef temp_config_dir(tmp_path):\n    \"\"\"Create a temporary directory for config files.\"\"\"\n    config_dir = tmp_path / \"test_ascend\"\n    config_dir.mkdir(parents=True, exist_ok=True)\n    return config_dir\n\n\n@pytest.fixture\ndef valid_config():\n    \"\"\"Create a valid AscendConfig instance for testing.\"\"\"\n    return AscendConfig(\n        repos_dir=\"/tmp/repos\",\n        reports_dir=\"/tmp/reports\",\n        config_dir=\"/tmp/config\",\n        anthropic_api_key_env=\"ANTHROPIC_API_KEY\",\n        model=\"claude-3-sonnet-20240229\",\n        default_lookback_hours=24,\n        linear_team_id=\"TEAM123\",\n        linear_api_key_env=\"LINEAR_API_KEY\",\n        linear_team_ids=[\"TEAM1\", \"TEAM2\"],\n        slack_channels=[\"#general\", \"#dev\"],\n        slack_bot_token_env=\"SLACK_BOT_TOKEN\",\n        github_org=\"test-org\",\n        manager_name=\"Test Manager\"\n    )\n\n\n@pytest.fixture\ndef valid_yaml_content():\n    \"\"\"Valid YAML config content.\"\"\"\n    return \"\"\"\nrepos_dir: /custom/repos\nmodel: claude-3-opus-20240229\ndefault_lookback_hours: 48\nslack_channels:\n  - \"#alerts\"\n  - \"#monitoring\"\n\"\"\"\n\n\n@pytest.fixture\ndef malformed_yaml_content():\n    \"\"\"Malformed YAML content for error testing.\"\"\"\n    return \"\"\"\nrepos_dir: /test\n  bad_indent: value\nmodel: [unclosed bracket\n\"\"\"\n\n\n@pytest.fixture\ndef yaml_with_nones():\n    \"\"\"YAML content with None values.\"\"\"\n    return \"\"\"\nrepos_dir: /test/repos\nmodel: null\nslack_channels: null\nlinear_team_ids:\n  - \"TEAM1\"\n\"\"\"\n\n\n@pytest.fixture\ndef invalid_values_yaml():\n    \"\"\"YAML with invalid field values for Pydantic validation.\"\"\"\n    return \"\"\"\ndefault_lookback_hours: \"not_an_integer\"\n\"\"\"\n\n\n@pytest.fixture\ndef empty_yaml_content():\n    \"\"\"Empty YAML file content.\"\"\"\n    return \"\"\n\n\n# ============================================================================\n# Happy Path Tests - load_config\n# ============================================================================\n\ndef test_load_config_default_path_no_file(temp_config_dir):\n    \"\"\"Load config when no file exists at default path, should return AscendConfig with defaults.\"\"\"\n    with patch('src_ascend_config.CONFIG_PATH', temp_config_dir / \"config.yaml\"):\n        config = load_config(None)\n        \n        # Should return a valid AscendConfig instance\n        assert isinstance(config, AscendConfig)\n        \n        # Should have default values for required fields\n        assert config.repos_dir is not None\n        assert config.reports_dir is not None\n        assert config.config_dir is not None\n        assert config.anthropic_api_key_env is not None\n        assert config.model is not None\n        assert isinstance(config.default_lookback_hours, int)\n\n\ndef test_load_config_valid_yaml(temp_config_dir, valid_yaml_content):\n    \"\"\"Load config from valid YAML file with partial config.\"\"\"\n    config_file = temp_config_dir / \"config.yaml\"\n    config_file.write_text(valid_yaml_content)\n    \n    config = load_config(config_file)\n    \n    # Should merge values from file with defaults\n    assert isinstance(config, AscendConfig)\n    assert config.repos_dir == \"/custom/repos\"\n    assert config.model == \"claude-3-opus-20240229\"\n    assert config.default_lookback_hours == 48\n    assert \"#alerts\" in config.slack_channels\n    \n    # Default values should still be present for unspecified fields\n    assert config.anthropic_api_key_env is not None\n    assert config.github_org is not None\n\n\ndef test_load_config_filters_none_values(temp_config_dir, yaml_with_nones):\n    \"\"\"Load config with None values in YAML, should filter them out.\"\"\"\n    config_file = temp_config_dir / \"config.yaml\"\n    config_file.write_text(yaml_with_nones)\n    \n    config = load_config(config_file)\n    \n    # None values should be filtered and defaults used\n    assert isinstance(config, AscendConfig)\n    assert config.repos_dir == \"/test/repos\"  # From file\n    assert config.model is not None  # Default, not None\n    assert config.slack_channels is not None  # Default, not None\n    assert \"TEAM1\" in config.linear_team_ids\n\n\ndef test_load_config_empty_yaml(temp_config_dir, empty_yaml_content):\n    \"\"\"Load config from empty YAML file.\"\"\"\n    config_file = temp_config_dir / \"config.yaml\"\n    config_file.write_text(empty_yaml_content)\n    \n    config = load_config(config_file)\n    \n    # Should return config with all defaults\n    assert isinstance(config, AscendConfig)\n    assert config.model is not None\n    assert config.repos_dir is not None\n\n\n# ============================================================================\n# Error Tests - load_config\n# ============================================================================\n\ndef test_load_config_malformed_yaml(temp_config_dir, malformed_yaml_content):\n    \"\"\"Load config from malformed YAML file.\"\"\"\n    config_file = temp_config_dir / \"malformed.yaml\"\n    config_file.write_text(malformed_yaml_content)\n    \n    with pytest.raises(Exception) as exc_info:\n        load_config(config_file)\n    \n    # Should raise yaml_parse_error\n    assert \"yaml\" in str(exc_info.typename).lower() or \"parse\" in str(exc_info.value).lower()\n\n\ndef test_load_config_invalid_values(temp_config_dir, invalid_values_yaml):\n    \"\"\"Load config with invalid field values for Pydantic validation.\"\"\"\n    config_file = temp_config_dir / \"invalid.yaml\"\n    config_file.write_text(invalid_values_yaml)\n    \n    with pytest.raises((ValidationError, ValueError)) as exc_info:\n        load_config(config_file)\n    \n    # Should raise pydantic_validation_error\n    assert exc_info.type in (ValidationError, ValueError)\n\n\ndef test_load_config_permission_denied(temp_config_dir):\n    \"\"\"Load config when file exists but cannot be read.\"\"\"\n    config_file = temp_config_dir / \"unreadable.yaml\"\n    config_file.write_text(\"model: test\")\n    config_file.chmod(0o000)\n    \n    try:\n        with pytest.raises((PermissionError, OSError, IOError)) as exc_info:\n            load_config(config_file)\n        \n        # Should raise io_error\n        assert exc_info.type in (PermissionError, OSError, IOError)\n    finally:\n        config_file.chmod(0o644)\n\n\n# ============================================================================\n# Happy Path Tests - save_config\n# ============================================================================\n\ndef test_save_config_default_path(temp_config_dir, valid_config):\n    \"\"\"Save config to default path, creating parent directories.\"\"\"\n    config_path = temp_config_dir / \"config.yaml\"\n    \n    with patch('src_ascend_config.CONFIG_PATH', config_path):\n        save_config(valid_config, None)\n        \n        # Config file should exist\n        assert config_path.exists()\n        \n        # Should contain YAML content\n        content = config_path.read_text()\n        assert \"repos_dir\" in content\n        assert \"model\" in content\n        \n        # Verify it's valid YAML\n        data = yaml.safe_load(content)\n        assert data is not None\n        assert data.get(\"model\") == valid_config.model\n\n\ndef test_save_config_custom_path(temp_config_dir, valid_config):\n    \"\"\"Save config to custom path with parent directory creation.\"\"\"\n    custom_path = temp_config_dir / \"custom\" / \"path\" / \"config.yaml\"\n    \n    save_config(valid_config, custom_path)\n    \n    # Parent directories should be created\n    assert custom_path.parent.exists()\n    \n    # Config file should exist\n    assert custom_path.exists()\n    \n    # Verify content\n    content = custom_path.read_text()\n    data = yaml.safe_load(content)\n    assert data.get(\"repos_dir\") == valid_config.repos_dir\n\n\ndef test_save_config_yaml_format(temp_config_dir, valid_config):\n    \"\"\"Verify saved YAML uses non-flow style.\"\"\"\n    config_path = temp_config_dir / \"test.yaml\"\n    \n    save_config(valid_config, config_path)\n    \n    content = config_path.read_text()\n    \n    # Should use block style for lists, not flow style\n    # Block style: \"- item\" not \"[item1, item2]\"\n    if valid_config.slack_channels:\n        assert \"- \" in content or not any(\"[\" in line and \"]\" in line for line in content.split(\"\\n\"))\n\n\ndef test_round_trip_save_load(temp_config_dir, valid_config):\n    \"\"\"Save and load config preserves all values.\"\"\"\n    config_path = temp_config_dir / \"roundtrip.yaml\"\n    \n    # Save config\n    save_config(valid_config, config_path)\n    \n    # Load it back\n    loaded_config = load_config(config_path)\n    \n    # All values should be preserved\n    assert loaded_config.repos_dir == valid_config.repos_dir\n    assert loaded_config.model == valid_config.model\n    assert loaded_config.default_lookback_hours == valid_config.default_lookback_hours\n    assert loaded_config.slack_channels == valid_config.slack_channels\n    assert loaded_config.linear_team_ids == valid_config.linear_team_ids\n    assert loaded_config.manager_name == valid_config.manager_name\n\n\n# ============================================================================\n# Error Tests - save_config\n# ============================================================================\n\ndef test_save_config_io_error(temp_config_dir, valid_config):\n    \"\"\"Save config when file cannot be written due to permissions.\"\"\"\n    # Create a read-only file\n    config_path = temp_config_dir / \"readonly.yaml\"\n    config_path.write_text(\"test\")\n    config_path.chmod(0o444)\n    \n    # Make parent directory read-only too\n    temp_config_dir.chmod(0o555)\n    \n    try:\n        with pytest.raises((PermissionError, OSError, IOError)):\n            save_config(valid_config, config_path)\n    finally:\n        temp_config_dir.chmod(0o755)\n        config_path.chmod(0o644)\n\n\ndef test_save_config_cannot_create_dirs(temp_config_dir, valid_config):\n    \"\"\"Save config when parent directories cannot be created.\"\"\"\n    # Create a file where we need a directory\n    blocking_file = temp_config_dir / \"blocking\"\n    blocking_file.write_text(\"block\")\n    \n    config_path = temp_config_dir / \"blocking\" / \"config.yaml\"\n    \n    with pytest.raises((NotADirectoryError, OSError, FileExistsError)):\n        save_config(valid_config, config_path)\n\n\n# ============================================================================\n# Happy Path Tests - get_config_value\n# ============================================================================\n\ndef test_get_config_value_valid_key(valid_config):\n    \"\"\"Get config value for valid key with provided config.\"\"\"\n    value = get_config_value(\"model\", valid_config)\n    \n    # Should return string representation\n    assert isinstance(value, str)\n    assert value == valid_config.model\n\n\ndef test_get_config_value_load_from_disk(temp_config_dir, valid_yaml_content):\n    \"\"\"Get config value when cfg is None, loads from disk.\"\"\"\n    config_path = temp_config_dir / \"config.yaml\"\n    config_path.write_text(valid_yaml_content)\n    \n    with patch('src_ascend_config.CONFIG_PATH', config_path):\n        value = get_config_value(\"repos_dir\", None)\n        \n        # Should load from disk and return value\n        assert isinstance(value, str)\n        assert value == \"/custom/repos\"\n\n\ndef test_get_config_value_list_field(valid_config):\n    \"\"\"Get config value for list field returns string representation.\"\"\"\n    value = get_config_value(\"slack_channels\", valid_config)\n    \n    # Should return string representation of list\n    assert isinstance(value, str)\n    assert \"#general\" in value or \"general\" in value\n\n\ndef test_get_config_value_optional_field(valid_config):\n    \"\"\"Get config value for optional field (manager_name).\"\"\"\n    value = get_config_value(\"manager_name\", valid_config)\n    \n    # Should return string representation\n    assert isinstance(value, str)\n    assert value == \"Test Manager\"\n\n\n# ============================================================================\n# Error Tests - get_config_value\n# ============================================================================\n\ndef test_get_config_value_invalid_key(valid_config):\n    \"\"\"Get config value with invalid field name.\"\"\"\n    with pytest.raises((KeyError, AttributeError)) as exc_info:\n        get_config_value(\"nonexistent_field\", valid_config)\n    \n    # Should raise key_error\n    assert exc_info.type in (KeyError, AttributeError)\n\n\ndef test_get_config_value_malformed_yaml(temp_config_dir, malformed_yaml_content):\n    \"\"\"Get config value when cfg is None and config file is malformed.\"\"\"\n    config_path = temp_config_dir / \"malformed.yaml\"\n    config_path.write_text(malformed_yaml_content)\n    \n    with patch('src_ascend_config.CONFIG_PATH', config_path):\n        with pytest.raises(Exception) as exc_info:\n            get_config_value(\"model\", None)\n        \n        # Should raise yaml_parse_error\n        assert \"yaml\" in str(exc_info.typename).lower() or \"parse\" in str(exc_info.value).lower()\n\n\ndef test_get_config_value_io_error(temp_config_dir):\n    \"\"\"Get config value when cfg is None and cannot read config file.\"\"\"\n    config_path = temp_config_dir / \"unreadable.yaml\"\n    config_path.write_text(\"model: test\")\n    config_path.chmod(0o000)\n    \n    with patch('src_ascend_config.CONFIG_PATH', config_path):\n        try:\n            with pytest.raises((PermissionError, OSError, IOError)):\n                get_config_value(\"model\", None)\n        finally:\n            config_path.chmod(0o644)\n\n\n# ============================================================================\n# Happy Path Tests - set_config_value\n# ============================================================================\n\ndef test_set_config_value_string_field(temp_config_dir):\n    \"\"\"Set config value for string field.\"\"\"\n    config_path = temp_config_dir / \"config.yaml\"\n    \n    updated_config = set_config_value(\"model\", \"claude-3-opus-20240229\", config_path)\n    \n    # Should return updated AscendConfig\n    assert isinstance(updated_config, AscendConfig)\n    assert updated_config.model == \"claude-3-opus-20240229\"\n    \n    # Config should be saved\n    assert config_path.exists()\n\n\ndef test_set_config_value_int_field(temp_config_dir):\n    \"\"\"Set config value for int field with type coercion.\"\"\"\n    config_path = temp_config_dir / \"config.yaml\"\n    \n    updated_config = set_config_value(\"default_lookback_hours\", \"48\", config_path)\n    \n    # Should coerce to int\n    assert isinstance(updated_config, AscendConfig)\n    assert updated_config.default_lookback_hours == 48\n    assert isinstance(updated_config.default_lookback_hours, int)\n\n\ndef test_set_config_value_list_field(temp_config_dir):\n    \"\"\"Set config value for list field with comma-separated values.\"\"\"\n    config_path = temp_config_dir / \"config.yaml\"\n    \n    updated_config = set_config_value(\"slack_channels\", \"#general,#dev,#alerts\", config_path)\n    \n    # Should split by comma and create list\n    assert isinstance(updated_config, AscendConfig)\n    assert isinstance(updated_config.slack_channels, list)\n    assert \"#general\" in updated_config.slack_channels\n    assert \"#dev\" in updated_config.slack_channels\n    assert \"#alerts\" in updated_config.slack_channels\n\n\ndef test_set_config_value_empty_list(temp_config_dir):\n    \"\"\"Set list field with empty string.\"\"\"\n    config_path = temp_config_dir / \"config.yaml\"\n    \n    updated_config = set_config_value(\"slack_channels\", \"\", config_path)\n    \n    # Should handle empty string\n    assert isinstance(updated_config, AscendConfig)\n    assert isinstance(updated_config.slack_channels, list)\n\n\n# ============================================================================\n# Error Tests - set_config_value\n# ============================================================================\n\ndef test_set_config_value_invalid_key(temp_config_dir):\n    \"\"\"Set config value with invalid field name.\"\"\"\n    config_path = temp_config_dir / \"config.yaml\"\n    \n    with pytest.raises((KeyError, AttributeError)) as exc_info:\n        set_config_value(\"invalid_field\", \"test\", config_path)\n    \n    assert exc_info.type in (KeyError, AttributeError)\n\n\ndef test_set_config_value_invalid_int(temp_config_dir):\n    \"\"\"Set int field with non-numeric value.\"\"\"\n    config_path = temp_config_dir / \"config.yaml\"\n    \n    with pytest.raises((ValueError, ValidationError)) as exc_info:\n        set_config_value(\"default_lookback_hours\", \"not_a_number\", config_path)\n    \n    assert exc_info.type in (ValueError, ValidationError)\n\n\ndef test_set_config_value_pydantic_validation_fails(temp_config_dir):\n    \"\"\"Set value that fails Pydantic validation.\"\"\"\n    config_path = temp_config_dir / \"config.yaml\"\n    \n    with pytest.raises((ValidationError, ValueError)):\n        # Negative hours might fail validation\n        set_config_value(\"default_lookback_hours\", \"-100\", config_path)\n\n\ndef test_set_config_value_malformed_existing_yaml(temp_config_dir, malformed_yaml_content):\n    \"\"\"Set value when existing config file has malformed YAML.\"\"\"\n    config_path = temp_config_dir / \"config.yaml\"\n    config_path.write_text(malformed_yaml_content)\n    \n    with pytest.raises(Exception) as exc_info:\n        set_config_value(\"model\", \"new-model\", config_path)\n    \n    # Should raise yaml_parse_error\n    assert \"yaml\" in str(exc_info.typename).lower() or \"parse\" in str(exc_info.value).lower()\n\n\ndef test_set_config_value_io_error(temp_config_dir):\n    \"\"\"Set value when cannot read or write config file.\"\"\"\n    config_path = temp_config_dir / \"unwritable.yaml\"\n    config_path.write_text(\"model: test\")\n    config_path.chmod(0o444)\n    \n    temp_config_dir.chmod(0o555)\n    \n    try:\n        with pytest.raises((PermissionError, OSError, IOError)):\n            set_config_value(\"model\", \"new-model\", config_path)\n    finally:\n        temp_config_dir.chmod(0o755)\n        config_path.chmod(0o644)\n\n\n# ============================================================================\n# Invariant Tests\n# ============================================================================\n\ndef test_invariant_ascend_home():\n    \"\"\"Verify ASCEND_HOME is always ~/.ascend.\"\"\"\n    from src.ascend.config import ASCEND_HOME\n    \n    expected_home = Path.home() / \".ascend\"\n    assert ASCEND_HOME == expected_home\n\n\ndef test_invariant_config_path():\n    \"\"\"Verify CONFIG_PATH is always ~/.ascend/config.yaml.\"\"\"\n    from src.ascend.config import CONFIG_PATH\n    \n    expected_path = Path.home() / \".ascend\" / \"config.yaml\"\n    assert CONFIG_PATH == expected_path\n\n\ndef test_invariant_db_path():\n    \"\"\"Verify DB_PATH is always ~/.ascend/ascend.db.\"\"\"\n    from src.ascend.config import DB_PATH\n    \n    expected_path = Path.home() / \".ascend\" / \"ascend.db\"\n    assert DB_PATH == expected_path\n\n\ndef test_invariant_history_dir():\n    \"\"\"Verify HISTORY_DIR is always ~/.ascend/history.\"\"\"\n    from src.ascend.config import HISTORY_DIR\n    \n    expected_path = Path.home() / \".ascend\" / \"history\"\n    assert HISTORY_DIR == expected_path\n\n\ndef test_invariant_transcripts_dir():\n    \"\"\"Verify TRANSCRIPTS_DIR is always ~/.ascend/transcripts.\"\"\"\n    from src.ascend.config import TRANSCRIPTS_DIR\n    \n    expected_path = Path.home() / \".ascend\" / \"transcripts\"\n    assert TRANSCRIPTS_DIR == expected_path\n\n\ndef test_invariant_schedules_dir():\n    \"\"\"Verify SCHEDULES_DIR is always ~/.ascend/schedules.\"\"\"\n    from src.ascend.config import SCHEDULES_DIR\n    \n    expected_path = Path.home() / \".ascend\" / \"schedules\"\n    assert SCHEDULES_DIR == expected_path\n\n\ndef test_invariant_no_none_values(temp_config_dir):\n    \"\"\"Verify config values are never None after load_config.\"\"\"\n    config_path = temp_config_dir / \"config.yaml\"\n    config_path.write_text(\"repos_dir: /test\")\n    \n    config = load_config(config_path)\n    \n    # Required fields should never be None\n    assert config.repos_dir is not None\n    assert config.reports_dir is not None\n    assert config.config_dir is not None\n    assert config.anthropic_api_key_env is not None\n    assert config.model is not None\n    assert config.default_lookback_hours is not None\n    assert config.linear_team_id is not None\n    assert config.linear_api_key_env is not None\n    assert config.linear_team_ids is not None\n    assert config.slack_channels is not None\n    assert config.slack_bot_token_env is not None\n    assert config.github_org is not None\n    # manager_name is Optional, so it can be None\n\n\ndef test_invariant_defaults_exist():\n    \"\"\"Verify _DEFAULTS dict provides fallback values.\"\"\"\n    from src.ascend.config import _DEFAULTS\n    \n    # _DEFAULTS should exist and contain values\n    assert isinstance(_DEFAULTS, dict)\n    assert len(_DEFAULTS) > 0\n    \n    # Should have defaults for key fields\n    assert \"repos_dir\" in _DEFAULTS\n    assert \"model\" in _DEFAULTS\n    assert \"default_lookback_hours\" in _DEFAULTS\n\n\ndef test_invariant_type_coercion_rules(temp_config_dir):\n    \"\"\"Verify type coercion in set_config_value works correctly.\"\"\"\n    config_path = temp_config_dir / \"config.yaml\"\n    \n    # Test int field coercion\n    config_int = set_config_value(\"default_lookback_hours\", \"72\", config_path)\n    assert isinstance(config_int.default_lookback_hours, int)\n    assert config_int.default_lookback_hours == 72\n    \n    # Test list field coercion\n    config_list = set_config_value(\"linear_team_ids\", \"TEAM1,TEAM2,TEAM3\", config_path)\n    assert isinstance(config_list.linear_team_ids, list)\n    assert len(config_list.linear_team_ids) == 3\n    \n    # Test string field remains string\n    config_str = set_config_value(\"model\", \"test-model\", config_path)\n    assert isinstance(config_str.model, str)\n    assert config_str.model == \"test-model\"\n\n\n# ============================================================================\n# Additional Edge Cases\n# ============================================================================\n\ndef test_load_config_with_custom_path(temp_config_dir, valid_yaml_content):\n    \"\"\"Load config from custom path.\"\"\"\n    custom_path = temp_config_dir / \"custom.yaml\"\n    custom_path.write_text(valid_yaml_content)\n    \n    config = load_config(custom_path)\n    \n    assert isinstance(config, AscendConfig)\n    assert config.repos_dir == \"/custom/repos\"\n\n\ndef test_save_config_overwrites_existing(temp_config_dir, valid_config):\n    \"\"\"Save config overwrites existing file.\"\"\"\n    config_path = temp_config_dir / \"config.yaml\"\n    config_path.write_text(\"old: data\")\n    \n    save_config(valid_config, config_path)\n    \n    # Old content should be overwritten\n    content = config_path.read_text()\n    assert \"old: data\" not in content\n    assert \"model:\" in content\n\n\ndef test_config_preserves_all_fields(valid_config):\n    \"\"\"Verify AscendConfig has all expected fields.\"\"\"\n    assert hasattr(valid_config, \"repos_dir\")\n    assert hasattr(valid_config, \"reports_dir\")\n    assert hasattr(valid_config, \"config_dir\")\n    assert hasattr(valid_config, \"anthropic_api_key_env\")\n    assert hasattr(valid_config, \"model\")\n    assert hasattr(valid_config, \"default_lookback_hours\")\n    assert hasattr(valid_config, \"linear_team_id\")\n    assert hasattr(valid_config, \"linear_api_key_env\")\n    assert hasattr(valid_config, \"linear_team_ids\")\n    assert hasattr(valid_config, \"slack_channels\")\n    assert hasattr(valid_config, \"slack_bot_token_env\")\n    assert hasattr(valid_config, \"github_org\")\n    assert hasattr(valid_config, \"manager_name\")\n\n\ndef test_set_config_value_whitespace_handling(temp_config_dir):\n    \"\"\"Test that set_config_value handles whitespace in comma-separated lists.\"\"\"\n    config_path = temp_config_dir / \"config.yaml\"\n    \n    # Test with spaces around commas\n    config = set_config_value(\"slack_channels\", \"#general , #dev , #alerts\", config_path)\n    \n    # Should handle whitespace properly\n    assert isinstance(config.slack_channels, list)\n    # Values might be trimmed or preserved depending on implementation\n    assert len(config.slack_channels) >= 3\n"
+}

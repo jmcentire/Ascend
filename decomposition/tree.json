@@ -1,0 +1,831 @@
+{
+  "root_id": "root",
+  "nodes": {
+    "root": {
+      "component_id": "root",
+      "name": "Project Root",
+      "description": "Adopted codebase at /Users/jmcentire/Code/Ascend",
+      "depth": 0,
+      "parent_id": "",
+      "children": [
+        "contracts",
+        "src"
+      ],
+      "contract": null,
+      "implementation_status": "pending",
+      "test_results": null
+    },
+    "contracts": {
+      "component_id": "contracts",
+      "name": "Contracts",
+      "description": "Package: contracts",
+      "depth": 1,
+      "parent_id": "root",
+      "children": [
+        "contracts_src_ascend_output",
+        "contracts_contracts_src_ascend_audit_interface",
+        "contracts_src_ascend_summarizer",
+        "contracts_src_ascend_config",
+        "contracts_src_ascend_cli",
+        "contracts_contracts_src_ascend_summarizer_interface",
+        "contracts_contracts_src_ascend_scheduler_interface",
+        "contracts_contracts_src_ascend_config_interface",
+        "contracts_contracts_src_ascend_cli_interface",
+        "contracts_src_ascend_db",
+        "contracts_src_ascend_scheduler",
+        "contracts_contracts_src_ascend_output_interface",
+        "contracts_contracts_src_ascend_db_interface",
+        "contracts_src_ascend_audit"
+      ],
+      "contract": null,
+      "implementation_status": "pending",
+      "test_results": null
+    },
+    "contracts_src_ascend_output": {
+      "component_id": "contracts_src_ascend_output",
+      "name": "Src Ascend Output",
+      "description": "Package: contracts/src_ascend_output",
+      "depth": 2,
+      "parent_id": "contracts",
+      "children": [
+        "contracts_src_ascend_output_interface"
+      ],
+      "contract": null,
+      "implementation_status": "pending",
+      "test_results": null
+    },
+    "contracts_src_ascend_output_interface": {
+      "component_id": "contracts_src_ascend_output_interface",
+      "name": "Interface",
+      "description": "Module contracts/src_ascend_output/interface.py: _colorize, print_report, print_json, print_status, copy_to_clipboard (+2 more)",
+      "depth": 3,
+      "parent_id": "contracts_src_ascend_output",
+      "children": [],
+      "contract": null,
+      "implementation_status": "pending",
+      "test_results": null
+    },
+    "contracts_contracts_src_ascend_audit_interface": {
+      "component_id": "contracts_contracts_src_ascend_audit_interface",
+      "name": "Contracts Src Ascend Audit Interface",
+      "description": "Package: contracts/contracts_src_ascend_audit_interface",
+      "depth": 2,
+      "parent_id": "contracts",
+      "children": [
+        "contracts_contracts_src_ascend_audit_interface_interface"
+      ],
+      "contract": null,
+      "implementation_status": "pending",
+      "test_results": null
+    },
+    "contracts_contracts_src_ascend_audit_interface_interface": {
+      "component_id": "contracts_contracts_src_ascend_audit_interface_interface",
+      "name": "Interface",
+      "description": "Module contracts/contracts_src_ascend_audit_interface/interface.py: _audit_path, log_operation, read_audit",
+      "depth": 3,
+      "parent_id": "contracts_contracts_src_ascend_audit_interface",
+      "children": [],
+      "contract": null,
+      "implementation_status": "pending",
+      "test_results": null
+    },
+    "contracts_src_ascend_summarizer": {
+      "component_id": "contracts_src_ascend_summarizer",
+      "name": "Src Ascend Summarizer",
+      "description": "Package: contracts/src_ascend_summarizer",
+      "depth": 2,
+      "parent_id": "contracts",
+      "children": [
+        "contracts_src_ascend_summarizer_interface"
+      ],
+      "contract": null,
+      "implementation_status": "pending",
+      "test_results": null
+    },
+    "contracts_src_ascend_summarizer_interface": {
+      "component_id": "contracts_src_ascend_summarizer_interface",
+      "name": "Interface",
+      "description": "Module contracts/src_ascend_summarizer/interface.py: _truncate, _parse_json, content_must_be_nonempty, get_client, summarize_transcript (+3 more)",
+      "depth": 3,
+      "parent_id": "contracts_src_ascend_summarizer",
+      "children": [],
+      "contract": null,
+      "implementation_status": "pending",
+      "test_results": null
+    },
+    "contracts_src_ascend_config": {
+      "component_id": "contracts_src_ascend_config",
+      "name": "Src Ascend Config",
+      "description": "Package: contracts/src_ascend_config",
+      "depth": 2,
+      "parent_id": "contracts",
+      "children": [
+        "contracts_src_ascend_config_interface"
+      ],
+      "contract": null,
+      "implementation_status": "pending",
+      "test_results": null
+    },
+    "contracts_src_ascend_config_interface": {
+      "component_id": "contracts_src_ascend_config_interface",
+      "name": "Interface",
+      "description": "Module contracts/src_ascend_config/interface.py: load_config, save_config, get_config_value, set_config_value",
+      "depth": 3,
+      "parent_id": "contracts_src_ascend_config",
+      "children": [],
+      "contract": null,
+      "implementation_status": "pending",
+      "test_results": null
+    },
+    "contracts_src_ascend_cli": {
+      "component_id": "contracts_src_ascend_cli",
+      "name": "Src Ascend Cli",
+      "description": "Package: contracts/src_ascend_cli",
+      "depth": 2,
+      "parent_id": "contracts",
+      "children": [
+        "contracts_src_ascend_cli_interface"
+      ],
+      "contract": null,
+      "implementation_status": "pending",
+      "test_results": null
+    },
+    "contracts_src_ascend_cli_interface": {
+      "component_id": "contracts_src_ascend_cli_interface",
+      "name": "Interface",
+      "description": "Module contracts/src_ascend_cli/interface.py: _build_parser, _rewrite_args, main",
+      "depth": 3,
+      "parent_id": "contracts_src_ascend_cli",
+      "children": [],
+      "contract": null,
+      "implementation_status": "pending",
+      "test_results": null
+    },
+    "contracts_contracts_src_ascend_summarizer_interface": {
+      "component_id": "contracts_contracts_src_ascend_summarizer_interface",
+      "name": "Contracts Src Ascend Summarizer Interface",
+      "description": "Package: contracts/contracts_src_ascend_summarizer_interface",
+      "depth": 2,
+      "parent_id": "contracts",
+      "children": [
+        "contracts_contracts_src_ascend_summarizer_interface_interface"
+      ],
+      "contract": null,
+      "implementation_status": "pending",
+      "test_results": null
+    },
+    "contracts_contracts_src_ascend_summarizer_interface_interface": {
+      "component_id": "contracts_contracts_src_ascend_summarizer_interface_interface",
+      "name": "Interface",
+      "description": "Module contracts/contracts_src_ascend_summarizer_interface/interface.py: _truncate, _parse_json, content_must_be_nonempty, get_client, summarize_transcript (+3 more)",
+      "depth": 3,
+      "parent_id": "contracts_contracts_src_ascend_summarizer_interface",
+      "children": [],
+      "contract": null,
+      "implementation_status": "pending",
+      "test_results": null
+    },
+    "contracts_contracts_src_ascend_scheduler_interface": {
+      "component_id": "contracts_contracts_src_ascend_scheduler_interface",
+      "name": "Contracts Src Ascend Scheduler Interface",
+      "description": "Package: contracts/contracts_src_ascend_scheduler_interface",
+      "depth": 2,
+      "parent_id": "contracts",
+      "children": [
+        "contracts_contracts_src_ascend_scheduler_interface_interface"
+      ],
+      "contract": null,
+      "implementation_status": "pending",
+      "test_results": null
+    },
+    "contracts_contracts_src_ascend_scheduler_interface_interface": {
+      "component_id": "contracts_contracts_src_ascend_scheduler_interface_interface",
+      "name": "Interface",
+      "description": "Module contracts/contracts_src_ascend_scheduler_interface/interface.py: schedule_to_cron, parse_cron, _expand_field, compute_next_run, describe_cron (+7 more)",
+      "depth": 3,
+      "parent_id": "contracts_contracts_src_ascend_scheduler_interface",
+      "children": [],
+      "contract": null,
+      "implementation_status": "pending",
+      "test_results": null
+    },
+    "contracts_contracts_src_ascend_config_interface": {
+      "component_id": "contracts_contracts_src_ascend_config_interface",
+      "name": "Contracts Src Ascend Config Interface",
+      "description": "Package: contracts/contracts_src_ascend_config_interface",
+      "depth": 2,
+      "parent_id": "contracts",
+      "children": [
+        "contracts_contracts_src_ascend_config_interface_interface"
+      ],
+      "contract": null,
+      "implementation_status": "pending",
+      "test_results": null
+    },
+    "contracts_contracts_src_ascend_config_interface_interface": {
+      "component_id": "contracts_contracts_src_ascend_config_interface_interface",
+      "name": "Interface",
+      "description": "Module contracts/contracts_src_ascend_config_interface/interface.py: load_config, save_config, get_config_value, set_config_value",
+      "depth": 3,
+      "parent_id": "contracts_contracts_src_ascend_config_interface",
+      "children": [],
+      "contract": null,
+      "implementation_status": "pending",
+      "test_results": null
+    },
+    "contracts_contracts_src_ascend_cli_interface": {
+      "component_id": "contracts_contracts_src_ascend_cli_interface",
+      "name": "Contracts Src Ascend Cli Interface",
+      "description": "Package: contracts/contracts_src_ascend_cli_interface",
+      "depth": 2,
+      "parent_id": "contracts",
+      "children": [
+        "contracts_contracts_src_ascend_cli_interface_interface"
+      ],
+      "contract": null,
+      "implementation_status": "pending",
+      "test_results": null
+    },
+    "contracts_contracts_src_ascend_cli_interface_interface": {
+      "component_id": "contracts_contracts_src_ascend_cli_interface_interface",
+      "name": "Interface",
+      "description": "Module contracts/contracts_src_ascend_cli_interface/interface.py: _build_parser, _rewrite_args, main",
+      "depth": 3,
+      "parent_id": "contracts_contracts_src_ascend_cli_interface",
+      "children": [],
+      "contract": null,
+      "implementation_status": "pending",
+      "test_results": null
+    },
+    "contracts_src_ascend_db": {
+      "component_id": "contracts_src_ascend_db",
+      "name": "Src Ascend Db",
+      "description": "Package: contracts/src_ascend_db",
+      "depth": 2,
+      "parent_id": "contracts",
+      "children": [
+        "contracts_src_ascend_db_interface"
+      ],
+      "contract": null,
+      "implementation_status": "pending",
+      "test_results": null
+    },
+    "contracts_src_ascend_db_interface": {
+      "component_id": "contracts_src_ascend_db_interface",
+      "name": "Interface",
+      "description": "Module contracts/src_ascend_db/interface.py: get_connection, init_db, check_db",
+      "depth": 3,
+      "parent_id": "contracts_src_ascend_db",
+      "children": [],
+      "contract": null,
+      "implementation_status": "pending",
+      "test_results": null
+    },
+    "contracts_src_ascend_scheduler": {
+      "component_id": "contracts_src_ascend_scheduler",
+      "name": "Src Ascend Scheduler",
+      "description": "Package: contracts/src_ascend_scheduler",
+      "depth": 2,
+      "parent_id": "contracts",
+      "children": [
+        "contracts_src_ascend_scheduler_interface"
+      ],
+      "contract": null,
+      "implementation_status": "pending",
+      "test_results": null
+    },
+    "contracts_src_ascend_scheduler_interface": {
+      "component_id": "contracts_src_ascend_scheduler_interface",
+      "name": "Interface",
+      "description": "Module contracts/src_ascend_scheduler/interface.py: schedule_to_cron, parse_cron, _expand_field, compute_next_run, describe_cron (+7 more)",
+      "depth": 3,
+      "parent_id": "contracts_src_ascend_scheduler",
+      "children": [],
+      "contract": null,
+      "implementation_status": "pending",
+      "test_results": null
+    },
+    "contracts_contracts_src_ascend_output_interface": {
+      "component_id": "contracts_contracts_src_ascend_output_interface",
+      "name": "Contracts Src Ascend Output Interface",
+      "description": "Package: contracts/contracts_src_ascend_output_interface",
+      "depth": 2,
+      "parent_id": "contracts",
+      "children": [
+        "contracts_contracts_src_ascend_output_interface_interface"
+      ],
+      "contract": null,
+      "implementation_status": "pending",
+      "test_results": null
+    },
+    "contracts_contracts_src_ascend_output_interface_interface": {
+      "component_id": "contracts_contracts_src_ascend_output_interface_interface",
+      "name": "Interface",
+      "description": "Module contracts/contracts_src_ascend_output_interface/interface.py: _colorize, print_report, print_json, print_status, copy_to_clipboard (+2 more)",
+      "depth": 3,
+      "parent_id": "contracts_contracts_src_ascend_output_interface",
+      "children": [],
+      "contract": null,
+      "implementation_status": "pending",
+      "test_results": null
+    },
+    "contracts_contracts_src_ascend_db_interface": {
+      "component_id": "contracts_contracts_src_ascend_db_interface",
+      "name": "Contracts Src Ascend Db Interface",
+      "description": "Package: contracts/contracts_src_ascend_db_interface",
+      "depth": 2,
+      "parent_id": "contracts",
+      "children": [
+        "contracts_contracts_src_ascend_db_interface_interface"
+      ],
+      "contract": null,
+      "implementation_status": "pending",
+      "test_results": null
+    },
+    "contracts_contracts_src_ascend_db_interface_interface": {
+      "component_id": "contracts_contracts_src_ascend_db_interface_interface",
+      "name": "Interface",
+      "description": "Module contracts/contracts_src_ascend_db_interface/interface.py: get_connection, init_db, check_db",
+      "depth": 3,
+      "parent_id": "contracts_contracts_src_ascend_db_interface",
+      "children": [],
+      "contract": null,
+      "implementation_status": "pending",
+      "test_results": null
+    },
+    "contracts_src_ascend_audit": {
+      "component_id": "contracts_src_ascend_audit",
+      "name": "Src Ascend Audit",
+      "description": "Package: contracts/src_ascend_audit",
+      "depth": 2,
+      "parent_id": "contracts",
+      "children": [
+        "contracts_src_ascend_audit_interface"
+      ],
+      "contract": null,
+      "implementation_status": "pending",
+      "test_results": null
+    },
+    "contracts_src_ascend_audit_interface": {
+      "component_id": "contracts_src_ascend_audit_interface",
+      "name": "Interface",
+      "description": "Module contracts/src_ascend_audit/interface.py: _audit_path, log_operation, read_audit",
+      "depth": 3,
+      "parent_id": "contracts_src_ascend_audit",
+      "children": [],
+      "contract": null,
+      "implementation_status": "pending",
+      "test_results": null
+    },
+    "src": {
+      "component_id": "src",
+      "name": "Src",
+      "description": "Package: src",
+      "depth": 1,
+      "parent_id": "root",
+      "children": [
+        "src_ascend"
+      ],
+      "contract": null,
+      "implementation_status": "pending",
+      "test_results": null
+    },
+    "src_ascend": {
+      "component_id": "src_ascend",
+      "name": "Ascend",
+      "description": "Package: src/ascend",
+      "depth": 2,
+      "parent_id": "src",
+      "children": [
+        "src_ascend_audit",
+        "src_ascend_cli",
+        "src_ascend_config",
+        "src_ascend_db",
+        "src_ascend_output",
+        "src_ascend_scheduler",
+        "src_ascend_summarizer",
+        "src_ascend_transcript",
+        "src_ascend_tui",
+        "src_ascend_integrations",
+        "src_ascend_commands"
+      ],
+      "contract": null,
+      "implementation_status": "pending",
+      "test_results": null
+    },
+    "src_ascend_audit": {
+      "component_id": "src_ascend_audit",
+      "name": "Audit",
+      "description": "Module src/ascend/audit.py: _audit_path, log_operation, read_audit",
+      "depth": 3,
+      "parent_id": "src_ascend",
+      "children": [],
+      "contract": null,
+      "implementation_status": "pending",
+      "test_results": null
+    },
+    "src_ascend_cli": {
+      "component_id": "src_ascend_cli",
+      "name": "Cli",
+      "description": "Module src/ascend/cli.py: _build_parser, _rewrite_args, main",
+      "depth": 3,
+      "parent_id": "src_ascend",
+      "children": [],
+      "contract": null,
+      "implementation_status": "pending",
+      "test_results": null
+    },
+    "src_ascend_config": {
+      "component_id": "src_ascend_config",
+      "name": "Config",
+      "description": "Module src/ascend/config.py: load_config, save_config, get_config_value, set_config_value",
+      "depth": 3,
+      "parent_id": "src_ascend",
+      "children": [],
+      "contract": null,
+      "implementation_status": "pending",
+      "test_results": null
+    },
+    "src_ascend_db": {
+      "component_id": "src_ascend_db",
+      "name": "Db",
+      "description": "Module src/ascend/db.py: get_connection, init_db, check_db",
+      "depth": 3,
+      "parent_id": "src_ascend",
+      "children": [],
+      "contract": null,
+      "implementation_status": "pending",
+      "test_results": null
+    },
+    "src_ascend_output": {
+      "component_id": "src_ascend_output",
+      "name": "Output",
+      "description": "Module src/ascend/output.py: _colorize, print_report, print_json, print_status, copy_to_clipboard (+2 more)",
+      "depth": 3,
+      "parent_id": "src_ascend",
+      "children": [],
+      "contract": null,
+      "implementation_status": "pending",
+      "test_results": null
+    },
+    "src_ascend_scheduler": {
+      "component_id": "src_ascend_scheduler",
+      "name": "Scheduler",
+      "description": "Module src/ascend/scheduler.py: schedule_to_cron, parse_cron, _expand_field, compute_next_run, describe_cron (+7 more)",
+      "depth": 3,
+      "parent_id": "src_ascend",
+      "children": [],
+      "contract": null,
+      "implementation_status": "pending",
+      "test_results": null
+    },
+    "src_ascend_summarizer": {
+      "component_id": "src_ascend_summarizer",
+      "name": "Summarizer",
+      "description": "Module src/ascend/summarizer.py: _truncate, _parse_json, get_client, summarize_transcript, extract_items (+3 more)",
+      "depth": 3,
+      "parent_id": "src_ascend",
+      "children": [],
+      "contract": null,
+      "implementation_status": "pending",
+      "test_results": null
+    },
+    "src_ascend_transcript": {
+      "component_id": "src_ascend_transcript",
+      "name": "Transcript",
+      "description": "Module src/ascend/transcript.py: parse_transcript, detect_date, resolve_member, scan_directory, check_duplicate (+2 more)",
+      "depth": 3,
+      "parent_id": "src_ascend",
+      "children": [],
+      "contract": null,
+      "implementation_status": "pending",
+      "test_results": null
+    },
+    "src_ascend_tui": {
+      "component_id": "src_ascend_tui",
+      "name": "Tui",
+      "description": "Package: src/ascend/tui",
+      "depth": 3,
+      "parent_id": "src_ascend",
+      "children": [
+        "src_ascend_tui_app",
+        "src_ascend_tui_screens",
+        "src_ascend_tui_widgets"
+      ],
+      "contract": null,
+      "implementation_status": "pending",
+      "test_results": null
+    },
+    "src_ascend_tui_app": {
+      "component_id": "src_ascend_tui_app",
+      "name": "App",
+      "description": "Module src/ascend/tui/app.py: search, compose, compose, compose, on_mount (+6 more)",
+      "depth": 4,
+      "parent_id": "src_ascend_tui",
+      "children": [],
+      "contract": null,
+      "implementation_status": "pending",
+      "test_results": null
+    },
+    "src_ascend_tui_screens": {
+      "component_id": "src_ascend_tui_screens",
+      "name": "Screens",
+      "description": "Package: src/ascend/tui/screens",
+      "depth": 4,
+      "parent_id": "src_ascend_tui",
+      "children": [
+        "src_ascend_tui_screens_coaching",
+        "src_ascend_tui_screens_dashboard",
+        "src_ascend_tui_screens_meetings",
+        "src_ascend_tui_screens_reports",
+        "src_ascend_tui_screens_roster",
+        "src_ascend_tui_screens_schedules"
+      ],
+      "contract": null,
+      "implementation_status": "pending",
+      "test_results": null
+    },
+    "src_ascend_tui_screens_coaching": {
+      "component_id": "src_ascend_tui_screens_coaching",
+      "name": "Coaching",
+      "description": "Module src/ascend/tui/screens/coaching.py: compose, on_mount, refresh_data, _load_risks, on_data_table_row_highlighted (+1 more)",
+      "depth": 5,
+      "parent_id": "src_ascend_tui_screens",
+      "children": [],
+      "contract": null,
+      "implementation_status": "pending",
+      "test_results": null
+    },
+    "src_ascend_tui_screens_dashboard": {
+      "component_id": "src_ascend_tui_screens_dashboard",
+      "name": "Dashboard",
+      "description": "Module src/ascend/tui/screens/dashboard.py: compose, on_mount, refresh_data, _load_stats, _load_risks (+2 more)",
+      "depth": 5,
+      "parent_id": "src_ascend_tui_screens",
+      "children": [],
+      "contract": null,
+      "implementation_status": "pending",
+      "test_results": null
+    },
+    "src_ascend_tui_screens_meetings": {
+      "component_id": "src_ascend_tui_screens_meetings",
+      "name": "Meetings",
+      "description": "Module src/ascend/tui/screens/meetings.py: compose, on_mount, refresh_data, on_input_changed, on_data_table_row_highlighted (+2 more)",
+      "depth": 5,
+      "parent_id": "src_ascend_tui_screens",
+      "children": [],
+      "contract": null,
+      "implementation_status": "pending",
+      "test_results": null
+    },
+    "src_ascend_tui_screens_reports": {
+      "component_id": "src_ascend_tui_screens_reports",
+      "name": "Reports",
+      "description": "Module src/ascend/tui/screens/reports.py: compose, on_mount, refresh_data, _build_dashboard_report, _build_team_report (+3 more)",
+      "depth": 5,
+      "parent_id": "src_ascend_tui_screens",
+      "children": [],
+      "contract": null,
+      "implementation_status": "pending",
+      "test_results": null
+    },
+    "src_ascend_tui_screens_roster": {
+      "component_id": "src_ascend_tui_screens_roster",
+      "name": "Roster",
+      "description": "Module src/ascend/tui/screens/roster.py: compose, on_mount, refresh_data, on_input_changed, on_data_table_row_highlighted (+3 more)",
+      "depth": 5,
+      "parent_id": "src_ascend_tui_screens",
+      "children": [],
+      "contract": null,
+      "implementation_status": "pending",
+      "test_results": null
+    },
+    "src_ascend_tui_screens_schedules": {
+      "component_id": "src_ascend_tui_screens_schedules",
+      "name": "Schedules",
+      "description": "Module src/ascend/tui/screens/schedules.py: compose, on_mount, refresh_data, _get_selected_name, action_enable_schedule (+5 more)",
+      "depth": 5,
+      "parent_id": "src_ascend_tui_screens",
+      "children": [],
+      "contract": null,
+      "implementation_status": "pending",
+      "test_results": null
+    },
+    "src_ascend_tui_widgets": {
+      "component_id": "src_ascend_tui_widgets",
+      "name": "Widgets",
+      "description": "Package: src/ascend/tui/widgets",
+      "depth": 4,
+      "parent_id": "src_ascend_tui",
+      "children": [
+        "src_ascend_tui_widgets_member_card",
+        "src_ascend_tui_widgets_metric_bar"
+      ],
+      "contract": null,
+      "implementation_status": "pending",
+      "test_results": null
+    },
+    "src_ascend_tui_widgets_member_card": {
+      "component_id": "src_ascend_tui_widgets_member_card",
+      "name": "Member Card",
+      "description": "Module src/ascend/tui/widgets/member_card.py: compose, on_mount, _hide_fields, _show_fields, show_member (+1 more)",
+      "depth": 5,
+      "parent_id": "src_ascend_tui_widgets",
+      "children": [],
+      "contract": null,
+      "implementation_status": "pending",
+      "test_results": null
+    },
+    "src_ascend_tui_widgets_metric_bar": {
+      "component_id": "src_ascend_tui_widgets_metric_bar",
+      "name": "Metric Bar",
+      "description": "Module src/ascend/tui/widgets/metric_bar.py: __init__, render, watch_value, watch_max_value",
+      "depth": 5,
+      "parent_id": "src_ascend_tui_widgets",
+      "children": [],
+      "contract": null,
+      "implementation_status": "pending",
+      "test_results": null
+    },
+    "src_ascend_integrations": {
+      "component_id": "src_ascend_integrations",
+      "name": "Integrations",
+      "description": "Package: src/ascend/integrations",
+      "depth": 3,
+      "parent_id": "src_ascend",
+      "children": [
+        "src_ascend_integrations_github",
+        "src_ascend_integrations_linear",
+        "src_ascend_integrations_slack",
+        "src_ascend_integrations_snapshot"
+      ],
+      "contract": null,
+      "implementation_status": "pending",
+      "test_results": null
+    },
+    "src_ascend_integrations_github": {
+      "component_id": "src_ascend_integrations_github",
+      "name": "Github",
+      "description": "Module src/ascend/integrations/github.py: _run_cmd, fetch_commits, fetch_prs, clear_pr_cache, fetch_all_github (+5 more)",
+      "depth": 4,
+      "parent_id": "src_ascend_integrations",
+      "children": [],
+      "contract": null,
+      "implementation_status": "pending",
+      "test_results": null
+    },
+    "src_ascend_integrations_linear": {
+      "component_id": "src_ascend_integrations_linear",
+      "name": "Linear",
+      "description": "Module src/ascend/integrations/linear.py: _graphql, fetch_recent_issues, fetch_all_issues, fetch_member_issues, match_issues (+3 more)",
+      "depth": 4,
+      "parent_id": "src_ascend_integrations",
+      "children": [],
+      "contract": null,
+      "implementation_status": "pending",
+      "test_results": null
+    },
+    "src_ascend_integrations_slack": {
+      "component_id": "src_ascend_integrations_slack",
+      "name": "Slack",
+      "description": "Module src/ascend/integrations/slack.py: _api, resolve_channel_id, fetch_channel_activity, detect_signals, _extract_notable",
+      "depth": 4,
+      "parent_id": "src_ascend_integrations",
+      "children": [],
+      "contract": null,
+      "implementation_status": "pending",
+      "test_results": null
+    },
+    "src_ascend_integrations_snapshot": {
+      "component_id": "src_ascend_integrations_snapshot",
+      "name": "Snapshot",
+      "description": "Module src/ascend/integrations/snapshot.py: take_snapshot, take_all_snapshots",
+      "depth": 4,
+      "parent_id": "src_ascend_integrations",
+      "children": [],
+      "contract": null,
+      "implementation_status": "pending",
+      "test_results": null
+    },
+    "src_ascend_commands": {
+      "component_id": "src_ascend_commands",
+      "name": "Commands",
+      "description": "Package: src/ascend/commands",
+      "depth": 3,
+      "parent_id": "src_ascend",
+      "children": [
+        "src_ascend_commands_coach",
+        "src_ascend_commands_init",
+        "src_ascend_commands_meeting",
+        "src_ascend_commands_plan",
+        "src_ascend_commands_report",
+        "src_ascend_commands_roster",
+        "src_ascend_commands_schedule",
+        "src_ascend_commands_sync",
+        "src_ascend_commands_team"
+      ],
+      "contract": null,
+      "implementation_status": "pending",
+      "test_results": null
+    },
+    "src_ascend_commands_coach": {
+      "component_id": "src_ascend_commands_coach",
+      "name": "Coach",
+      "description": "Module src/ascend/commands/coach.py: _get_conn, _resolve_member, cmd_coach_analyze, cmd_coach_risks, cmd_coach_star (+3 more)",
+      "depth": 4,
+      "parent_id": "src_ascend_commands",
+      "children": [],
+      "contract": null,
+      "implementation_status": "pending",
+      "test_results": null
+    },
+    "src_ascend_commands_init": {
+      "component_id": "src_ascend_commands_init",
+      "name": "Init",
+      "description": "Module src/ascend/commands/init.py: cmd_init, cmd_doctor, cmd_config_show, cmd_config_set",
+      "depth": 4,
+      "parent_id": "src_ascend_commands",
+      "children": [],
+      "contract": null,
+      "implementation_status": "pending",
+      "test_results": null
+    },
+    "src_ascend_commands_meeting": {
+      "component_id": "src_ascend_commands_meeting",
+      "name": "Meeting",
+      "description": "Module src/ascend/commands/meeting.py: _get_conn, _resolve_member_arg, cmd_meeting_ingest, cmd_meeting_list, cmd_meeting_show (+4 more)",
+      "depth": 4,
+      "parent_id": "src_ascend_commands",
+      "children": [],
+      "contract": null,
+      "implementation_status": "pending",
+      "test_results": null
+    },
+    "src_ascend_commands_plan": {
+      "component_id": "src_ascend_commands_plan",
+      "name": "Plan",
+      "description": "Module src/ascend/commands/plan.py: _get_conn, _resolve_member, _current_cycle, cmd_plan_cycle, cmd_plan_goal_create (+7 more)",
+      "depth": 4,
+      "parent_id": "src_ascend_commands",
+      "children": [],
+      "contract": null,
+      "implementation_status": "pending",
+      "test_results": null
+    },
+    "src_ascend_commands_report": {
+      "component_id": "src_ascend_commands_report",
+      "name": "Report",
+      "description": "Module src/ascend/commands/report.py: _get_conn, _resolve_member, _date_range, _get_snapshots, _get_meetings (+14 more)",
+      "depth": 4,
+      "parent_id": "src_ascend_commands",
+      "children": [],
+      "contract": null,
+      "implementation_status": "pending",
+      "test_results": null
+    },
+    "src_ascend_commands_roster": {
+      "component_id": "src_ascend_commands_roster",
+      "name": "Roster",
+      "description": "Module src/ascend/commands/roster.py: _get_conn, _row_to_member, _resolve_member, cmd_roster_list, cmd_roster_add (+11 more)",
+      "depth": 4,
+      "parent_id": "src_ascend_commands",
+      "children": [],
+      "contract": null,
+      "implementation_status": "pending",
+      "test_results": null
+    },
+    "src_ascend_commands_schedule": {
+      "component_id": "src_ascend_commands_schedule",
+      "name": "Schedule",
+      "description": "Module src/ascend/commands/schedule.py: _get_conn, cmd_schedule_list, cmd_schedule_add, cmd_schedule_remove, cmd_schedule_run (+2 more)",
+      "depth": 4,
+      "parent_id": "src_ascend_commands",
+      "children": [],
+      "contract": null,
+      "implementation_status": "pending",
+      "test_results": null
+    },
+    "src_ascend_commands_sync": {
+      "component_id": "src_ascend_commands_sync",
+      "name": "Sync",
+      "description": "Module src/ascend/commands/sync.py: _get_conn, _resolve_member, _get_since, cmd_sync, cmd_sync_github (+12 more)",
+      "depth": 4,
+      "parent_id": "src_ascend_commands",
+      "children": [],
+      "contract": null,
+      "implementation_status": "pending",
+      "test_results": null
+    },
+    "src_ascend_commands_team": {
+      "component_id": "src_ascend_commands_team",
+      "name": "Team",
+      "description": "Module src/ascend/commands/team.py: _get_conn, cmd_team_list, cmd_team_create, cmd_team_add, cmd_team_show",
+      "depth": 4,
+      "parent_id": "src_ascend_commands",
+      "children": [],
+      "contract": null,
+      "implementation_status": "pending",
+      "test_results": null
+    }
+  }
+}

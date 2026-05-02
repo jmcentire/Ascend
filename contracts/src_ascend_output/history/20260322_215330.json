@@ -1,0 +1,349 @@
+{
+  "component_id": "src_ascend_output",
+  "name": "Output Formatter",
+  "description": "Output formatting utilities for terminal output with ANSI colors, JSON serialization, clipboard integration, and markdown table formatting. Provides functions for colorizing markdown-formatted reports, printing to stdout/stderr, copying to clipboard via pbcopy, and unified output rendering.",
+  "version": 1,
+  "types": [],
+  "functions": [
+    {
+      "name": "_colorize",
+      "description": "Apply ANSI color codes to markdown-formatted report text based on line patterns. Colors headers (#, ##, ###), status indicators (Blocked, Active, On Track, At Risk), and metadata lines (Generated:, ---).",
+      "inputs": [
+        {
+          "name": "text",
+          "type_ref": "str",
+          "required": true,
+          "default": "",
+          "description": "Markdown-formatted text to colorize",
+          "validators": []
+        }
+      ],
+      "output_type": "str",
+      "error_cases": [],
+      "preconditions": [],
+      "postconditions": [
+        "Returns string with ANSI escape codes inserted",
+        "Output string contains original text content with added color codes",
+        "Lines starting with '# ' or '## ' are bold cyan",
+        "Lines starting with '### ' are bold",
+        "Lines containing 'Blocked' are red",
+        "Lines containing 'Active' or 'On Track' are green",
+        "Lines containing 'At Risk' are yellow",
+        "Lines starting with 'Generated:' or '---' are dimmed"
+      ],
+      "idempotent": true,
+      "is_async": false,
+      "side_effects": [],
+      "structured_side_effects": [
+        {
+          "kind": "none",
+          "target": "",
+          "description": ""
+        }
+      ],
+      "performance_budget": null
+    },
+    {
+      "name": "print_report",
+      "description": "Print report text to stdout with optional ANSI coloring. If use_color is None, auto-detects TTY and enables colors for interactive terminals.",
+      "inputs": [
+        {
+          "name": "text",
+          "type_ref": "str",
+          "required": true,
+          "default": "",
+          "description": "Report text to print",
+          "validators": []
+        },
+        {
+          "name": "use_color",
+          "type_ref": "bool | None",
+          "required": false,
+          "default": "None",
+          "description": "Whether to apply ANSI colors. None means auto-detect from sys.stdout.isatty()",
+          "validators": []
+        }
+      ],
+      "output_type": "None",
+      "error_cases": [],
+      "preconditions": [],
+      "postconditions": [
+        "Text is printed to stdout",
+        "If use_color is True or (None and stdout is a TTY), text is colorized",
+        "If use_color is False or (None and stdout is not a TTY), text is printed as-is"
+      ],
+      "idempotent": false,
+      "is_async": false,
+      "side_effects": [
+        "Writes to stdout"
+      ],
+      "structured_side_effects": [
+        {
+          "kind": "mutates_state",
+          "target": "sys.stdout",
+          "description": "Writes formatted text to stdout"
+        }
+      ],
+      "performance_budget": null
+    },
+    {
+      "name": "print_json",
+      "description": "Print data as formatted JSON to stdout with 2-space indentation. Uses str as default serializer for non-JSON-serializable types.",
+      "inputs": [
+        {
+          "name": "data",
+          "type_ref": "Any",
+          "required": true,
+          "default": "",
+          "description": "Data to serialize and print as JSON",
+          "validators": []
+        }
+      ],
+      "output_type": "None",
+      "error_cases": [],
+      "preconditions": [],
+      "postconditions": [
+        "Data is serialized to JSON with indent=2",
+        "JSON output is printed to stdout",
+        "Non-serializable objects are converted to strings"
+      ],
+      "idempotent": false,
+      "is_async": false,
+      "side_effects": [
+        "Writes to stdout"
+      ],
+      "structured_side_effects": [
+        {
+          "kind": "mutates_state",
+          "target": "sys.stdout",
+          "description": "Writes JSON to stdout"
+        }
+      ],
+      "performance_budget": null
+    },
+    {
+      "name": "print_status",
+      "description": "Print a status message to stderr without interfering with piped stdout. Dims the message if stderr is a TTY.",
+      "inputs": [
+        {
+          "name": "message",
+          "type_ref": "str",
+          "required": true,
+          "default": "",
+          "description": "Status message to print",
+          "validators": []
+        }
+      ],
+      "output_type": "None",
+      "error_cases": [],
+      "preconditions": [],
+      "postconditions": [
+        "Message is written to stderr with newline",
+        "If stderr is a TTY, message is dimmed with ANSI codes",
+        "If stderr is not a TTY, message is written as-is"
+      ],
+      "idempotent": false,
+      "is_async": false,
+      "side_effects": [
+        "Writes to stderr"
+      ],
+      "structured_side_effects": [
+        {
+          "kind": "mutates_state",
+          "target": "sys.stderr",
+          "description": "Writes status message to stderr"
+        }
+      ],
+      "performance_budget": null
+    },
+    {
+      "name": "copy_to_clipboard",
+      "description": "Copy text to system clipboard via pbcopy command (macOS only). Returns True on success, False on failure. Has 5-second timeout.",
+      "inputs": [
+        {
+          "name": "text",
+          "type_ref": "str",
+          "required": true,
+          "default": "",
+          "description": "Text to copy to clipboard",
+          "validators": []
+        }
+      ],
+      "output_type": "bool",
+      "error_cases": [
+        {
+          "name": "timeout",
+          "condition": "pbcopy subprocess exceeds 5-second timeout",
+          "error_type": "subprocess.TimeoutExpired",
+          "error_data": {
+            "handling": "Caught and returns False"
+          }
+        },
+        {
+          "name": "pbcopy_not_found",
+          "condition": "pbcopy command not found on system",
+          "error_type": "FileNotFoundError",
+          "error_data": {
+            "handling": "Caught and returns False"
+          }
+        },
+        {
+          "name": "os_error",
+          "condition": "OS-level error executing subprocess",
+          "error_type": "OSError",
+          "error_data": {
+            "handling": "Caught and returns False"
+          }
+        }
+      ],
+      "preconditions": [],
+      "postconditions": [
+        "Returns True if pbcopy command succeeds (returncode == 0)",
+        "Returns False if pbcopy times out, is not found, or OS error occurs",
+        "On success, text is in system clipboard"
+      ],
+      "idempotent": false,
+      "is_async": false,
+      "side_effects": [
+        "Executes pbcopy subprocess",
+        "Modifies system clipboard"
+      ],
+      "structured_side_effects": [
+        {
+          "kind": "mutates_state",
+          "target": "system clipboard",
+          "description": "Copies text to clipboard via pbcopy subprocess"
+        }
+      ],
+      "performance_budget": null
+    },
+    {
+      "name": "format_table",
+      "description": "Format data as a markdown table with aligned columns. Returns 'No data.' if rows list is empty. Calculates column widths based on headers and row content.",
+      "inputs": [
+        {
+          "name": "headers",
+          "type_ref": "list[str]",
+          "required": true,
+          "default": "",
+          "description": "Column headers for the table",
+          "validators": []
+        },
+        {
+          "name": "rows",
+          "type_ref": "list[list[str]]",
+          "required": true,
+          "default": "",
+          "description": "Rows of data, each row is a list of cell values",
+          "validators": []
+        }
+      ],
+      "output_type": "str",
+      "error_cases": [],
+      "preconditions": [],
+      "postconditions": [
+        "Returns 'No data.' if rows list is empty",
+        "Returns markdown-formatted table string if rows exist",
+        "Table has header row, separator row, and data rows",
+        "Columns are left-justified and padded to consistent widths",
+        "Cells are converted to strings",
+        "Missing cells (row shorter than headers) are rendered as empty strings"
+      ],
+      "idempotent": true,
+      "is_async": false,
+      "side_effects": [],
+      "structured_side_effects": [
+        {
+          "kind": "none",
+          "target": "",
+          "description": ""
+        }
+      ],
+      "performance_budget": null
+    },
+    {
+      "name": "render_output",
+      "description": "Unified output handler that prints data as JSON or markdown and optionally copies to clipboard. In json_mode, serializes any data to JSON. Otherwise, prints strings as reports or serializes non-strings to JSON.",
+      "inputs": [
+        {
+          "name": "data",
+          "type_ref": "Any",
+          "required": true,
+          "default": "",
+          "description": "Data to render (string for markdown report, or any data for JSON)",
+          "validators": []
+        },
+        {
+          "name": "json_mode",
+          "type_ref": "bool",
+          "required": false,
+          "default": "False",
+          "description": "If True, always output as JSON",
+          "validators": []
+        },
+        {
+          "name": "copy",
+          "type_ref": "bool",
+          "required": false,
+          "default": "False",
+          "description": "If True, copy output to clipboard",
+          "validators": []
+        }
+      ],
+      "output_type": "None",
+      "error_cases": [],
+      "preconditions": [],
+      "postconditions": [
+        "If json_mode is True: data is serialized to JSON and printed to stdout",
+        "If json_mode is False and data is str: data is printed as colored report",
+        "If json_mode is False and data is not str: data is serialized to JSON and printed",
+        "If copy is True: output text is copied to clipboard via copy_to_clipboard"
+      ],
+      "idempotent": false,
+      "is_async": false,
+      "side_effects": [
+        "Prints to stdout",
+        "May copy to clipboard"
+      ],
+      "structured_side_effects": [
+        {
+          "kind": "mutates_state",
+          "target": "sys.stdout",
+          "description": "Prints output to stdout"
+        },
+        {
+          "kind": "mutates_state",
+          "target": "system clipboard",
+          "description": "Optionally copies output to clipboard"
+        }
+      ],
+      "performance_budget": null
+    }
+  ],
+  "dependencies": [
+    "json",
+    "subprocess",
+    "sys",
+    "typing"
+  ],
+  "dependency_contracts": {},
+  "invariants": [
+    "ANSI color codes are constant: RESET='\\033[0m', BOLD='\\033[1m', DIM='\\033[2m', GREEN='\\033[32m', YELLOW='\\033[33m', RED='\\033[31m', CYAN='\\033[36m'",
+    "JSON serialization always uses indent=2 and default=str",
+    "Clipboard operations use pbcopy command with 5-second timeout",
+    "Status messages always go to stderr, reports to stdout",
+    "Color auto-detection uses sys.stdout.isatty() for print_report and sys.stderr.isatty() for print_status"
+  ],
+  "requires": [],
+  "processing_register": "",
+  "data_access": {
+    "reads": [],
+    "writes": [],
+    "rationale": "",
+    "side_effects": []
+  },
+  "authority": {
+    "domains": [],
+    "rationale": null
+  }
+}

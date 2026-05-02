@@ -1,0 +1,403 @@
+{
+  "component_id": "src_ascend_audit",
+  "contract_version": 1,
+  "test_cases": [
+    {
+      "id": "test_audit_path_happy_path",
+      "description": "Test _audit_path returns correct Path to audit.jsonl in HISTORY_DIR",
+      "function": "_audit_path",
+      "category": "happy_path",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {},
+      "input_description": "HISTORY_DIR is configured to a valid directory",
+      "expected_output_description": "Returns Path object pointing to HISTORY_DIR/audit.jsonl",
+      "expected_error": "",
+      "assertions": [
+        "Result is a Path object",
+        "Path ends with 'audit.jsonl'",
+        "Path parent is HISTORY_DIR"
+      ]
+    },
+    {
+      "id": "test_log_operation_all_params",
+      "description": "Test log_operation with all optional parameters provided",
+      "function": "log_operation",
+      "category": "happy_path",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "command": "test_command",
+        "args": "{\"key\": \"value\"}",
+        "result": "success",
+        "error": "none"
+      },
+      "input_description": "",
+      "expected_output_description": "Entry is appended to audit.jsonl with all fields",
+      "expected_error": "",
+      "assertions": [
+        "Audit file exists",
+        "Entry contains timestamp in ISO format",
+        "Entry contains command field",
+        "Entry contains args field",
+        "Entry contains result field",
+        "Entry contains error field"
+      ]
+    },
+    {
+      "id": "test_log_operation_minimal_params",
+      "description": "Test log_operation with only required command parameter",
+      "function": "log_operation",
+      "category": "happy_path",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "command": "minimal_command",
+        "args": "None",
+        "result": "None",
+        "error": "None"
+      },
+      "input_description": "",
+      "expected_output_description": "Entry is appended with only command and timestamp",
+      "expected_error": "",
+      "assertions": [
+        "Audit file exists",
+        "Entry contains timestamp",
+        "Entry contains command field",
+        "Entry does not contain args field",
+        "Entry does not contain result field",
+        "Entry does not contain error field"
+      ]
+    },
+    {
+      "id": "test_log_operation_creates_parent_dirs",
+      "description": "Test log_operation creates parent directories if they don't exist",
+      "function": "log_operation",
+      "category": "happy_path",
+      "setup_description": "HISTORY_DIR points to non-existent directory",
+      "mock_dependencies": {},
+      "input_values": {
+        "command": "test_command"
+      },
+      "input_description": "",
+      "expected_output_description": "Parent directories are created",
+      "expected_error": "",
+      "assertions": [
+        "Parent directory exists after call",
+        "Audit file is created"
+      ]
+    },
+    {
+      "id": "test_log_operation_empty_optional_params",
+      "description": "Test log_operation with empty strings for optional parameters",
+      "function": "log_operation",
+      "category": "edge_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "command": "test",
+        "args": "{}",
+        "result": "\"\"",
+        "error": "\"\""
+      },
+      "input_description": "",
+      "expected_output_description": "Empty strings are considered falsy and not included",
+      "expected_error": "",
+      "assertions": [
+        "Entry does not contain args field for empty dict",
+        "Entry does not contain result field for empty string",
+        "Entry does not contain error field for empty string"
+      ]
+    },
+    {
+      "id": "test_log_operation_complex_args",
+      "description": "Test log_operation with complex nested args dictionary",
+      "function": "log_operation",
+      "category": "happy_path",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "command": "complex_command",
+        "args": "{\"nested\": {\"key\": [1, 2, 3]}, \"another\": \"value\"}"
+      },
+      "input_description": "",
+      "expected_output_description": "Complex args are serialized correctly",
+      "expected_error": "",
+      "assertions": [
+        "Entry contains args field",
+        "Args are correctly deserialized"
+      ]
+    },
+    {
+      "id": "test_log_operation_permission_error",
+      "description": "Test log_operation raises permission_error when write permissions are denied",
+      "function": "log_operation",
+      "category": "error_case",
+      "setup_description": "Audit directory is read-only",
+      "mock_dependencies": {},
+      "input_values": {
+        "command": "test_command"
+      },
+      "input_description": "",
+      "expected_output_description": "",
+      "expected_error": "permission_error",
+      "assertions": [
+        "PermissionError is raised"
+      ]
+    },
+    {
+      "id": "test_log_operation_json_serialization_error",
+      "description": "Test log_operation raises json_serialization_error for non-serializable objects",
+      "function": "log_operation",
+      "category": "error_case",
+      "setup_description": "Args contain object that cannot be serialized even with default=str",
+      "mock_dependencies": {},
+      "input_values": {
+        "command": "test_command",
+        "args": "non_serializable_object"
+      },
+      "input_description": "",
+      "expected_output_description": "",
+      "expected_error": "json_serialization_error",
+      "assertions": [
+        "TypeError is raised for non-serializable objects"
+      ]
+    },
+    {
+      "id": "test_read_audit_empty_file",
+      "description": "Test read_audit returns empty list when audit file doesn't exist",
+      "function": "read_audit",
+      "category": "edge_case",
+      "setup_description": "Audit file does not exist",
+      "mock_dependencies": {},
+      "input_values": {
+        "last_n": "10"
+      },
+      "input_description": "",
+      "expected_output_description": "Returns empty list",
+      "expected_error": "",
+      "assertions": [
+        "Returns empty list"
+      ]
+    },
+    {
+      "id": "test_read_audit_last_n_entries",
+      "description": "Test read_audit returns last N entries in order",
+      "function": "read_audit",
+      "category": "happy_path",
+      "setup_description": "Audit file contains 5 entries",
+      "mock_dependencies": {},
+      "input_values": {
+        "last_n": "3"
+      },
+      "input_description": "",
+      "expected_output_description": "Returns last 3 entries in order",
+      "expected_error": "",
+      "assertions": [
+        "Returns list of length 3",
+        "Entries are in correct order",
+        "Returns the last 3 entries"
+      ]
+    },
+    {
+      "id": "test_read_audit_zero_entries",
+      "description": "Test read_audit with last_n=0",
+      "function": "read_audit",
+      "category": "edge_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "last_n": "0"
+      },
+      "input_description": "",
+      "expected_output_description": "Returns empty list",
+      "expected_error": "",
+      "assertions": [
+        "Returns empty list"
+      ]
+    },
+    {
+      "id": "test_read_audit_exceeds_available",
+      "description": "Test read_audit when last_n exceeds available entries",
+      "function": "read_audit",
+      "category": "edge_case",
+      "setup_description": "Audit file contains 5 entries",
+      "mock_dependencies": {},
+      "input_values": {
+        "last_n": "100"
+      },
+      "input_description": "",
+      "expected_output_description": "Returns all 5 entries",
+      "expected_error": "",
+      "assertions": [
+        "Returns list of length 5",
+        "All entries are returned"
+      ]
+    },
+    {
+      "id": "test_read_audit_filters_empty_lines",
+      "description": "Test read_audit filters out empty lines in audit file",
+      "function": "read_audit",
+      "category": "edge_case",
+      "setup_description": "Audit file contains entries with empty lines",
+      "mock_dependencies": {},
+      "input_values": {
+        "last_n": "10"
+      },
+      "input_description": "",
+      "expected_output_description": "Empty lines are filtered out",
+      "expected_error": "",
+      "assertions": [
+        "Returns only valid entries",
+        "Empty lines are not included"
+      ]
+    },
+    {
+      "id": "test_read_audit_json_decode_error",
+      "description": "Test read_audit raises json_decode_error for malformed JSON",
+      "function": "read_audit",
+      "category": "error_case",
+      "setup_description": "Audit file contains malformed JSON line",
+      "mock_dependencies": {},
+      "input_values": {
+        "last_n": "10"
+      },
+      "input_description": "",
+      "expected_output_description": "",
+      "expected_error": "json_decode_error",
+      "assertions": [
+        "JSONDecodeError is raised"
+      ]
+    },
+    {
+      "id": "test_read_audit_permission_error",
+      "description": "Test read_audit raises permission_error when read permissions are denied",
+      "function": "read_audit",
+      "category": "error_case",
+      "setup_description": "Audit file is write-only",
+      "mock_dependencies": {},
+      "input_values": {
+        "last_n": "10"
+      },
+      "input_description": "",
+      "expected_output_description": "",
+      "expected_error": "permission_error",
+      "assertions": [
+        "PermissionError is raised"
+      ]
+    },
+    {
+      "id": "test_invariant_append_only",
+      "description": "Test that audit log is append-only (multiple log operations append)",
+      "function": "log_operation",
+      "category": "invariant",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {},
+      "input_description": "",
+      "expected_output_description": "Each operation appends without modifying previous entries",
+      "expected_error": "",
+      "assertions": [
+        "File grows with each operation",
+        "Previous entries remain unchanged",
+        "New entries are appended"
+      ]
+    },
+    {
+      "id": "test_invariant_timestamp_format",
+      "description": "Test that each audit entry contains UTC ISO-formatted timestamp",
+      "function": "log_operation",
+      "category": "invariant",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "command": "test_command"
+      },
+      "input_description": "",
+      "expected_output_description": "Entry contains valid UTC ISO timestamp",
+      "expected_error": "",
+      "assertions": [
+        "Timestamp field exists",
+        "Timestamp is in ISO format",
+        "Timestamp is valid UTC time"
+      ]
+    },
+    {
+      "id": "test_invariant_command_field",
+      "description": "Test that each audit entry contains a command field",
+      "function": "log_operation",
+      "category": "invariant",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "command": "test_command"
+      },
+      "input_description": "",
+      "expected_output_description": "Entry contains command field",
+      "expected_error": "",
+      "assertions": [
+        "Command field exists in entry"
+      ]
+    },
+    {
+      "id": "test_invariant_valid_json_lines",
+      "description": "Test that each line in audit.jsonl is valid JSON followed by newline",
+      "function": "log_operation",
+      "category": "invariant",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "command": "test_command"
+      },
+      "input_description": "",
+      "expected_output_description": "Each line is valid JSON ending with newline",
+      "expected_error": "",
+      "assertions": [
+        "Each line ends with newline",
+        "Each line is valid JSON"
+      ]
+    },
+    {
+      "id": "test_log_operation_partial_optional_params",
+      "description": "Test log_operation with some optional parameters (only args and result)",
+      "function": "log_operation",
+      "category": "happy_path",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {
+        "command": "partial_command",
+        "args": "{\"key\": \"value\"}",
+        "result": "success",
+        "error": "None"
+      },
+      "input_description": "",
+      "expected_output_description": "Entry contains command, args, result but not error",
+      "expected_error": "",
+      "assertions": [
+        "Entry contains args field",
+        "Entry contains result field",
+        "Entry does not contain error field"
+      ]
+    },
+    {
+      "id": "test_read_audit_single_entry",
+      "description": "Test read_audit with last_n=1",
+      "function": "read_audit",
+      "category": "edge_case",
+      "setup_description": "Audit file contains multiple entries",
+      "mock_dependencies": {},
+      "input_values": {
+        "last_n": "1"
+      },
+      "input_description": "",
+      "expected_output_description": "Returns only the last entry",
+      "expected_error": "",
+      "assertions": [
+        "Returns list of length 1",
+        "Returns the last entry"
+      ]
+    }
+  ],
+  "test_language": "python",
+  "generated_code": "\"\"\"\nContract tests for src_ascend_audit module.\n\nThis test suite verifies the audit logging functionality according to the contract.\nTests are isolated using tmp_path fixtures and mock ascend.config to redirect\nthe audit path to temporary directories.\n\"\"\"\n\nimport pytest\nimport json\nimport os\nimport stat\nfrom pathlib import Path\nfrom datetime import datetime\nfrom unittest.mock import Mock, patch, mock_open, MagicMock\nfrom typing import Any\n\n# Import the module under test\nfrom src.ascend.audit import _audit_path, log_operation, read_audit\n\n\n@pytest.fixture\ndef mock_history_dir(tmp_path, monkeypatch):\n    \"\"\"Fixture to mock HISTORY_DIR from ascend.config with a tmp_path.\"\"\"\n    history_dir = tmp_path / \"history\"\n    \n    # Mock the ascend.config module\n    mock_config = Mock()\n    mock_config.HISTORY_DIR = history_dir\n    \n    monkeypatch.setattr(\"src_ascend_audit.config\", mock_config)\n    \n    return history_dir\n\n\n@pytest.fixture\ndef populated_audit_log(mock_history_dir):\n    \"\"\"Fixture to create a populated audit log with 5 entries.\"\"\"\n    audit_file = mock_history_dir / \"audit.jsonl\"\n    audit_file.parent.mkdir(parents=True, exist_ok=True)\n    \n    entries = []\n    for i in range(5):\n        entry = {\n            \"timestamp\": datetime.utcnow().isoformat(),\n            \"command\": f\"command_{i}\",\n            \"args\": {\"index\": i}\n        }\n        entries.append(entry)\n    \n    with open(audit_file, 'w') as f:\n        for entry in entries:\n            f.write(json.dumps(entry) + '\\n')\n    \n    return audit_file, entries\n\n\nclass TestAuditPath:\n    \"\"\"Tests for _audit_path function.\"\"\"\n    \n    def test_audit_path_happy_path(self, mock_history_dir):\n        \"\"\"Test _audit_path returns correct Path to audit.jsonl in HISTORY_DIR.\"\"\"\n        result = _audit_path()\n        \n        # Result is a Path object\n        assert isinstance(result, Path)\n        \n        # Path ends with 'audit.jsonl'\n        assert result.name == \"audit.jsonl\"\n        \n        # Path parent is HISTORY_DIR\n        assert result.parent == mock_history_dir\n\n\nclass TestLogOperation:\n    \"\"\"Tests for log_operation function.\"\"\"\n    \n    def test_log_operation_all_params(self, mock_history_dir):\n        \"\"\"Test log_operation with all optional parameters provided.\"\"\"\n        command = \"test_command\"\n        args = {\"key\": \"value\"}\n        result = \"success\"\n        error = \"none\"\n        \n        log_operation(command, args, result, error)\n        \n        audit_file = mock_history_dir / \"audit.jsonl\"\n        \n        # Audit file exists\n        assert audit_file.exists()\n        \n        # Read the entry\n        with open(audit_file, 'r') as f:\n            line = f.readline()\n            entry = json.loads(line)\n        \n        # Entry contains timestamp in ISO format\n        assert \"timestamp\" in entry\n        datetime.fromisoformat(entry[\"timestamp\"])  # Should not raise\n        \n        # Entry contains command field\n        assert entry[\"command\"] == command\n        \n        # Entry contains args field\n        assert \"args\" in entry\n        assert entry[\"args\"] == args\n        \n        # Entry contains result field\n        assert \"result\" in entry\n        assert entry[\"result\"] == result\n        \n        # Entry contains error field\n        assert \"error\" in entry\n        assert entry[\"error\"] == error\n    \n    def test_log_operation_minimal_params(self, mock_history_dir):\n        \"\"\"Test log_operation with only required command parameter.\"\"\"\n        command = \"minimal_command\"\n        \n        log_operation(command, None, None, None)\n        \n        audit_file = mock_history_dir / \"audit.jsonl\"\n        \n        # Audit file exists\n        assert audit_file.exists()\n        \n        # Read the entry\n        with open(audit_file, 'r') as f:\n            line = f.readline()\n            entry = json.loads(line)\n        \n        # Entry contains timestamp\n        assert \"timestamp\" in entry\n        \n        # Entry contains command field\n        assert entry[\"command\"] == command\n        \n        # Entry does not contain args field\n        assert \"args\" not in entry\n        \n        # Entry does not contain result field\n        assert \"result\" not in entry\n        \n        # Entry does not contain error field\n        assert \"error\" not in entry\n    \n    def test_log_operation_creates_parent_dirs(self, mock_history_dir):\n        \"\"\"Test log_operation creates parent directories if they don't exist.\"\"\"\n        command = \"test_command\"\n        \n        # Ensure parent directory doesn't exist\n        assert not mock_history_dir.exists()\n        \n        log_operation(command, None, None, None)\n        \n        audit_file = mock_history_dir / \"audit.jsonl\"\n        \n        # Parent directory exists after call\n        assert mock_history_dir.exists()\n        \n        # Audit file is created\n        assert audit_file.exists()\n    \n    def test_log_operation_empty_optional_params(self, mock_history_dir):\n        \"\"\"Test log_operation with empty strings for optional parameters.\"\"\"\n        command = \"test\"\n        \n        log_operation(command, {}, \"\", \"\")\n        \n        audit_file = mock_history_dir / \"audit.jsonl\"\n        \n        with open(audit_file, 'r') as f:\n            line = f.readline()\n            entry = json.loads(line)\n        \n        # Entry does not contain args field for empty dict\n        assert \"args\" not in entry\n        \n        # Entry does not contain result field for empty string\n        assert \"result\" not in entry\n        \n        # Entry does not contain error field for empty string\n        assert \"error\" not in entry\n    \n    def test_log_operation_complex_args(self, mock_history_dir):\n        \"\"\"Test log_operation with complex nested args dictionary.\"\"\"\n        command = \"complex_command\"\n        args = {\"nested\": {\"key\": [1, 2, 3]}, \"another\": \"value\"}\n        \n        log_operation(command, args, None, None)\n        \n        audit_file = mock_history_dir / \"audit.jsonl\"\n        \n        with open(audit_file, 'r') as f:\n            line = f.readline()\n            entry = json.loads(line)\n        \n        # Entry contains args field\n        assert \"args\" in entry\n        \n        # Args are correctly deserialized\n        assert entry[\"args\"] == args\n    \n    def test_log_operation_permission_error(self, mock_history_dir):\n        \"\"\"Test log_operation raises permission_error when write permissions are denied.\"\"\"\n        command = \"test_command\"\n        \n        # Create the directory but make it read-only\n        mock_history_dir.mkdir(parents=True, exist_ok=True)\n        os.chmod(mock_history_dir, stat.S_IRUSR | stat.S_IXUSR)\n        \n        try:\n            # PermissionError is raised\n            with pytest.raises(PermissionError):\n                log_operation(command, None, None, None)\n        finally:\n            # Restore permissions for cleanup\n            os.chmod(mock_history_dir, stat.S_IRWXU)\n    \n    def test_log_operation_json_serialization_error(self, mock_history_dir):\n        \"\"\"Test log_operation raises json_serialization_error for non-serializable objects.\"\"\"\n        command = \"test_command\"\n        \n        # Create a custom class that cannot be serialized even with default=str\n        class NonSerializable:\n            def __str__(self):\n                raise TypeError(\"Cannot convert to string\")\n        \n        # Mock json.dump to raise TypeError\n        with patch('src_ascend_audit.json.dump') as mock_dump:\n            mock_dump.side_effect = TypeError(\"Object not serializable\")\n            \n            # TypeError is raised for non-serializable objects\n            with pytest.raises(TypeError):\n                log_operation(command, {\"obj\": NonSerializable()}, None, None)\n    \n    def test_log_operation_partial_optional_params(self, mock_history_dir):\n        \"\"\"Test log_operation with some optional parameters (only args and result).\"\"\"\n        command = \"partial_command\"\n        args = {\"key\": \"value\"}\n        result = \"success\"\n        \n        log_operation(command, args, result, None)\n        \n        audit_file = mock_history_dir / \"audit.jsonl\"\n        \n        with open(audit_file, 'r') as f:\n            line = f.readline()\n            entry = json.loads(line)\n        \n        # Entry contains args field\n        assert \"args\" in entry\n        assert entry[\"args\"] == args\n        \n        # Entry contains result field\n        assert \"result\" in entry\n        assert entry[\"result\"] == result\n        \n        # Entry does not contain error field\n        assert \"error\" not in entry\n\n\nclass TestReadAudit:\n    \"\"\"Tests for read_audit function.\"\"\"\n    \n    def test_read_audit_empty_file(self, mock_history_dir):\n        \"\"\"Test read_audit returns empty list when audit file doesn't exist.\"\"\"\n        result = read_audit(10)\n        \n        # Returns empty list\n        assert result == []\n    \n    def test_read_audit_last_n_entries(self, populated_audit_log):\n        \"\"\"Test read_audit returns last N entries in order.\"\"\"\n        audit_file, entries = populated_audit_log\n        \n        result = read_audit(3)\n        \n        # Returns list of length 3\n        assert len(result) == 3\n        \n        # Entries are in correct order\n        assert result[0][\"command\"] == \"command_2\"\n        assert result[1][\"command\"] == \"command_3\"\n        assert result[2][\"command\"] == \"command_4\"\n        \n        # Returns the last 3 entries\n        for i, entry in enumerate(result):\n            assert entry[\"args\"][\"index\"] == i + 2\n    \n    def test_read_audit_zero_entries(self, mock_history_dir):\n        \"\"\"Test read_audit with last_n=0.\"\"\"\n        result = read_audit(0)\n        \n        # Returns empty list\n        assert result == []\n    \n    def test_read_audit_exceeds_available(self, populated_audit_log):\n        \"\"\"Test read_audit when last_n exceeds available entries.\"\"\"\n        audit_file, entries = populated_audit_log\n        \n        result = read_audit(100)\n        \n        # Returns list of length 5\n        assert len(result) == 5\n        \n        # All entries are returned\n        for i, entry in enumerate(result):\n            assert entry[\"command\"] == f\"command_{i}\"\n    \n    def test_read_audit_filters_empty_lines(self, mock_history_dir):\n        \"\"\"Test read_audit filters out empty lines in audit file.\"\"\"\n        audit_file = mock_history_dir / \"audit.jsonl\"\n        audit_file.parent.mkdir(parents=True, exist_ok=True)\n        \n        # Create file with entries and empty lines\n        with open(audit_file, 'w') as f:\n            f.write(json.dumps({\"command\": \"cmd1\"}) + '\\n')\n            f.write('\\n')  # Empty line\n            f.write(json.dumps({\"command\": \"cmd2\"}) + '\\n')\n            f.write('\\n')  # Empty line\n            f.write(json.dumps({\"command\": \"cmd3\"}) + '\\n')\n        \n        result = read_audit(10)\n        \n        # Returns only valid entries\n        assert len(result) == 3\n        \n        # Empty lines are not included\n        for entry in result:\n            assert \"command\" in entry\n    \n    def test_read_audit_json_decode_error(self, mock_history_dir):\n        \"\"\"Test read_audit raises json_decode_error for malformed JSON.\"\"\"\n        audit_file = mock_history_dir / \"audit.jsonl\"\n        audit_file.parent.mkdir(parents=True, exist_ok=True)\n        \n        # Create file with malformed JSON\n        with open(audit_file, 'w') as f:\n            f.write(json.dumps({\"command\": \"cmd1\"}) + '\\n')\n            f.write('{\"invalid json\\n')  # Malformed JSON\n        \n        # JSONDecodeError is raised\n        with pytest.raises(json.JSONDecodeError):\n            read_audit(10)\n    \n    def test_read_audit_permission_error(self, mock_history_dir):\n        \"\"\"Test read_audit raises permission_error when read permissions are denied.\"\"\"\n        audit_file = mock_history_dir / \"audit.jsonl\"\n        audit_file.parent.mkdir(parents=True, exist_ok=True)\n        \n        # Create file and make it write-only\n        with open(audit_file, 'w') as f:\n            f.write(json.dumps({\"command\": \"cmd1\"}) + '\\n')\n        \n        os.chmod(audit_file, stat.S_IWUSR)\n        \n        try:\n            # PermissionError is raised\n            with pytest.raises(PermissionError):\n                read_audit(10)\n        finally:\n            # Restore permissions for cleanup\n            os.chmod(audit_file, stat.S_IRWXU)\n    \n    def test_read_audit_single_entry(self, populated_audit_log):\n        \"\"\"Test read_audit with last_n=1.\"\"\"\n        audit_file, entries = populated_audit_log\n        \n        result = read_audit(1)\n        \n        # Returns list of length 1\n        assert len(result) == 1\n        \n        # Returns the last entry\n        assert result[0][\"command\"] == \"command_4\"\n        assert result[0][\"args\"][\"index\"] == 4\n\n\nclass TestInvariants:\n    \"\"\"Tests for audit log invariants.\"\"\"\n    \n    def test_invariant_append_only(self, mock_history_dir):\n        \"\"\"Test that audit log is append-only (multiple log operations append).\"\"\"\n        audit_file = mock_history_dir / \"audit.jsonl\"\n        \n        # Log first operation\n        log_operation(\"cmd1\", None, None, None)\n        \n        # Get file size after first operation\n        size1 = audit_file.stat().st_size\n        \n        # Read first entry\n        with open(audit_file, 'r') as f:\n            first_content = f.read()\n        \n        # Log second operation\n        log_operation(\"cmd2\", None, None, None)\n        \n        # File grows with each operation\n        size2 = audit_file.stat().st_size\n        assert size2 > size1\n        \n        # Read all content\n        with open(audit_file, 'r') as f:\n            lines = f.readlines()\n        \n        # Previous entries remain unchanged\n        assert lines[0] == first_content\n        \n        # New entries are appended\n        assert len(lines) == 2\n        entry2 = json.loads(lines[1])\n        assert entry2[\"command\"] == \"cmd2\"\n    \n    def test_invariant_timestamp_format(self, mock_history_dir):\n        \"\"\"Test that each audit entry contains UTC ISO-formatted timestamp.\"\"\"\n        command = \"test_command\"\n        \n        log_operation(command, None, None, None)\n        \n        audit_file = mock_history_dir / \"audit.jsonl\"\n        \n        with open(audit_file, 'r') as f:\n            line = f.readline()\n            entry = json.loads(line)\n        \n        # Timestamp field exists\n        assert \"timestamp\" in entry\n        \n        # Timestamp is in ISO format\n        timestamp_str = entry[\"timestamp\"]\n        \n        # Timestamp is valid UTC time\n        parsed_time = datetime.fromisoformat(timestamp_str)\n        assert parsed_time is not None\n    \n    def test_invariant_command_field(self, mock_history_dir):\n        \"\"\"Test that each audit entry contains a command field.\"\"\"\n        command = \"test_command\"\n        \n        log_operation(command, None, None, None)\n        \n        audit_file = mock_history_dir / \"audit.jsonl\"\n        \n        with open(audit_file, 'r') as f:\n            line = f.readline()\n            entry = json.loads(line)\n        \n        # Command field exists in entry\n        assert \"command\" in entry\n        assert entry[\"command\"] == command\n    \n    def test_invariant_valid_json_lines(self, mock_history_dir):\n        \"\"\"Test that each line in audit.jsonl is valid JSON followed by newline.\"\"\"\n        log_operation(\"cmd1\", None, None, None)\n        log_operation(\"cmd2\", {\"arg\": \"value\"}, None, None)\n        log_operation(\"cmd3\", None, \"result\", \"error\")\n        \n        audit_file = mock_history_dir / \"audit.jsonl\"\n        \n        with open(audit_file, 'r') as f:\n            content = f.read()\n            lines = content.split('\\n')\n        \n        # Each non-empty line is valid JSON\n        for line in lines:\n            if line:  # Skip empty lines at end of file\n                # Each line ends with newline (when read as raw content)\n                assert line in content\n                \n                # Each line is valid JSON\n                entry = json.loads(line)\n                assert isinstance(entry, dict)\n"
+}

@@ -1,0 +1,432 @@
+{
+  "component_id": "contracts_contracts_src_ascend_db_interface_interface",
+  "contract_version": 1,
+  "test_cases": [
+    {
+      "id": "test_get_connection_happy_path",
+      "description": "Successfully opens a connection to a valid database path with all required settings",
+      "function": "get_connection",
+      "category": "happy_path",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {},
+      "input_description": "Valid temporary database path",
+      "expected_output_description": "Returns open Connection with WAL mode, foreign keys enabled, Row factory set",
+      "expected_error": "",
+      "assertions": [
+        "Connection object is returned",
+        "Connection is open (not None)",
+        "WAL journal mode is enabled",
+        "Foreign keys are enforced",
+        "row_factory is sqlite3.Row"
+      ]
+    },
+    {
+      "id": "test_get_connection_creates_db_file",
+      "description": "get_connection creates database file if it doesn't exist",
+      "function": "get_connection",
+      "category": "edge_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {},
+      "input_description": "Path to non-existent database file in existing directory",
+      "expected_output_description": "Creates database file and returns connection",
+      "expected_error": "",
+      "assertions": [
+        "Database file exists after connection",
+        "Connection is valid"
+      ]
+    },
+    {
+      "id": "test_get_connection_directory_not_exists",
+      "description": "Raises error when parent directory doesn't exist",
+      "function": "get_connection",
+      "category": "error_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {},
+      "input_description": "Path with non-existent parent directory",
+      "expected_output_description": "",
+      "expected_error": "file_access_error",
+      "assertions": [
+        "Exception is raised",
+        "Error indicates directory doesn't exist or permission issue"
+      ]
+    },
+    {
+      "id": "test_get_connection_invalid_path",
+      "description": "Raises error when path cannot be converted to string",
+      "function": "get_connection",
+      "category": "error_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {},
+      "input_description": "Invalid path object that cannot be stringified",
+      "expected_output_description": "",
+      "expected_error": "invalid_path",
+      "assertions": [
+        "Exception is raised",
+        "Error indicates invalid path"
+      ]
+    },
+    {
+      "id": "test_get_connection_insufficient_permissions",
+      "description": "Raises error when insufficient permissions to access database",
+      "function": "get_connection",
+      "category": "error_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {},
+      "input_description": "Path to directory without write permissions",
+      "expected_output_description": "",
+      "expected_error": "file_access_error",
+      "assertions": [
+        "Exception is raised",
+        "Error indicates permission issue"
+      ]
+    },
+    {
+      "id": "test_init_db_happy_path",
+      "description": "Successfully initializes database with complete schema",
+      "function": "init_db",
+      "category": "happy_path",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {},
+      "input_description": "Valid temporary database path",
+      "expected_output_description": "Creates database with version 2 schema and all tables",
+      "expected_error": "",
+      "assertions": [
+        "Database file exists",
+        "Connection is returned",
+        "Schema version is 2",
+        "All required tables exist",
+        "FTS5 virtual table exists",
+        "Triggers exist",
+        "WAL mode enabled",
+        "Foreign keys enabled"
+      ]
+    },
+    {
+      "id": "test_init_db_creates_parent_directories",
+      "description": "Creates parent directories if they don't exist",
+      "function": "init_db",
+      "category": "edge_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {},
+      "input_description": "Path with multiple non-existent parent directories",
+      "expected_output_description": "All parent directories created, database initialized",
+      "expected_error": "",
+      "assertions": [
+        "All parent directories exist",
+        "Database file exists",
+        "Schema is initialized"
+      ]
+    },
+    {
+      "id": "test_init_db_idempotent",
+      "description": "Calling init_db multiple times on same database is safe (idempotent)",
+      "function": "init_db",
+      "category": "edge_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {},
+      "input_description": "Existing initialized database",
+      "expected_output_description": "Schema remains at version 2, no errors",
+      "expected_error": "",
+      "assertions": [
+        "Schema version remains 2",
+        "All tables still exist",
+        "No exceptions raised"
+      ]
+    },
+    {
+      "id": "test_init_db_schema_upgrade",
+      "description": "Upgrades schema when current version is less than SCHEMA_VERSION",
+      "function": "init_db",
+      "category": "edge_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {},
+      "input_description": "Database with schema version 1",
+      "expected_output_description": "Schema upgraded to version 2",
+      "expected_error": "",
+      "assertions": [
+        "Schema version is 2 after init",
+        "All new tables/triggers are created"
+      ]
+    },
+    {
+      "id": "test_init_db_permission_error",
+      "description": "Raises error when insufficient permissions to create database",
+      "function": "init_db",
+      "category": "error_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {},
+      "input_description": "Path in read-only directory",
+      "expected_output_description": "",
+      "expected_error": "permission_error",
+      "assertions": [
+        "Exception is raised",
+        "Error indicates permission issue"
+      ]
+    },
+    {
+      "id": "test_init_db_sql_error",
+      "description": "Raises error when SQL schema execution fails",
+      "function": "init_db",
+      "category": "error_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {},
+      "input_description": "Mock scenario with invalid SQL in schema",
+      "expected_output_description": "",
+      "expected_error": "sql_error",
+      "assertions": [
+        "Exception is raised",
+        "Error indicates SQL execution failure"
+      ]
+    },
+    {
+      "id": "test_init_db_operational_error",
+      "description": "Raises error when database is locked or corrupted",
+      "function": "init_db",
+      "category": "error_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {},
+      "input_description": "Locked or corrupted database file",
+      "expected_output_description": "",
+      "expected_error": "operational_error",
+      "assertions": [
+        "Exception is raised",
+        "Error indicates database lock or corruption"
+      ]
+    },
+    {
+      "id": "test_check_db_happy_path",
+      "description": "Successfully checks a healthy initialized database",
+      "function": "check_db",
+      "category": "happy_path",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {},
+      "input_description": "Initialized database with schema version 2",
+      "expected_output_description": "Returns HealthCheckResult with ok=True, version=2, and table counts",
+      "expected_error": "",
+      "assertions": [
+        "Result has 'ok' key set to True",
+        "Result has 'version' key with value 2",
+        "Result has 'tables' key with dict of table counts",
+        "All expected tables are in 'tables' dict",
+        "Connection is closed after check"
+      ]
+    },
+    {
+      "id": "test_check_db_database_not_found",
+      "description": "Returns error state when database file doesn't exist",
+      "function": "check_db",
+      "category": "error_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {},
+      "input_description": "Path to non-existent database",
+      "expected_output_description": "Returns HealthCheckResult with ok=False and error message",
+      "expected_error": "database_not_found",
+      "assertions": [
+        "Result has 'ok' key set to False",
+        "Result has 'error' key with description",
+        "Error indicates database not found"
+      ]
+    },
+    {
+      "id": "test_check_db_schema_not_initialized",
+      "description": "Returns error state when schema_version table doesn't exist",
+      "function": "check_db",
+      "category": "error_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {},
+      "input_description": "Database file exists but schema_version table missing",
+      "expected_output_description": "Returns HealthCheckResult with ok=False and error message",
+      "expected_error": "schema_not_initialized",
+      "assertions": [
+        "Result has 'ok' key set to False",
+        "Result has 'error' key",
+        "Error indicates schema not initialized"
+      ]
+    },
+    {
+      "id": "test_check_db_sql_error_missing_table",
+      "description": "Returns error when expected table doesn't exist during count query",
+      "function": "check_db",
+      "category": "error_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {},
+      "input_description": "Database with schema_version but missing expected tables",
+      "expected_output_description": "Returns HealthCheckResult with ok=False and SQL error",
+      "expected_error": "sql_error",
+      "assertions": [
+        "Result has 'ok' key set to False",
+        "Result has 'error' key",
+        "Error indicates SQL query failure"
+      ]
+    },
+    {
+      "id": "test_check_db_connection_closed",
+      "description": "Verifies connection is properly closed even after errors",
+      "function": "check_db",
+      "category": "edge_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {},
+      "input_description": "Any database path (valid or invalid)",
+      "expected_output_description": "Connection is closed before returning",
+      "expected_error": "",
+      "assertions": [
+        "No connection leaks",
+        "Connection is closed regardless of success/failure"
+      ]
+    },
+    {
+      "id": "test_check_db_with_data",
+      "description": "check_db returns accurate table counts with populated tables",
+      "function": "check_db",
+      "category": "edge_case",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {},
+      "input_description": "Initialized database with test data inserted",
+      "expected_output_description": "Table counts reflect actual row counts",
+      "expected_error": "",
+      "assertions": [
+        "ok is True",
+        "tables dict has correct counts for populated tables",
+        "Empty tables show count of 0"
+      ]
+    },
+    {
+      "id": "test_invariant_schema_version",
+      "description": "SCHEMA_VERSION constant is 2",
+      "function": "init_db",
+      "category": "invariant",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {},
+      "input_description": "",
+      "expected_output_description": "",
+      "expected_error": "",
+      "assertions": [
+        "SCHEMA_VERSION equals 2"
+      ]
+    },
+    {
+      "id": "test_invariant_all_tables_created",
+      "description": "All required tables are created by init_db",
+      "function": "init_db",
+      "category": "invariant",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {},
+      "input_description": "Fresh database initialization",
+      "expected_output_description": "",
+      "expected_error": "",
+      "assertions": [
+        "schema_version table exists",
+        "teams table exists",
+        "members table exists",
+        "member_flags table exists",
+        "team_members table exists",
+        "meetings table exists",
+        "meeting_items table exists",
+        "goals table exists",
+        "performance_snapshots table exists",
+        "coaching_entries table exists",
+        "schedules table exists",
+        "meetings_fts virtual table exists"
+      ]
+    },
+    {
+      "id": "test_invariant_triggers_created",
+      "description": "FTS5 sync triggers are created",
+      "function": "init_db",
+      "category": "invariant",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {},
+      "input_description": "Fresh database initialization",
+      "expected_output_description": "",
+      "expected_error": "",
+      "assertions": [
+        "meetings_ai trigger exists",
+        "meetings_ad trigger exists",
+        "meetings_au trigger exists"
+      ]
+    },
+    {
+      "id": "test_invariant_wal_mode",
+      "description": "All connections use WAL journal mode",
+      "function": "get_connection",
+      "category": "invariant",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {},
+      "input_description": "",
+      "expected_output_description": "",
+      "expected_error": "",
+      "assertions": [
+        "Connection journal_mode is 'wal'"
+      ]
+    },
+    {
+      "id": "test_invariant_foreign_keys",
+      "description": "All connections have foreign key constraints enabled",
+      "function": "get_connection",
+      "category": "invariant",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {},
+      "input_description": "",
+      "expected_output_description": "",
+      "expected_error": "",
+      "assertions": [
+        "Foreign keys are enabled (PRAGMA foreign_keys returns 1)"
+      ]
+    },
+    {
+      "id": "test_invariant_row_factory",
+      "description": "All connections use sqlite3.Row as row_factory",
+      "function": "get_connection",
+      "category": "invariant",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {},
+      "input_description": "",
+      "expected_output_description": "",
+      "expected_error": "",
+      "assertions": [
+        "Connection row_factory is sqlite3.Row"
+      ]
+    },
+    {
+      "id": "test_check_db_expected_tables",
+      "description": "check_db expects specific tables in its verification",
+      "function": "check_db",
+      "category": "invariant",
+      "setup_description": "",
+      "mock_dependencies": {},
+      "input_values": {},
+      "input_description": "Initialized database",
+      "expected_output_description": "",
+      "expected_error": "",
+      "assertions": [
+        "tables dict includes: members, member_flags, teams, team_members, meetings, meeting_items, goals, performance_snapshots, coaching_entries, schedules"
+      ]
+    }
+  ],
+  "test_language": "python",
+  "generated_code": "\"\"\"\nContract tests for Ascend SQLite Database Interface\n\nTests verify behavior at boundaries, not internals. Cover happy paths, edge cases,\nerror cases, and invariants. Mock dependencies where appropriate.\n\"\"\"\n\nimport pytest\nimport sqlite3\nimport tempfile\nimport os\nimport sys\nfrom pathlib import Path\nfrom unittest.mock import Mock, patch, MagicMock\nimport random\nimport string\n\n# Import the component under test\n# Adjust import path as needed based on actual module structure\ntry:\n    from contracts.contracts_src_ascend_db_interface.interface import (\n        get_connection,\n        init_db,\n        check_db,\n        SCHEMA_VERSION,\n        _SCHEMA_SQL,\n    )\nexcept ImportError:\n    # Fallback for different module structures\n    import contracts_contracts_src_ascend_db_interface_interface as db_interface\n    get_connection = db_interface.get_connection\n    init_db = db_interface.init_db\n    check_db = db_interface.check_db\n    SCHEMA_VERSION = getattr(db_interface, 'SCHEMA_VERSION', 2)\n    _SCHEMA_SQL = getattr(db_interface, '_SCHEMA_SQL', '')\n\n\n# ============================================================================\n# Fixtures\n# ============================================================================\n\n@pytest.fixture\ndef temp_db_path(tmp_path):\n    \"\"\"Provides a temporary database path in an existing directory\"\"\"\n    return tmp_path / \"test.db\"\n\n\n@pytest.fixture\ndef nonexistent_db_path(tmp_path):\n    \"\"\"Provides a path to a database that doesn't exist\"\"\"\n    return tmp_path / \"nonexistent.db\"\n\n\n@pytest.fixture\ndef nested_db_path(tmp_path):\n    \"\"\"Provides a database path with non-existent parent directories\"\"\"\n    return tmp_path / \"level1\" / \"level2\" / \"level3\" / \"test.db\"\n\n\n@pytest.fixture\ndef initialized_db(temp_db_path):\n    \"\"\"Provides a fully initialized database\"\"\"\n    conn = init_db(temp_db_path)\n    conn.close()\n    return temp_db_path\n\n\n@pytest.fixture\ndef empty_db_file(tmp_path):\n    \"\"\"Creates an empty file (not a valid SQLite database)\"\"\"\n    db_path = tmp_path / \"empty.db\"\n    db_path.touch()\n    return db_path\n\n\n@pytest.fixture\ndef db_with_data(initialized_db):\n    \"\"\"Provides a database with some test data\"\"\"\n    conn = sqlite3.connect(str(initialized_db))\n    cursor = conn.cursor()\n    \n    # Insert test data into various tables\n    cursor.execute(\"INSERT INTO teams (name) VALUES (?)\", (\"Team Alpha\",))\n    cursor.execute(\"INSERT INTO teams (name) VALUES (?)\", (\"Team Beta\",))\n    cursor.execute(\"INSERT INTO members (name, email) VALUES (?, ?)\", (\"Alice\", \"alice@example.com\"))\n    cursor.execute(\"INSERT INTO members (name, email) VALUES (?, ?)\", (\"Bob\", \"bob@example.com\"))\n    cursor.execute(\"INSERT INTO goals (title, description) VALUES (?, ?)\", (\"Goal 1\", \"Test goal\"))\n    \n    conn.commit()\n    conn.close()\n    return initialized_db\n\n\n# ============================================================================\n# get_connection Tests\n# ============================================================================\n\ndef test_get_connection_happy_path(temp_db_path):\n    \"\"\"Successfully opens a connection to a valid database path with all required settings\"\"\"\n    # Act\n    conn = get_connection(temp_db_path)\n    \n    # Assert - Connection object is returned and is open\n    assert conn is not None\n    assert isinstance(conn, sqlite3.Connection)\n    \n    # Assert - WAL journal mode is enabled\n    cursor = conn.cursor()\n    cursor.execute(\"PRAGMA journal_mode\")\n    journal_mode = cursor.fetchone()[0]\n    assert journal_mode.lower() == 'wal', f\"Expected WAL mode, got {journal_mode}\"\n    \n    # Assert - Foreign keys are enforced\n    cursor.execute(\"PRAGMA foreign_keys\")\n    foreign_keys = cursor.fetchone()[0]\n    assert foreign_keys == 1, \"Foreign keys should be enabled\"\n    \n    # Assert - row_factory is sqlite3.Row\n    assert conn.row_factory == sqlite3.Row, \"row_factory should be sqlite3.Row\"\n    \n    conn.close()\n\n\ndef test_get_connection_creates_db_file(temp_db_path):\n    \"\"\"get_connection creates database file if it doesn't exist\"\"\"\n    # Arrange\n    assert not temp_db_path.exists()\n    \n    # Act\n    conn = get_connection(temp_db_path)\n    \n    # Assert - Database file exists after connection\n    assert temp_db_path.exists(), \"Database file should be created\"\n    \n    # Assert - Connection is valid\n    assert conn is not None\n    cursor = conn.cursor()\n    cursor.execute(\"SELECT 1\")\n    result = cursor.fetchone()[0]\n    assert result == 1\n    \n    conn.close()\n\n\ndef test_get_connection_directory_not_exists(tmp_path):\n    \"\"\"Raises error when parent directory doesn't exist\"\"\"\n    # Arrange - Path with non-existent parent directory\n    db_path = tmp_path / \"nonexistent_dir\" / \"test.db\"\n    \n    # Act & Assert - Exception is raised\n    with pytest.raises(Exception) as exc_info:\n        get_connection(db_path)\n    \n    # Assert - Error indicates directory doesn't exist or permission issue\n    error_msg = str(exc_info.value).lower()\n    assert 'file' in error_msg or 'access' in error_msg or 'directory' in error_msg or 'no such' in error_msg\n\n\ndef test_get_connection_invalid_path():\n    \"\"\"Raises error when path cannot be converted to string\"\"\"\n    # Arrange - Create a mock object that fails when converted to string\n    class InvalidPath:\n        def __str__(self):\n            raise TypeError(\"Cannot convert to string\")\n        \n        def __fspath__(self):\n            raise TypeError(\"Cannot convert to path\")\n    \n    invalid_path = InvalidPath()\n    \n    # Act & Assert - Exception is raised\n    with pytest.raises(Exception) as exc_info:\n        get_connection(invalid_path)\n    \n    # Assert - Error indicates invalid path\n    assert exc_info.value is not None\n\n\ndef test_get_connection_insufficient_permissions(tmp_path):\n    \"\"\"Raises error when insufficient permissions to access database\"\"\"\n    # Arrange - Create a directory and make it read-only\n    readonly_dir = tmp_path / \"readonly\"\n    readonly_dir.mkdir()\n    db_path = readonly_dir / \"test.db\"\n    \n    # Make directory read-only (Unix-like systems)\n    if os.name != 'nt':  # Skip on Windows\n        try:\n            os.chmod(readonly_dir, 0o444)\n            \n            # Act & Assert - Exception is raised\n            with pytest.raises(Exception) as exc_info:\n                get_connection(db_path)\n            \n            # Assert - Error indicates permission issue\n            error_msg = str(exc_info.value).lower()\n            assert 'permission' in error_msg or 'access' in error_msg or 'readonly' in error_msg or 'unable' in error_msg\n        finally:\n            # Restore permissions for cleanup\n            os.chmod(readonly_dir, 0o755)\n    else:\n        pytest.skip(\"Permission test skipped on Windows\")\n\n\n# ============================================================================\n# init_db Tests\n# ============================================================================\n\ndef test_init_db_happy_path(temp_db_path):\n    \"\"\"Successfully initializes database with complete schema\"\"\"\n    # Act\n    conn = init_db(temp_db_path)\n    \n    # Assert - Database file exists\n    assert temp_db_path.exists(), \"Database file should exist\"\n    \n    # Assert - Connection is returned\n    assert conn is not None\n    assert isinstance(conn, sqlite3.Connection)\n    \n    # Assert - Schema version is 2\n    cursor = conn.cursor()\n    cursor.execute(\"SELECT version FROM schema_version ORDER BY version DESC LIMIT 1\")\n    version = cursor.fetchone()[0]\n    assert version == 2, f\"Schema version should be 2, got {version}\"\n    \n    # Assert - All required tables exist\n    cursor.execute(\"SELECT name FROM sqlite_master WHERE type='table'\")\n    tables = {row[0] for row in cursor.fetchall()}\n    required_tables = {\n        'schema_version', 'teams', 'members', 'member_flags', 'team_members',\n        'meetings', 'meeting_items', 'goals', 'performance_snapshots',\n        'coaching_entries', 'schedules'\n    }\n    assert required_tables.issubset(tables), f\"Missing tables: {required_tables - tables}\"\n    \n    # Assert - FTS5 virtual table exists\n    cursor.execute(\"SELECT name FROM sqlite_master WHERE type='table' AND name='meetings_fts'\")\n    assert cursor.fetchone() is not None, \"meetings_fts virtual table should exist\"\n    \n    # Assert - Triggers exist\n    cursor.execute(\"SELECT name FROM sqlite_master WHERE type='trigger'\")\n    triggers = {row[0] for row in cursor.fetchall()}\n    required_triggers = {'meetings_ai', 'meetings_ad', 'meetings_au'}\n    assert required_triggers.issubset(triggers), f\"Missing triggers: {required_triggers - triggers}\"\n    \n    # Assert - WAL mode enabled\n    cursor.execute(\"PRAGMA journal_mode\")\n    assert cursor.fetchone()[0].lower() == 'wal'\n    \n    # Assert - Foreign keys enabled\n    cursor.execute(\"PRAGMA foreign_keys\")\n    assert cursor.fetchone()[0] == 1\n    \n    conn.close()\n\n\ndef test_init_db_creates_parent_directories(nested_db_path):\n    \"\"\"Creates parent directories if they don't exist\"\"\"\n    # Arrange\n    assert not nested_db_path.parent.exists()\n    \n    # Act\n    conn = init_db(nested_db_path)\n    \n    # Assert - All parent directories exist\n    assert nested_db_path.parent.exists(), \"Parent directories should be created\"\n    assert nested_db_path.parent.parent.exists()\n    assert nested_db_path.parent.parent.parent.exists()\n    \n    # Assert - Database file exists\n    assert nested_db_path.exists()\n    \n    # Assert - Schema is initialized\n    cursor = conn.cursor()\n    cursor.execute(\"SELECT version FROM schema_version\")\n    version = cursor.fetchone()[0]\n    assert version == 2\n    \n    conn.close()\n\n\ndef test_init_db_idempotent(initialized_db):\n    \"\"\"Calling init_db multiple times on same database is safe (idempotent)\"\"\"\n    # Arrange - Database already initialized\n    conn1 = sqlite3.connect(str(initialized_db))\n    cursor1 = conn1.cursor()\n    cursor1.execute(\"SELECT version FROM schema_version ORDER BY version DESC LIMIT 1\")\n    initial_version = cursor1.fetchone()[0]\n    \n    # Insert some test data to verify it's preserved\n    cursor1.execute(\"INSERT INTO teams (name) VALUES (?)\", (\"Test Team\",))\n    conn1.commit()\n    cursor1.execute(\"SELECT COUNT(*) FROM teams\")\n    initial_count = cursor1.fetchone()[0]\n    conn1.close()\n    \n    # Act - Call init_db again (multiple times)\n    conn2 = init_db(initialized_db)\n    conn2.close()\n    \n    conn3 = init_db(initialized_db)\n    \n    # Assert - Schema version remains 2\n    cursor3 = conn3.cursor()\n    cursor3.execute(\"SELECT version FROM schema_version ORDER BY version DESC LIMIT 1\")\n    final_version = cursor3.fetchone()[0]\n    assert final_version == 2, f\"Schema version should remain 2, got {final_version}\"\n    \n    # Assert - All tables still exist\n    cursor3.execute(\"SELECT name FROM sqlite_master WHERE type='table'\")\n    tables = {row[0] for row in cursor3.fetchall()}\n    required_tables = {\n        'schema_version', 'teams', 'members', 'member_flags', 'team_members',\n        'meetings', 'meeting_items', 'goals', 'performance_snapshots',\n        'coaching_entries', 'schedules'\n    }\n    assert required_tables.issubset(tables)\n    \n    # Assert - Data is preserved\n    cursor3.execute(\"SELECT COUNT(*) FROM teams\")\n    final_count = cursor3.fetchone()[0]\n    assert final_count == initial_count, \"Data should be preserved\"\n    \n    conn3.close()\n\n\ndef test_init_db_schema_upgrade(temp_db_path):\n    \"\"\"Upgrades schema when current version is less than SCHEMA_VERSION\"\"\"\n    # Arrange - Create database with version 1\n    conn = sqlite3.connect(str(temp_db_path))\n    cursor = conn.cursor()\n    cursor.execute(\"CREATE TABLE schema_version (version INTEGER PRIMARY KEY)\")\n    cursor.execute(\"INSERT INTO schema_version (version) VALUES (1)\")\n    cursor.execute(\"CREATE TABLE teams (id INTEGER PRIMARY KEY, name TEXT)\")\n    conn.commit()\n    conn.close()\n    \n    # Act - Call init_db to upgrade\n    conn = init_db(temp_db_path)\n    \n    # Assert - Schema version is 2 after init\n    cursor = conn.cursor()\n    cursor.execute(\"SELECT version FROM schema_version ORDER BY version DESC LIMIT 1\")\n    version = cursor.fetchone()[0]\n    assert version == 2, f\"Schema should be upgraded to version 2, got {version}\"\n    \n    # Assert - All new tables/triggers are created\n    cursor.execute(\"SELECT name FROM sqlite_master WHERE type='table'\")\n    tables = {row[0] for row in cursor.fetchall()}\n    assert 'meetings' in tables\n    assert 'meeting_items' in tables\n    assert 'goals' in tables\n    \n    conn.close()\n\n\ndef test_init_db_permission_error(tmp_path):\n    \"\"\"Raises error when insufficient permissions to create database\"\"\"\n    # Arrange - Create read-only directory (Unix-like systems)\n    if os.name != 'nt':\n        readonly_dir = tmp_path / \"readonly\"\n        readonly_dir.mkdir()\n        os.chmod(readonly_dir, 0o444)\n        db_path = readonly_dir / \"test.db\"\n        \n        try:\n            # Act & Assert - Exception is raised\n            with pytest.raises(Exception) as exc_info:\n                init_db(db_path)\n            \n            # Assert - Error indicates permission issue\n            error_msg = str(exc_info.value).lower()\n            assert 'permission' in error_msg or 'access' in error_msg or 'readonly' in error_msg\n        finally:\n            os.chmod(readonly_dir, 0o755)\n    else:\n        pytest.skip(\"Permission test skipped on Windows\")\n\n\ndef test_init_db_sql_error(temp_db_path):\n    \"\"\"Raises error when SQL schema execution fails\"\"\"\n    # Arrange - Mock _SCHEMA_SQL to contain invalid SQL\n    with patch('contracts_contracts_src_ascend_db_interface_interface._SCHEMA_SQL', 'INVALID SQL STATEMENT;;;'):\n        # Act & Assert - Exception is raised\n        with pytest.raises(Exception) as exc_info:\n            init_db(temp_db_path)\n        \n        # Assert - Error indicates SQL execution failure\n        assert exc_info.value is not None\n\n\ndef test_init_db_operational_error(temp_db_path):\n    \"\"\"Raises error when database is locked or corrupted\"\"\"\n    # Arrange - Create a corrupted database file\n    with open(temp_db_path, 'wb') as f:\n        # Write invalid SQLite header\n        f.write(b'NOT A SQLITE DATABASE FILE\\x00' * 10)\n    \n    # Act & Assert - Exception is raised\n    with pytest.raises(Exception) as exc_info:\n        init_db(temp_db_path)\n    \n    # Assert - Error indicates database lock or corruption\n    error_msg = str(exc_info.value).lower()\n    assert 'database' in error_msg or 'corrupt' in error_msg or 'operational' in error_msg or 'malformed' in error_msg\n\n\n# ============================================================================\n# check_db Tests\n# ============================================================================\n\ndef test_check_db_happy_path(initialized_db):\n    \"\"\"Successfully checks a healthy initialized database\"\"\"\n    # Act\n    result = check_db(initialized_db)\n    \n    # Assert - Result has 'ok' key set to True\n    assert 'ok' in result\n    assert result['ok'] is True, \"Health check should succeed\"\n    \n    # Assert - Result has 'version' key with value 2\n    assert 'version' in result\n    assert result['version'] == 2, f\"Version should be 2, got {result['version']}\"\n    \n    # Assert - Result has 'tables' key with dict of table counts\n    assert 'tables' in result\n    assert isinstance(result['tables'], dict)\n    \n    # Assert - All expected tables are in 'tables' dict\n    expected_tables = {\n        'members', 'member_flags', 'teams', 'team_members', 'meetings',\n        'meeting_items', 'goals', 'performance_snapshots', 'coaching_entries', 'schedules'\n    }\n    for table in expected_tables:\n        assert table in result['tables'], f\"Table {table} should be in result\"\n        assert isinstance(result['tables'][table], int), f\"Count for {table} should be an integer\"\n    \n    # Assert - Connection is closed after check (verify no locks)\n    # We can verify this by successfully opening a new connection\n    conn = sqlite3.connect(str(initialized_db))\n    conn.close()\n\n\ndef test_check_db_database_not_found(tmp_path):\n    \"\"\"Returns error state when database file doesn't exist\"\"\"\n    # Arrange - Path to non-existent database\n    nonexistent = tmp_path / \"nonexistent.db\"\n    \n    # Act\n    result = check_db(nonexistent)\n    \n    # Assert - Result has 'ok' key set to False\n    assert 'ok' in result\n    assert result['ok'] is False, \"Health check should fail for non-existent database\"\n    \n    # Assert - Result has 'error' key with description\n    assert 'error' in result\n    assert isinstance(result['error'], str)\n    assert len(result['error']) > 0\n    \n    # Assert - Error indicates database not found\n    error_msg = result['error'].lower()\n    assert 'not found' in error_msg or 'does not exist' in error_msg or 'no such' in error_msg\n\n\ndef test_check_db_schema_not_initialized(empty_db_file):\n    \"\"\"Returns error state when schema_version table doesn't exist\"\"\"\n    # Arrange - Create a valid but empty SQLite database\n    conn = sqlite3.connect(str(empty_db_file))\n    conn.execute(\"CREATE TABLE dummy (id INTEGER)\")\n    conn.commit()\n    conn.close()\n    \n    # Act\n    result = check_db(empty_db_file)\n    \n    # Assert - Result has 'ok' key set to False\n    assert 'ok' in result\n    assert result['ok'] is False\n    \n    # Assert - Result has 'error' key\n    assert 'error' in result\n    \n    # Assert - Error indicates schema not initialized\n    error_msg = result['error'].lower()\n    assert 'schema' in error_msg or 'not initialized' in error_msg or 'version' in error_msg\n\n\ndef test_check_db_sql_error_missing_table(temp_db_path):\n    \"\"\"Returns error when expected table doesn't exist during count query\"\"\"\n    # Arrange - Create database with schema_version but missing some expected tables\n    conn = sqlite3.connect(str(temp_db_path))\n    cursor = conn.cursor()\n    cursor.execute(\"CREATE TABLE schema_version (version INTEGER PRIMARY KEY)\")\n    cursor.execute(\"INSERT INTO schema_version (version) VALUES (2)\")\n    cursor.execute(\"CREATE TABLE teams (id INTEGER PRIMARY KEY)\")\n    # Intentionally don't create all required tables\n    conn.commit()\n    conn.close()\n    \n    # Act\n    result = check_db(temp_db_path)\n    \n    # Assert - Result has 'ok' key set to False\n    assert 'ok' in result\n    assert result['ok'] is False\n    \n    # Assert - Result has 'error' key\n    assert 'error' in result\n    \n    # Assert - Error indicates SQL query failure\n    error_msg = result['error'].lower()\n    assert 'table' in error_msg or 'sql' in error_msg or 'no such' in error_msg\n\n\ndef test_check_db_connection_closed(initialized_db):\n    \"\"\"Verifies connection is properly closed even after errors\"\"\"\n    # Test successful case\n    result1 = check_db(initialized_db)\n    assert result1['ok'] is True\n    \n    # Verify we can immediately open connection (no locks)\n    conn = sqlite3.connect(str(initialized_db))\n    conn.close()\n    \n    # Test error case (non-existent database)\n    nonexistent = initialized_db.parent / \"nonexistent.db\"\n    result2 = check_db(nonexistent)\n    assert result2['ok'] is False\n    \n    # Test another error case (empty database)\n    empty_db = initialized_db.parent / \"empty_test.db\"\n    empty_db.touch()\n    result3 = check_db(empty_db)\n    assert result3['ok'] is False\n    \n    # All connections should be closed, no resource leaks\n    # This is implicitly tested by the fact that we can continue operations\n\n\ndef test_check_db_with_data(db_with_data):\n    \"\"\"check_db returns accurate table counts with populated tables\"\"\"\n    # Act\n    result = check_db(db_with_data)\n    \n    # Assert - ok is True\n    assert result['ok'] is True\n    \n    # Assert - tables dict has correct counts for populated tables\n    assert 'tables' in result\n    assert result['tables']['teams'] == 2, \"Should have 2 teams\"\n    assert result['tables']['members'] == 2, \"Should have 2 members\"\n    assert result['tables']['goals'] == 1, \"Should have 1 goal\"\n    \n    # Assert - Empty tables show count of 0\n    assert result['tables']['member_flags'] == 0, \"member_flags should be empty\"\n    assert result['tables']['meetings'] == 0, \"meetings should be empty\"\n\n\n# ============================================================================\n# Invariant Tests\n# ============================================================================\n\ndef test_invariant_schema_version():\n    \"\"\"SCHEMA_VERSION constant is 2\"\"\"\n    assert SCHEMA_VERSION == 2, f\"SCHEMA_VERSION should be 2, got {SCHEMA_VERSION}\"\n\n\ndef test_invariant_all_tables_created(temp_db_path):\n    \"\"\"All required tables are created by init_db\"\"\"\n    # Arrange & Act - Fresh database initialization\n    conn = init_db(temp_db_path)\n    cursor = conn.cursor()\n    \n    # Assert - schema_version table exists\n    cursor.execute(\"SELECT name FROM sqlite_master WHERE type='table' AND name='schema_version'\")\n    assert cursor.fetchone() is not None, \"schema_version table should exist\"\n    \n    # Assert - teams table exists\n    cursor.execute(\"SELECT name FROM sqlite_master WHERE type='table' AND name='teams'\")\n    assert cursor.fetchone() is not None, \"teams table should exist\"\n    \n    # Assert - members table exists\n    cursor.execute(\"SELECT name FROM sqlite_master WHERE type='table' AND name='members'\")\n    assert cursor.fetchone() is not None, \"members table should exist\"\n    \n    # Assert - member_flags table exists\n    cursor.execute(\"SELECT name FROM sqlite_master WHERE type='table' AND name='member_flags'\")\n    assert cursor.fetchone() is not None, \"member_flags table should exist\"\n    \n    # Assert - team_members table exists\n    cursor.execute(\"SELECT name FROM sqlite_master WHERE type='table' AND name='team_members'\")\n    assert cursor.fetchone() is not None, \"team_members table should exist\"\n    \n    # Assert - meetings table exists\n    cursor.execute(\"SELECT name FROM sqlite_master WHERE type='table' AND name='meetings'\")\n    assert cursor.fetchone() is not None, \"meetings table should exist\"\n    \n    # Assert - meeting_items table exists\n    cursor.execute(\"SELECT name FROM sqlite_master WHERE type='table' AND name='meeting_items'\")\n    assert cursor.fetchone() is not None, \"meeting_items table should exist\"\n    \n    # Assert - goals table exists\n    cursor.execute(\"SELECT name FROM sqlite_master WHERE type='table' AND name='goals'\")\n    assert cursor.fetchone() is not None, \"goals table should exist\"\n    \n    # Assert - performance_snapshots table exists\n    cursor.execute(\"SELECT name FROM sqlite_master WHERE type='table' AND name='performance_snapshots'\")\n    assert cursor.fetchone() is not None, \"performance_snapshots table should exist\"\n    \n    # Assert - coaching_entries table exists\n    cursor.execute(\"SELECT name FROM sqlite_master WHERE type='table' AND name='coaching_entries'\")\n    assert cursor.fetchone() is not None, \"coaching_entries table should exist\"\n    \n    # Assert - schedules table exists\n    cursor.execute(\"SELECT name FROM sqlite_master WHERE type='table' AND name='schedules'\")\n    assert cursor.fetchone() is not None, \"schedules table should exist\"\n    \n    # Assert - meetings_fts virtual table exists\n    cursor.execute(\"SELECT name FROM sqlite_master WHERE type='table' AND name='meetings_fts'\")\n    assert cursor.fetchone() is not None, \"meetings_fts virtual table should exist\"\n    \n    conn.close()\n\n\ndef test_invariant_triggers_created(temp_db_path):\n    \"\"\"FTS5 sync triggers are created\"\"\"\n    # Arrange & Act - Fresh database initialization\n    conn = init_db(temp_db_path)\n    cursor = conn.cursor()\n    \n    # Assert - meetings_ai trigger exists\n    cursor.execute(\"SELECT name FROM sqlite_master WHERE type='trigger' AND name='meetings_ai'\")\n    assert cursor.fetchone() is not None, \"meetings_ai trigger should exist\"\n    \n    # Assert - meetings_ad trigger exists\n    cursor.execute(\"SELECT name FROM sqlite_master WHERE type='trigger' AND name='meetings_ad'\")\n    assert cursor.fetchone() is not None, \"meetings_ad trigger should exist\"\n    \n    # Assert - meetings_au trigger exists\n    cursor.execute(\"SELECT name FROM sqlite_master WHERE type='trigger' AND name='meetings_au'\")\n    assert cursor.fetchone() is not None, \"meetings_au trigger should exist\"\n    \n    conn.close()\n\n\ndef test_invariant_wal_mode(temp_db_path):\n    \"\"\"All connections use WAL journal mode\"\"\"\n    # Act\n    conn = get_connection(temp_db_path)\n    \n    # Assert - Connection journal_mode is 'wal'\n    cursor = conn.cursor()\n    cursor.execute(\"PRAGMA journal_mode\")\n    journal_mode = cursor.fetchone()[0]\n    assert journal_mode.lower() == 'wal', f\"Expected WAL mode, got {journal_mode}\"\n    \n    conn.close()\n    \n    # Test with init_db as well\n    conn2 = init_db(temp_db_path)\n    cursor2 = conn2.cursor()\n    cursor2.execute(\"PRAGMA journal_mode\")\n    journal_mode2 = cursor2.fetchone()[0]\n    assert journal_mode2.lower() == 'wal', f\"Expected WAL mode from init_db, got {journal_mode2}\"\n    \n    conn2.close()\n\n\ndef test_invariant_foreign_keys(temp_db_path):\n    \"\"\"All connections have foreign key constraints enabled\"\"\"\n    # Act\n    conn = get_connection(temp_db_path)\n    \n    # Assert - Foreign keys are enabled (PRAGMA foreign_keys returns 1)\n    cursor = conn.cursor()\n    cursor.execute(\"PRAGMA foreign_keys\")\n    fk_enabled = cursor.fetchone()[0]\n    assert fk_enabled == 1, \"Foreign keys should be enabled\"\n    \n    conn.close()\n    \n    # Test with init_db as well\n    conn2 = init_db(temp_db_path)\n    cursor2 = conn2.cursor()\n    cursor2.execute(\"PRAGMA foreign_keys\")\n    fk_enabled2 = cursor2.fetchone()[0]\n    assert fk_enabled2 == 1, \"Foreign keys should be enabled from init_db\"\n    \n    conn2.close()\n\n\ndef test_invariant_row_factory(temp_db_path):\n    \"\"\"All connections use sqlite3.Row as row_factory\"\"\"\n    # Act\n    conn = get_connection(temp_db_path)\n    \n    # Assert - Connection row_factory is sqlite3.Row\n    assert conn.row_factory == sqlite3.Row, \"row_factory should be sqlite3.Row\"\n    \n    conn.close()\n    \n    # Test with init_db as well\n    conn2 = init_db(temp_db_path)\n    assert conn2.row_factory == sqlite3.Row, \"row_factory from init_db should be sqlite3.Row\"\n    \n    conn2.close()\n\n\ndef test_check_db_expected_tables(initialized_db):\n    \"\"\"check_db expects specific tables in its verification\"\"\"\n    # Arrange - Initialized database\n    \n    # Act\n    result = check_db(initialized_db)\n    \n    # Assert - tables dict includes all expected tables\n    assert result['ok'] is True\n    expected_tables = {\n        'members', 'member_flags', 'teams', 'team_members', 'meetings',\n        'meeting_items', 'goals', 'performance_snapshots', 'coaching_entries', 'schedules'\n    }\n    \n    for table in expected_tables:\n        assert table in result['tables'], f\"Expected table {table} in check_db result\"\n        assert isinstance(result['tables'][table], int), f\"Count for {table} should be integer\"\n\n\n# ============================================================================\n# Additional Edge Cases and Integration Tests\n# ============================================================================\n\ndef test_connection_resource_cleanup(temp_db_path):\n    \"\"\"Verify connections are properly managed and don't leak\"\"\"\n    # Open and close multiple connections\n    for _ in range(10):\n        conn = get_connection(temp_db_path)\n        cursor = conn.cursor()\n        cursor.execute(\"SELECT 1\")\n        conn.close()\n    \n    # Should still be able to open connection\n    final_conn = get_connection(temp_db_path)\n    assert final_conn is not None\n    final_conn.close()\n\n\ndef test_init_db_multiple_rapid_calls(temp_db_path):\n    \"\"\"Test rapid repeated calls to init_db (stress test for idempotency)\"\"\"\n    # Call init_db multiple times in succession\n    for i in range(5):\n        conn = init_db(temp_db_path)\n        cursor = conn.cursor()\n        cursor.execute(\"SELECT version FROM schema_version ORDER BY version DESC LIMIT 1\")\n        version = cursor.fetchone()[0]\n        assert version == 2, f\"Version should be 2 on iteration {i}\"\n        conn.close()\n\n\ndef test_check_db_corrupted_schema_version(temp_db_path):\n    \"\"\"Test check_db with corrupted schema_version data\"\"\"\n    # Arrange - Create database with invalid schema_version entry\n    conn = sqlite3.connect(str(temp_db_path))\n    cursor = conn.cursor()\n    cursor.execute(\"CREATE TABLE schema_version (version INTEGER PRIMARY KEY)\")\n    cursor.execute(\"INSERT INTO schema_version (version) VALUES (999)\")  # Invalid version\n    cursor.execute(\"CREATE TABLE teams (id INTEGER PRIMARY KEY)\")\n    conn.commit()\n    conn.close()\n    \n    # Act - check_db should still work but might report unexpected version\n    result = check_db(temp_db_path)\n    \n    # The behavior depends on implementation - it may succeed with wrong version\n    # or fail due to missing tables\n    assert 'ok' in result\n    if result['ok']:\n        assert 'version' in result\n\n\ndef test_get_connection_existing_database(initialized_db):\n    \"\"\"Test get_connection on an already initialized database\"\"\"\n    # Act\n    conn = get_connection(initialized_db)\n    \n    # Assert - Can query existing tables\n    cursor = conn.cursor()\n    cursor.execute(\"SELECT name FROM sqlite_master WHERE type='table'\")\n    tables = {row[0] for row in cursor.fetchall()}\n    \n    assert 'teams' in tables\n    assert 'members' in tables\n    \n    conn.close()\n\n\ndef test_row_factory_functionality(initialized_db):\n    \"\"\"Test that sqlite3.Row factory works correctly\"\"\"\n    # Arrange\n    conn = get_connection(initialized_db)\n    cursor = conn.cursor()\n    \n    # Insert test data\n    cursor.execute(\"INSERT INTO teams (name) VALUES (?)\", (\"Test Team\",))\n    conn.commit()\n    \n    # Act - Query with Row factory\n    cursor.execute(\"SELECT id, name FROM teams WHERE name = ?\", (\"Test Team\",))\n    row = cursor.fetchone()\n    \n    # Assert - Can access by column name (dict-like)\n    assert row['name'] == \"Test Team\"\n    assert 'id' in row.keys()\n    \n    # Assert - Can also access by index\n    assert row[1] == \"Test Team\"\n    \n    conn.close()\n\n\ndef test_init_db_preserves_data_on_reinitialization(temp_db_path):\n    \"\"\"Verify that reinitializing doesn't destroy existing data\"\"\"\n    # Arrange - Initialize and add data\n    conn1 = init_db(temp_db_path)\n    cursor1 = conn1.cursor()\n    cursor1.execute(\"INSERT INTO teams (name) VALUES (?)\", (\"Persistent Team\",))\n    conn1.commit()\n    conn1.close()\n    \n    # Act - Reinitialize\n    conn2 = init_db(temp_db_path)\n    cursor2 = conn2.cursor()\n    \n    # Assert - Data still exists\n    cursor2.execute(\"SELECT name FROM teams WHERE name = ?\", (\"Persistent Team\",))\n    result = cursor2.fetchone()\n    assert result is not None\n    assert result[0] == \"Persistent Team\"\n    \n    conn2.close()\n\n\ndef test_check_db_empty_tables(initialized_db):\n    \"\"\"Verify check_db correctly reports counts for empty tables\"\"\"\n    # Act\n    result = check_db(initialized_db)\n    \n    # Assert\n    assert result['ok'] is True\n    \n    # All tables should exist with 0 count\n    for table in ['members', 'teams', 'meetings', 'goals']:\n        assert table in result['tables']\n        assert result['tables'][table] == 0, f\"Table {table} should have 0 rows\"\n\n\ndef test_foreign_key_enforcement(initialized_db):\n    \"\"\"Verify that foreign key constraints are actually enforced\"\"\"\n    # Arrange\n    conn = get_connection(initialized_db)\n    cursor = conn.cursor()\n    \n    # Try to insert a team_member without a valid team_id\n    # This should fail if foreign keys are enforced\n    with pytest.raises(sqlite3.IntegrityError):\n        cursor.execute(\"INSERT INTO team_members (team_id, member_id) VALUES (?, ?)\", (9999, 9999))\n    \n    conn.close()\n\n\ndef test_wal_mode_persistence(temp_db_path):\n    \"\"\"Verify WAL mode persists across connection cycles\"\"\"\n    # Arrange\n    conn1 = init_db(temp_db_path)\n    conn1.close()\n    \n    # Act - Open new connection\n    conn2 = sqlite3.connect(str(temp_db_path))\n    cursor = conn2.cursor()\n    cursor.execute(\"PRAGMA journal_mode\")\n    mode = cursor.fetchone()[0]\n    \n    # Assert - WAL mode should persist\n    assert mode.lower() == 'wal', \"WAL mode should persist across connections\"\n    \n    conn2.close()\n\n\ndef test_random_path_characters(tmp_path):\n    \"\"\"Test database creation with various valid path characters\"\"\"\n    # Generate random valid filename\n    valid_chars = string.ascii_letters + string.digits + \"_-\"\n    random_name = ''.join(random.choice(valid_chars) for _ in range(20)) + \".db\"\n    db_path = tmp_path / random_name\n    \n    # Act\n    conn = init_db(db_path)\n    \n    # Assert\n    assert db_path.exists()\n    cursor = conn.cursor()\n    cursor.execute(\"SELECT version FROM schema_version\")\n    assert cursor.fetchone()[0] == 2\n    \n    conn.close()\n\n\ndef test_check_db_after_manual_table_drop(initialized_db):\n    \"\"\"Test check_db behavior when tables are manually dropped\"\"\"\n    # Arrange - Drop a required table\n    conn = sqlite3.connect(str(initialized_db))\n    cursor = conn.cursor()\n    cursor.execute(\"DROP TABLE members\")\n    conn.commit()\n    conn.close()\n    \n    # Act\n    result = check_db(initialized_db)\n    \n    # Assert - Should report error due to missing table\n    assert result['ok'] is False\n    assert 'error' in result\n"
+}

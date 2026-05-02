@@ -1,0 +1,36 @@
+name: ascend
+audience: public
+description: >
+  AI-powered engineering management CLI. Team tracking, performance
+  snapshots, 1:1 coaching, meeting transcript analysis, risk detection,
+  and schedule management. TUI built with Textual.
+
+domains:
+  - engineering-management
+  - team-analytics
+  - coaching
+  - tui
+  - claude-ai-integration
+
+voice:
+  tone: supportive, data-driven, action-oriented
+  principles:
+    - Coaching grounded in observed patterns, not assumptions
+    - Performance snapshots are descriptive, not evaluative
+    - Risk detection flags early, never after the fact
+    - Meeting transcripts yield actionable items, not summaries
+  anti-patterns:
+    - Surveillance framing — this is a coaching tool, not monitoring
+    - Generating coaching without transcript/data backing
+    - Storing raw transcripts beyond extraction
+
+standards:
+  code_review:
+    - Pydantic models for all data structures
+    - SQLite for local persistence
+    - Claude API for summarization and coaching
+  documentation:
+    - CLI commands documented with examples
+
+connects_to:
+  - kindex

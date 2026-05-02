@@ -1,0 +1,867 @@
+{
+  "component_id": "src_ascend_scheduler",
+  "name": "Ascend Scheduler",
+  "description": "Cron expression parsing, next-run computation, and macOS launchd plist generation for scheduled job management. Converts human-friendly schedule specifications to cron expressions, computes next run times, and manages launchd plists for periodic task execution.",
+  "version": 1,
+  "types": [
+    {
+      "name": "_DAY_MAP",
+      "kind": "struct",
+      "fields": [
+        {
+          "name": "sunday",
+          "type_ref": "int",
+          "required": true,
+          "default": "",
+          "description": "Sunday = 0",
+          "validators": []
+        },
+        {
+          "name": "sun",
+          "type_ref": "int",
+          "required": true,
+          "default": "",
+          "description": "Sunday = 0",
+          "validators": []
+        },
+        {
+          "name": "monday",
+          "type_ref": "int",
+          "required": true,
+          "default": "",
+          "description": "Monday = 1",
+          "validators": []
+        },
+        {
+          "name": "mon",
+          "type_ref": "int",
+          "required": true,
+          "default": "",
+          "description": "Monday = 1",
+          "validators": []
+        },
+        {
+          "name": "tuesday",
+          "type_ref": "int",
+          "required": true,
+          "default": "",
+          "description": "Tuesday = 2",
+          "validators": []
+        },
+        {
+          "name": "tue",
+          "type_ref": "int",
+          "required": true,
+          "default": "",
+          "description": "Tuesday = 2",
+          "validators": []
+        },
+        {
+          "name": "wednesday",
+          "type_ref": "int",
+          "required": true,
+          "default": "",
+          "description": "Wednesday = 3",
+          "validators": []
+        },
+        {
+          "name": "wed",
+          "type_ref": "int",
+          "required": true,
+          "default": "",
+          "description": "Wednesday = 3",
+          "validators": []
+        },
+        {
+          "name": "thursday",
+          "type_ref": "int",
+          "required": true,
+          "default": "",
+          "description": "Thursday = 4",
+          "validators": []
+        },
+        {
+          "name": "thu",
+          "type_ref": "int",
+          "required": true,
+          "default": "",
+          "description": "Thursday = 4",
+          "validators": []
+        },
+        {
+          "name": "friday",
+          "type_ref": "int",
+          "required": true,
+          "default": "",
+          "description": "Friday = 5",
+          "validators": []
+        },
+        {
+          "name": "fri",
+          "type_ref": "int",
+          "required": true,
+          "default": "",
+          "description": "Friday = 5",
+          "validators": []
+        },
+        {
+          "name": "saturday",
+          "type_ref": "int",
+          "required": true,
+          "default": "",
+          "description": "Saturday = 6",
+          "validators": []
+        },
+        {
+          "name": "sat",
+          "type_ref": "int",
+          "required": true,
+          "default": "",
+          "description": "Saturday = 6",
+          "validators": []
+        }
+      ],
+      "item_type": "",
+      "variants": [],
+      "inner_types": [],
+      "description": "Mapping from day names (full and abbreviated) to cron weekday numbers (0=Sunday)",
+      "owner_component": ""
+    },
+    {
+      "name": "_CRON_WEEKDAY_TO_PYTHON",
+      "kind": "struct",
+      "fields": [
+        {
+          "name": "0",
+          "type_ref": "int",
+          "required": true,
+          "default": "",
+          "description": "Cron Sunday (0) -> Python Sunday (6)",
+          "validators": []
+        },
+        {
+          "name": "1",
+          "type_ref": "int",
+          "required": true,
+          "default": "",
+          "description": "Cron Monday (1) -> Python Monday (0)",
+          "validators": []
+        },
+        {
+          "name": "2",
+          "type_ref": "int",
+          "required": true,
+          "default": "",
+          "description": "Cron Tuesday (2) -> Python Tuesday (1)",
+          "validators": []
+        },
+        {
+          "name": "3",
+          "type_ref": "int",
+          "required": true,
+          "default": "",
+          "description": "Cron Wednesday (3) -> Python Wednesday (2)",
+          "validators": []
+        },
+        {
+          "name": "4",
+          "type_ref": "int",
+          "required": true,
+          "default": "",
+          "description": "Cron Thursday (4) -> Python Thursday (3)",
+          "validators": []
+        },
+        {
+          "name": "5",
+          "type_ref": "int",
+          "required": true,
+          "default": "",
+          "description": "Cron Friday (5) -> Python Friday (4)",
+          "validators": []
+        },
+        {
+          "name": "6",
+          "type_ref": "int",
+          "required": true,
+          "default": "",
+          "description": "Cron Saturday (6) -> Python Saturday (5)",
+          "validators": []
+        }
+      ],
+      "item_type": "",
+      "variants": [],
+      "inner_types": [],
+      "description": "Mapping from cron weekday numbers (0=Sunday) to Python weekday numbers (0=Monday, 6=Sunday)",
+      "owner_component": ""
+    },
+    {
+      "name": "CronFields",
+      "kind": "struct",
+      "fields": [
+        {
+          "name": "minute",
+          "type_ref": "str",
+          "required": true,
+          "default": "",
+          "description": "Minute field (0-59, *, ranges, lists)",
+          "validators": []
+        },
+        {
+          "name": "hour",
+          "type_ref": "str",
+          "required": true,
+          "default": "",
+          "description": "Hour field (0-23, *, ranges, lists)",
+          "validators": []
+        },
+        {
+          "name": "dom",
+          "type_ref": "str",
+          "required": true,
+          "default": "",
+          "description": "Day of month field (1-31, *, ranges, lists)",
+          "validators": []
+        },
+        {
+          "name": "month",
+          "type_ref": "str",
+          "required": true,
+          "default": "",
+          "description": "Month field (1-12, *, ranges, lists)",
+          "validators": []
+        },
+        {
+          "name": "dow",
+          "type_ref": "str",
+          "required": true,
+          "default": "",
+          "description": "Day of week field (0-6, *, ranges, lists, 0=Sunday)",
+          "validators": []
+        }
+      ],
+      "item_type": "",
+      "variants": [],
+      "inner_types": [],
+      "description": "Dictionary representing parsed cron expression fields",
+      "owner_component": ""
+    }
+  ],
+  "functions": [
+    {
+      "name": "schedule_to_cron",
+      "description": "Convert human-friendly schedule specification to a standard 5-field cron expression (minute hour day-of-month month day-of-week).",
+      "inputs": [
+        {
+          "name": "daily",
+          "type_ref": "bool",
+          "required": true,
+          "default": "False",
+          "description": "Schedule daily execution",
+          "validators": []
+        },
+        {
+          "name": "weekdays",
+          "type_ref": "bool",
+          "required": true,
+          "default": "False",
+          "description": "Schedule weekday (Mon-Fri) execution",
+          "validators": []
+        },
+        {
+          "name": "weekly",
+          "type_ref": "Optional[str]",
+          "required": true,
+          "default": "None",
+          "description": "Day name for weekly execution (e.g., 'monday', 'tue')",
+          "validators": []
+        },
+        {
+          "name": "biweekly",
+          "type_ref": "Optional[str]",
+          "required": true,
+          "default": "None",
+          "description": "Day name for biweekly execution (2nd and 4th week)",
+          "validators": []
+        },
+        {
+          "name": "monthly",
+          "type_ref": "Optional[str]",
+          "required": true,
+          "default": "None",
+          "description": "Comma-separated day numbers for monthly execution",
+          "validators": []
+        },
+        {
+          "name": "quarterly",
+          "type_ref": "bool",
+          "required": true,
+          "default": "False",
+          "description": "Schedule quarterly execution (1st of Jan/Apr/Jul/Oct)",
+          "validators": []
+        },
+        {
+          "name": "hour",
+          "type_ref": "int",
+          "required": true,
+          "default": "9",
+          "description": "Hour of day (0-23)",
+          "validators": []
+        },
+        {
+          "name": "minute",
+          "type_ref": "int",
+          "required": true,
+          "default": "0",
+          "description": "Minute of hour (0-59)",
+          "validators": []
+        }
+      ],
+      "output_type": "str",
+      "error_cases": [
+        {
+          "name": "UnknownDayError",
+          "condition": "weekly or biweekly day name not in _DAY_MAP (case-insensitive)",
+          "error_type": "ValueError",
+          "error_data": {
+            "message": "Unknown day: {day_name}"
+          }
+        },
+        {
+          "name": "NoScheduleError",
+          "condition": "No schedule frequency parameter is specified",
+          "error_type": "ValueError",
+          "error_data": {
+            "message": "No schedule frequency specified"
+          }
+        }
+      ],
+      "preconditions": [
+        "At least one schedule frequency parameter (daily, weekdays, weekly, biweekly, monthly, quarterly) must be truthy",
+        "If weekly or biweekly is provided, the day name must exist in _DAY_MAP"
+      ],
+      "postconditions": [
+        "Returns a valid 5-field cron expression string",
+        "Cron format is: 'minute hour day-of-month month day-of-week'"
+      ],
+      "idempotent": false,
+      "is_async": false,
+      "side_effects": [],
+      "structured_side_effects": [],
+      "performance_budget": null
+    },
+    {
+      "name": "parse_cron",
+      "description": "Parse a 5-field cron expression into a dictionary with named components.",
+      "inputs": [
+        {
+          "name": "expr",
+          "type_ref": "str",
+          "required": true,
+          "default": "",
+          "description": "Cron expression string with 5 space-separated fields",
+          "validators": []
+        }
+      ],
+      "output_type": "dict",
+      "error_cases": [
+        {
+          "name": "InvalidCronFieldCount",
+          "condition": "expr does not contain exactly 5 fields after splitting by whitespace",
+          "error_type": "ValueError",
+          "error_data": {
+            "message": "Expected 5 cron fields, got {count}: {expr}"
+          }
+        }
+      ],
+      "preconditions": [
+        "expr must contain exactly 5 whitespace-separated fields"
+      ],
+      "postconditions": [
+        "Returns dict with keys: minute, hour, dom, month, dow",
+        "Each value is the original string field (may contain *, ranges, lists)"
+      ],
+      "idempotent": false,
+      "is_async": false,
+      "side_effects": [],
+      "structured_side_effects": [],
+      "performance_budget": null
+    },
+    {
+      "name": "_expand_field",
+      "description": "Expand a cron field (*, range, list) into a set of integer values within the given bounds.",
+      "inputs": [
+        {
+          "name": "field",
+          "type_ref": "str",
+          "required": true,
+          "default": "",
+          "description": "Cron field string (e.g., '*', '1-5', '1,3,5')",
+          "validators": []
+        },
+        {
+          "name": "min_val",
+          "type_ref": "int",
+          "required": true,
+          "default": "",
+          "description": "Minimum valid value for this field",
+          "validators": []
+        },
+        {
+          "name": "max_val",
+          "type_ref": "int",
+          "required": true,
+          "default": "",
+          "description": "Maximum valid value for this field",
+          "validators": []
+        }
+      ],
+      "output_type": "set[int]",
+      "error_cases": [
+        {
+          "name": "InvalidFieldFormat",
+          "condition": "field contains non-numeric characters outside of valid syntax",
+          "error_type": "ValueError",
+          "error_data": {}
+        }
+      ],
+      "preconditions": [
+        "field contains only *, digits, commas, and hyphens",
+        "Range syntax uses single hyphen between two integers"
+      ],
+      "postconditions": [
+        "Returns set of all matching integer values in [min_val, max_val]",
+        "'*' expands to all values in range",
+        "Comma-separated values are unioned",
+        "Range 'a-b' expands to all integers from a to b inclusive"
+      ],
+      "idempotent": false,
+      "is_async": false,
+      "side_effects": [],
+      "structured_side_effects": [],
+      "performance_budget": null
+    },
+    {
+      "name": "compute_next_run",
+      "description": "Compute the next scheduled run time from a cron expression, searching up to 366 days ahead. Uses cron OR-semantics when both day-of-month and day-of-week are restricted.",
+      "inputs": [
+        {
+          "name": "cron_expr",
+          "type_ref": "str",
+          "required": true,
+          "default": "",
+          "description": "5-field cron expression",
+          "validators": []
+        },
+        {
+          "name": "after",
+          "type_ref": "Optional[datetime]",
+          "required": true,
+          "default": "None",
+          "description": "Reference datetime to compute next run after (defaults to now)",
+          "validators": []
+        }
+      ],
+      "output_type": "str",
+      "error_cases": [
+        {
+          "name": "InvalidCronExpression",
+          "condition": "cron_expr cannot be parsed by parse_cron",
+          "error_type": "ValueError",
+          "error_data": {}
+        }
+      ],
+      "preconditions": [
+        "cron_expr is a valid 5-field cron expression"
+      ],
+      "postconditions": [
+        "Returns ISO format datetime string 'YYYY-MM-DD HH:MM' if a match is found within 366 days",
+        "Returns empty string '' if no match found within 366 days",
+        "Returned time is strictly after the 'after' parameter",
+        "Seconds and microseconds are zeroed out"
+      ],
+      "idempotent": false,
+      "is_async": false,
+      "side_effects": [],
+      "structured_side_effects": [
+        {
+          "kind": "reads_file",
+          "target": "system clock (datetime.now())",
+          "description": "Reads current time if after is None"
+        }
+      ],
+      "performance_budget": null
+    },
+    {
+      "name": "describe_cron",
+      "description": "Convert a cron expression to a human-readable English description.",
+      "inputs": [
+        {
+          "name": "cron_expr",
+          "type_ref": "str",
+          "required": true,
+          "default": "",
+          "description": "5-field cron expression",
+          "validators": []
+        }
+      ],
+      "output_type": "str",
+      "error_cases": [
+        {
+          "name": "InvalidCronExpression",
+          "condition": "cron_expr cannot be parsed by parse_cron",
+          "error_type": "ValueError",
+          "error_data": {}
+        }
+      ],
+      "preconditions": [
+        "cron_expr is a valid 5-field cron expression"
+      ],
+      "postconditions": [
+        "Returns human-readable schedule description",
+        "Falls back to returning the original cron_expr if no pattern matches"
+      ],
+      "idempotent": false,
+      "is_async": false,
+      "side_effects": [],
+      "structured_side_effects": [],
+      "performance_budget": null
+    },
+    {
+      "name": "_find_ascend_path",
+      "description": "Locate the ascend executable by searching PATH and common installation locations.",
+      "inputs": [],
+      "output_type": "str",
+      "error_cases": [],
+      "preconditions": [],
+      "postconditions": [
+        "Returns path to ascend executable if found via shutil.which or common locations",
+        "Returns 'ascend' as fallback if not found (relies on PATH at runtime)"
+      ],
+      "idempotent": false,
+      "is_async": false,
+      "side_effects": [],
+      "structured_side_effects": [
+        {
+          "kind": "reads_file",
+          "target": "filesystem",
+          "description": "Checks PATH and common locations: /usr/local/bin/ascend, ~/.local/bin/ascend"
+        }
+      ],
+      "performance_budget": null
+    },
+    {
+      "name": "_cron_to_calendar_intervals",
+      "description": "Convert a cron expression to launchd StartCalendarInterval XML format.",
+      "inputs": [
+        {
+          "name": "cron_expr",
+          "type_ref": "str",
+          "required": true,
+          "default": "",
+          "description": "5-field cron expression",
+          "validators": []
+        }
+      ],
+      "output_type": "str",
+      "error_cases": [
+        {
+          "name": "InvalidCronExpression",
+          "condition": "cron_expr cannot be parsed",
+          "error_type": "ValueError",
+          "error_data": {}
+        }
+      ],
+      "preconditions": [
+        "cron_expr is a valid 5-field cron expression"
+      ],
+      "postconditions": [
+        "Returns XML string representing launchd CalendarInterval dict or array",
+        "Single interval: returns <dict>...</dict>",
+        "Multiple intervals: returns <array><dict>...</dict>...</array>",
+        "Simplifies complex schedules by selecting min values for minute/hour if <= 2 values, else defaults to 0 or 9"
+      ],
+      "idempotent": false,
+      "is_async": false,
+      "side_effects": [],
+      "structured_side_effects": [],
+      "performance_budget": null
+    },
+    {
+      "name": "generate_plist",
+      "description": "Generate metadata for a launchd plist (label, ascend path, log path). Returns a 3-tuple instead of plist content.",
+      "inputs": [
+        {
+          "name": "schedule_name",
+          "type_ref": "str",
+          "required": true,
+          "default": "",
+          "description": "Name of the schedule",
+          "validators": []
+        },
+        {
+          "name": "schedules_dir",
+          "type_ref": "Path",
+          "required": true,
+          "default": "",
+          "description": "Directory for schedule logs",
+          "validators": []
+        }
+      ],
+      "output_type": "str",
+      "error_cases": [],
+      "preconditions": [],
+      "postconditions": [
+        "Returns tuple of (label, ascend_path, log_path)",
+        "label format: 'com.ascend.schedule.{schedule_name}'",
+        "log_path format: '{schedules_dir}/{schedule_name}.log'"
+      ],
+      "idempotent": false,
+      "is_async": false,
+      "side_effects": [],
+      "structured_side_effects": [
+        {
+          "kind": "reads_file",
+          "target": "filesystem",
+          "description": "Calls _find_ascend_path which checks filesystem"
+        }
+      ],
+      "performance_budget": null
+    },
+    {
+      "name": "write_plist",
+      "description": "Generate and write a launchd plist file to ~/Library/LaunchAgents/ for the given schedule.",
+      "inputs": [
+        {
+          "name": "schedule_name",
+          "type_ref": "str",
+          "required": true,
+          "default": "",
+          "description": "Name of the schedule",
+          "validators": []
+        },
+        {
+          "name": "cron_expr",
+          "type_ref": "str",
+          "required": true,
+          "default": "",
+          "description": "5-field cron expression",
+          "validators": []
+        },
+        {
+          "name": "schedules_dir",
+          "type_ref": "Path",
+          "required": true,
+          "default": "",
+          "description": "Directory for schedule logs",
+          "validators": []
+        }
+      ],
+      "output_type": "Optional[Path]",
+      "error_cases": [
+        {
+          "name": "InvalidCronExpression",
+          "condition": "cron_expr cannot be converted to calendar intervals",
+          "error_type": "ValueError",
+          "error_data": {}
+        }
+      ],
+      "preconditions": [
+        "cron_expr is a valid 5-field cron expression"
+      ],
+      "postconditions": [
+        "Creates ~/Library/LaunchAgents directory if it doesn't exist",
+        "Writes plist file to ~/Library/LaunchAgents/com.ascend.schedule.{schedule_name}.plist",
+        "Returns Path to written plist file",
+        "Plist contains zsh invocation: '/bin/zsh -l -c {ascend_path} schedule-run {schedule_name}'"
+      ],
+      "idempotent": false,
+      "is_async": false,
+      "side_effects": [],
+      "structured_side_effects": [
+        {
+          "kind": "writes_file",
+          "target": "~/Library/LaunchAgents/{label}.plist",
+          "description": "Creates LaunchAgents directory and writes plist file"
+        },
+        {
+          "kind": "reads_file",
+          "target": "filesystem",
+          "description": "Calls _find_ascend_path"
+        }
+      ],
+      "performance_budget": null
+    },
+    {
+      "name": "load_plist",
+      "description": "Load a launchd plist using launchctl. Returns True on success, False on failure.",
+      "inputs": [
+        {
+          "name": "schedule_name",
+          "type_ref": "str",
+          "required": true,
+          "default": "",
+          "description": "Name of the schedule",
+          "validators": []
+        }
+      ],
+      "output_type": "bool",
+      "error_cases": [],
+      "preconditions": [],
+      "postconditions": [
+        "Returns False if plist file doesn't exist",
+        "Returns True if launchctl load succeeds",
+        "Returns False if launchctl load fails or times out"
+      ],
+      "idempotent": false,
+      "is_async": false,
+      "side_effects": [],
+      "structured_side_effects": [
+        {
+          "kind": "network_call",
+          "target": "launchctl system service",
+          "description": "Executes 'launchctl load' subprocess with 10 second timeout"
+        },
+        {
+          "kind": "reads_file",
+          "target": "~/Library/LaunchAgents/com.ascend.schedule.{schedule_name}.plist",
+          "description": "Checks if plist exists"
+        }
+      ],
+      "performance_budget": null
+    },
+    {
+      "name": "unload_plist",
+      "description": "Unload a launchd plist using launchctl. Returns True on success, False on failure.",
+      "inputs": [
+        {
+          "name": "schedule_name",
+          "type_ref": "str",
+          "required": true,
+          "default": "",
+          "description": "Name of the schedule",
+          "validators": []
+        }
+      ],
+      "output_type": "bool",
+      "error_cases": [],
+      "preconditions": [],
+      "postconditions": [
+        "Returns False if plist file doesn't exist",
+        "Returns True if launchctl unload succeeds",
+        "Returns False if launchctl unload fails or times out"
+      ],
+      "idempotent": false,
+      "is_async": false,
+      "side_effects": [],
+      "structured_side_effects": [
+        {
+          "kind": "network_call",
+          "target": "launchctl system service",
+          "description": "Executes 'launchctl unload' subprocess with 10 second timeout"
+        },
+        {
+          "kind": "reads_file",
+          "target": "~/Library/LaunchAgents/com.ascend.schedule.{schedule_name}.plist",
+          "description": "Checks if plist exists"
+        }
+      ],
+      "performance_budget": null
+    },
+    {
+      "name": "remove_plist",
+      "description": "Unload and delete a launchd plist file. Returns True if file was deleted, False otherwise.",
+      "inputs": [
+        {
+          "name": "schedule_name",
+          "type_ref": "str",
+          "required": true,
+          "default": "",
+          "description": "Name of the schedule",
+          "validators": []
+        }
+      ],
+      "output_type": "bool",
+      "error_cases": [],
+      "preconditions": [],
+      "postconditions": [
+        "Calls unload_plist first to unload the job",
+        "Returns True if plist file existed and was deleted",
+        "Returns False if plist file doesn't exist"
+      ],
+      "idempotent": false,
+      "is_async": false,
+      "side_effects": [],
+      "structured_side_effects": [
+        {
+          "kind": "writes_file",
+          "target": "~/Library/LaunchAgents/com.ascend.schedule.{schedule_name}.plist",
+          "description": "Deletes plist file if it exists"
+        },
+        {
+          "kind": "network_call",
+          "target": "launchctl system service",
+          "description": "Calls unload_plist which executes launchctl"
+        }
+      ],
+      "performance_budget": null
+    }
+  ],
+  "dependencies": [
+    "shutil",
+    "subprocess",
+    "datetime",
+    "pathlib",
+    "typing"
+  ],
+  "dependency_contracts": {},
+  "invariants": [
+    "Cron weekday 0 = Sunday (differs from Python's datetime.weekday() where 0 = Monday)",
+    "Cron expressions are always 5 fields: minute hour day-of-month month day-of-week",
+    "When both day-of-month and day-of-week are restricted (not *), cron uses OR semantics (match either)",
+    "compute_next_run searches up to 366 days ahead before giving up",
+    "launchd plist files are stored in ~/Library/LaunchAgents/",
+    "launchd plist label format: com.ascend.schedule.{schedule_name}",
+    "Schedule log files use format: {schedules_dir}/{schedule_name}.log",
+    "_PLIST_TEMPLATE defines XML structure for macOS launchd configuration",
+    "Biweekly schedules target 2nd and 4th occurrences (days 8-14 and 22-28)",
+    "Quarterly schedules run on 1st day of Jan, Apr, Jul, Oct"
+  ],
+  "requires": [],
+  "processing_register": "",
+  "data_access": {
+    "reads": [
+      "filesystem",
+      "system_clock"
+    ],
+    "writes": [
+      "filesystem"
+    ],
+    "rationale": "Reads from filesystem to locate ascend executable and check plist existence. Writes plist files to ~/Library/LaunchAgents/. Reads system clock for current time in compute_next_run.",
+    "side_effects": [
+      {
+        "type": "subprocess_execution",
+        "classification": "system_integration",
+        "fields": [
+          "launchctl"
+        ],
+        "rationale": "Executes launchctl load/unload commands to manage launchd jobs"
+      },
+      {
+        "type": "file_write",
+        "classification": "persistent_state",
+        "fields": [
+          "~/Library/LaunchAgents/*.plist"
+        ],
+        "rationale": "Creates and deletes launchd plist configuration files"
+      }
+    ]
+  },
+  "authority": {
+    "domains": [
+      "scheduler",
+      "cron_parsing",
+      "launchd_management"
+    ],
+    "rationale": "This module is the authoritative source for schedule parsing, cron expression handling, and launchd plist management within the Ascend system"
+  }
+}

@@ -1,0 +1,178 @@
+{
+  "component_id": "contracts_src_ascend_cli_interface",
+  "name": "Ascend CLI Interface",
+  "description": "Command-line interface for Ascend, an AI-powered engineering management tool. Provides flat subcommand architecture for managing teams, meetings, performance reports, goals, and integrations. Supports space-separated commands (e.g., 'roster list') by rewriting them to hyphenated form (e.g., 'roster-list'). Handles argument parsing and lazy loading of command handlers.",
+  "version": 1,
+  "types": [
+    {
+      "name": "SystemExit",
+      "kind": "primitive",
+      "fields": [],
+      "item_type": "",
+      "variants": [],
+      "inner_types": [],
+      "description": "Built-in exception type for exiting the program with a status code",
+      "owner_component": "builtins"
+    }
+  ],
+  "functions": [
+    {
+      "name": "_build_parser",
+      "description": "Builds and configures the ArgumentParser for the Ascend CLI with all subcommands and their arguments. Creates approximately 50+ subcommands across categories: init, config, roster, team, meeting, sync, report, plan, coach, and schedule.",
+      "inputs": [],
+      "output_type": "argparse.ArgumentParser",
+      "error_cases": [],
+      "preconditions": [],
+      "postconditions": [
+        "Returns a fully configured ArgumentParser with program name 'ascend'",
+        "Parser includes --version flag showing ascend version",
+        "Parser contains subparsers for all CLI commands",
+        "All subcommands have appropriate arguments defined"
+      ],
+      "idempotent": false,
+      "is_async": false,
+      "side_effects": [],
+      "structured_side_effects": [
+        {
+          "kind": "none",
+          "target": "",
+          "description": ""
+        }
+      ],
+      "performance_budget": null
+    },
+    {
+      "name": "_rewrite_args",
+      "description": "Rewrites space-separated command arguments to hyphenated form. Supports both 3-word commands (e.g., 'plan goal create' -> 'plan-goal-create') and 2-word commands (e.g., 'roster list' -> 'roster-list'). Tries longest match first (3-word before 2-word).",
+      "inputs": [
+        {
+          "name": "argv",
+          "type_ref": "list[str]",
+          "required": true,
+          "default": "",
+          "description": "List of command line arguments to potentially rewrite",
+          "validators": []
+        }
+      ],
+      "output_type": "list[str]",
+      "error_cases": [],
+      "preconditions": [],
+      "postconditions": [
+        "Returns rewritten arguments if a known multi-word command is found",
+        "Returns original arguments unchanged if no match found",
+        "3-word commands take precedence over 2-word commands"
+      ],
+      "idempotent": false,
+      "is_async": false,
+      "side_effects": [],
+      "structured_side_effects": [
+        {
+          "kind": "none",
+          "target": "",
+          "description": ""
+        }
+      ],
+      "performance_budget": null
+    },
+    {
+      "name": "main",
+      "description": "CLI entry point. Parses command line arguments, rewrites space-separated commands to hyphenated form, and dispatches to appropriate command handler. Imports command handlers lazily to optimize startup time. Exits with code 1 if no command is provided.",
+      "inputs": [
+        {
+          "name": "argv",
+          "type_ref": "list[str] | None",
+          "required": false,
+          "default": "None",
+          "description": "Optional list of command line arguments; defaults to None (uses sys.argv)",
+          "validators": []
+        }
+      ],
+      "output_type": "None",
+      "error_cases": [
+        {
+          "name": "no_command_provided",
+          "condition": "args.command is falsy",
+          "error_type": "SystemExit",
+          "error_data": {
+            "exit_code": "1"
+          }
+        },
+        {
+          "name": "unknown_command",
+          "condition": "args.command does not match any known command",
+          "error_type": "SystemExit",
+          "error_data": {
+            "exit_code": "1"
+          }
+        }
+      ],
+      "preconditions": [],
+      "postconditions": [
+        "Command handler is invoked for valid commands",
+        "Help is printed if no command provided",
+        "Process exits with code 1 for missing or unknown commands"
+      ],
+      "idempotent": false,
+      "is_async": false,
+      "side_effects": [
+        "Lazy imports command handler modules based on command",
+        "Prints help text to stdout if no command given",
+        "Calls sys.exit(1) for error conditions",
+        "Invokes command handlers which may have various side effects"
+      ],
+      "structured_side_effects": [
+        {
+          "kind": "mutates_state",
+          "target": "command handler modules",
+          "description": "Lazy imports command handler modules based on command"
+        },
+        {
+          "kind": "logging",
+          "target": "stdout",
+          "description": "Prints help text to stdout if no command given"
+        },
+        {
+          "kind": "mutates_state",
+          "target": "process",
+          "description": "Calls sys.exit(1) for error conditions"
+        }
+      ],
+      "performance_budget": null
+    }
+  ],
+  "dependencies": [
+    "argparse",
+    "sys",
+    "ascend",
+    "ascend.commands.init",
+    "ascend.commands.roster",
+    "ascend.commands.team",
+    "ascend.commands.meeting",
+    "ascend.commands.sync",
+    "ascend.commands.report",
+    "ascend.commands.plan",
+    "ascend.commands.coach",
+    "ascend.commands.schedule",
+    "ascend.tui.app"
+  ],
+  "dependency_contracts": {},
+  "invariants": [
+    "All multi-word commands must be accessible via both space-separated and hyphenated forms",
+    "Command handlers are always lazy-loaded (imported only when command is invoked)",
+    "All subcommands support --json flag for machine-readable output where applicable",
+    "Parser program name is always 'ascend'",
+    "3-word command matching takes precedence over 2-word matching in _rewrite_args"
+  ],
+  "requires": [],
+  "processing_register": "",
+  "data_access": {
+    "reads": [],
+    "writes": [],
+    "rationale": "",
+    "side_effects": []
+  },
+  "authority": {
+    "domains": [],
+    "rationale": null
+  }
+}

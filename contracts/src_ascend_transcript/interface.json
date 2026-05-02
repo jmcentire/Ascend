@@ -1,0 +1,590 @@
+{
+  "component_id": "src_ascend_transcript",
+  "name": "Ascend Transcript Parser",
+  "description": "Parses meeting transcript files (.txt, .md) into structured data with speaker turns. Provides pure parsing functions for extracting speaker turns and dates, plus database-aware helpers for member resolution and duplicate detection. Handles filename-based and content-based metadata extraction.",
+  "version": 1,
+  "types": [
+    {
+      "name": "TranscriptError",
+      "kind": "struct",
+      "fields": [
+        {
+          "name": "message",
+          "type_ref": "str",
+          "required": true,
+          "default": "",
+          "description": "Error message",
+          "validators": []
+        },
+        {
+          "name": "variant",
+          "type_ref": "str",
+          "required": true,
+          "default": "",
+          "description": "Error category: FILE_NOT_FOUND, FILE_UNREADABLE, EMPTY_TRANSCRIPT, INVALID_FORMAT, or DIRECTORY_NOT_FOUND",
+          "validators": []
+        }
+      ],
+      "item_type": "",
+      "variants": [],
+      "inner_types": [],
+      "description": "Custom exception for transcript parsing failures. Extends ValueError with variant categorization.",
+      "owner_component": ""
+    },
+    {
+      "name": "TranscriptTurn",
+      "kind": "struct",
+      "fields": [
+        {
+          "name": "speaker",
+          "type_ref": "str",
+          "required": true,
+          "default": "",
+          "description": "Speaker name extracted from transcript line",
+          "validators": []
+        },
+        {
+          "name": "text",
+          "type_ref": "str",
+          "required": true,
+          "default": "",
+          "description": "Text content spoken by the speaker, may span multiple lines",
+          "validators": []
+        }
+      ],
+      "item_type": "",
+      "variants": [],
+      "inner_types": [],
+      "description": "A single speaker turn in a transcript. Immutable (frozen=True in Pydantic model_config).",
+      "owner_component": ""
+    },
+    {
+      "name": "ParsedTranscript",
+      "kind": "struct",
+      "fields": [
+        {
+          "name": "source_file",
+          "type_ref": "str",
+          "required": true,
+          "default": "",
+          "description": "Original filename",
+          "validators": []
+        },
+        {
+          "name": "raw_text",
+          "type_ref": "str",
+          "required": true,
+          "default": "",
+          "description": "Full transcript text (excluded from serialization via Field(exclude=True))",
+          "validators": []
+        },
+        {
+          "name": "turns",
+          "type_ref": "list[TranscriptTurn]",
+          "required": true,
+          "default": "",
+          "description": "Ordered list of speaker turns",
+          "validators": []
+        },
+        {
+          "name": "date",
+          "type_ref": "Optional[str]",
+          "required": false,
+          "default": "",
+          "description": "Meeting date in YYYY-MM-DD format if detected, None otherwise",
+          "validators": []
+        },
+        {
+          "name": "member_name",
+          "type_ref": "Optional[str]",
+          "required": false,
+          "default": "",
+          "description": "Member name extracted from filename if present, None otherwise",
+          "validators": []
+        },
+        {
+          "name": "member_id",
+          "type_ref": "Optional[int]",
+          "required": false,
+          "default": "",
+          "description": "Database member ID, initially None after parsing",
+          "validators": []
+        }
+      ],
+      "item_type": "",
+      "variants": [],
+      "inner_types": [],
+      "description": "Structured representation of a parsed meeting transcript with extracted metadata.",
+      "owner_component": ""
+    }
+  ],
+  "functions": [
+    {
+      "name": "parse_transcript",
+      "description": "Read a transcript file from disk and parse it into a structured ParsedTranscript object. Extracts speaker turns using regex pattern matching, detects date from filename/content, and extracts member name from filename. Truncates files exceeding MAX_RAW_TEXT (100,000 chars).",
+      "inputs": [
+        {
+          "name": "file_path",
+          "type_ref": "Path",
+          "required": true,
+          "default": "",
+          "description": "Path to the transcript file (.txt or .md)",
+          "validators": []
+        }
+      ],
+      "output_type": "ParsedTranscript",
+      "error_cases": [
+        {
+          "name": "file_not_found",
+          "condition": "file_path does not exist",
+          "error_type": "TranscriptError",
+          "error_data": {
+            "variant": "FILE_NOT_FOUND"
+          }
+        },
+        {
+          "name": "not_a_file",
+          "condition": "file_path exists but is not a regular file",
+          "error_type": "TranscriptError",
+          "error_data": {
+            "variant": "INVALID_FORMAT"
+          }
+        },
+        {
+          "name": "file_unreadable",
+          "condition": "PermissionError or OSError when reading file",
+          "error_type": "TranscriptError",
+          "error_data": {
+            "variant": "FILE_UNREADABLE"
+          }
+        },
+        {
+          "name": "empty_transcript",
+          "condition": "File content is empty or only whitespace",
+          "error_type": "TranscriptError",
+          "error_data": {
+            "variant": "EMPTY_TRANSCRIPT"
+          }
+        }
+      ],
+      "preconditions": [
+        "file_path must exist",
+        "file_path must be a regular file (not directory)",
+        "file must be readable with UTF-8 encoding",
+        "file must not be empty (after stripping whitespace)"
+      ],
+      "postconditions": [
+        "Returns ParsedTranscript with source_file set to filename",
+        "raw_text contains file content (truncated to MAX_RAW_TEXT if needed)",
+        "turns list contains parsed speaker turns (may be empty if no matches)",
+        "date is extracted if found in filename or first 20 lines of content",
+        "member_name is extracted from filename pattern YYYY-MM-DD_Name if present",
+        "member_id is always None (requires separate resolution)"
+      ],
+      "idempotent": false,
+      "is_async": false,
+      "side_effects": [
+        "Reads file from disk",
+        "Logs warning if file exceeds MAX_RAW_TEXT"
+      ],
+      "structured_side_effects": [
+        {
+          "kind": "reads_file",
+          "target": "file_path",
+          "description": "Reads transcript file with UTF-8 encoding"
+        },
+        {
+          "kind": "logging",
+          "target": "logger",
+          "description": "Warns if transcript exceeds MAX_RAW_TEXT characters"
+        }
+      ],
+      "performance_budget": null
+    },
+    {
+      "name": "detect_date",
+      "description": "Extract a meeting date in YYYY-MM-DD format from filename (priority) or content (first 20 lines). Validates extracted dates using datetime.date.fromisoformat.",
+      "inputs": [
+        {
+          "name": "filename",
+          "type_ref": "str",
+          "required": true,
+          "default": "",
+          "description": "Filename to search for date pattern",
+          "validators": []
+        },
+        {
+          "name": "content",
+          "type_ref": "str",
+          "required": true,
+          "default": "",
+          "description": "Transcript content to search if filename has no date",
+          "validators": []
+        }
+      ],
+      "output_type": "Optional[str]",
+      "error_cases": [],
+      "preconditions": [],
+      "postconditions": [
+        "Returns YYYY-MM-DD string if valid date found in filename (checked first)",
+        "Returns YYYY-MM-DD string if valid date found in first 20 lines of content (checked second)",
+        "Returns None if no valid date found in either location"
+      ],
+      "idempotent": false,
+      "is_async": false,
+      "side_effects": [],
+      "structured_side_effects": [
+        {
+          "kind": "none",
+          "target": "",
+          "description": ""
+        }
+      ],
+      "performance_budget": null
+    },
+    {
+      "name": "resolve_member",
+      "description": "Match speaker names from transcript against members database to identify the meeting subject (team member). Uses exact matching (name, email prefix, slack handle) followed by fuzzy matching (SequenceMatcher ratio >= 0.6). Excludes manager_name from matching.",
+      "inputs": [
+        {
+          "name": "speaker_names",
+          "type_ref": "list[str]",
+          "required": true,
+          "default": "",
+          "description": "List of speaker names from transcript",
+          "validators": []
+        },
+        {
+          "name": "manager_name",
+          "type_ref": "Optional[str]",
+          "required": true,
+          "default": "",
+          "description": "Manager name to exclude from matching, None if not filtering",
+          "validators": []
+        },
+        {
+          "name": "db_conn",
+          "type_ref": "sqlite3.Connection",
+          "required": true,
+          "default": "",
+          "description": "SQLite database connection with members table",
+          "validators": []
+        }
+      ],
+      "output_type": "Optional[int]",
+      "error_cases": [
+        {
+          "name": "database_error",
+          "condition": "sqlite3.Error when querying members table",
+          "error_type": "TranscriptError",
+          "error_data": {
+            "variant": "INVALID_FORMAT"
+          }
+        }
+      ],
+      "preconditions": [
+        "db_conn must be a valid, open SQLite connection",
+        "Database must have 'members' table with columns: id, name, email, slack"
+      ],
+      "postconditions": [
+        "Returns member id (int) if exact or fuzzy match found (excluding manager)",
+        "Returns None if no match found",
+        "Exact matches (name, email prefix, slack) are tried before fuzzy matching",
+        "Fuzzy matching uses FUZZY_THRESHOLD=0.6 on lowercased names"
+      ],
+      "idempotent": false,
+      "is_async": false,
+      "side_effects": [
+        "Reads from members table in database"
+      ],
+      "structured_side_effects": [
+        {
+          "kind": "network_call",
+          "target": "db_conn",
+          "description": "Executes SELECT query on members table"
+        }
+      ],
+      "performance_budget": null
+    },
+    {
+      "name": "scan_directory",
+      "description": "Find all transcript files (.txt, .md extensions) in a directory. Non-recursive scan that filters hidden files, non-files, and zero-byte files. Returns sorted list by filename.",
+      "inputs": [
+        {
+          "name": "dir_path",
+          "type_ref": "Path",
+          "required": true,
+          "default": "",
+          "description": "Directory path to scan for transcript files",
+          "validators": []
+        }
+      ],
+      "output_type": "list[Path]",
+      "error_cases": [
+        {
+          "name": "directory_not_found",
+          "condition": "dir_path does not exist",
+          "error_type": "TranscriptError",
+          "error_data": {
+            "variant": "DIRECTORY_NOT_FOUND"
+          }
+        },
+        {
+          "name": "not_a_directory",
+          "condition": "dir_path exists but is not a directory",
+          "error_type": "TranscriptError",
+          "error_data": {
+            "variant": "DIRECTORY_NOT_FOUND"
+          }
+        }
+      ],
+      "preconditions": [
+        "dir_path must exist",
+        "dir_path must be a directory"
+      ],
+      "postconditions": [
+        "Returns list of Path objects for .txt and .md files",
+        "List is sorted alphabetically by filename",
+        "Hidden files (starting with '.') are excluded",
+        "Non-file entries (directories, symlinks) are excluded",
+        "Zero-byte files are excluded",
+        "Case-insensitive extension matching (.txt, .TXT, .md, .MD)"
+      ],
+      "idempotent": false,
+      "is_async": false,
+      "side_effects": [
+        "Reads directory metadata and file stats"
+      ],
+      "structured_side_effects": [
+        {
+          "kind": "reads_file",
+          "target": "dir_path",
+          "description": "Iterates directory entries and reads file metadata"
+        }
+      ],
+      "performance_budget": null
+    },
+    {
+      "name": "check_duplicate",
+      "description": "Check if a transcript with matching source_file, member_id, and date already exists in the meetings table. Uses IS operator for NULL-safe comparison of optional fields.",
+      "inputs": [
+        {
+          "name": "source_file",
+          "type_ref": "str",
+          "required": true,
+          "default": "",
+          "description": "Source filename to check",
+          "validators": []
+        },
+        {
+          "name": "member_id",
+          "type_ref": "Optional[int]",
+          "required": true,
+          "default": "",
+          "description": "Member ID to check, None for no member",
+          "validators": []
+        },
+        {
+          "name": "date",
+          "type_ref": "Optional[str]",
+          "required": true,
+          "default": "",
+          "description": "Meeting date to check, None for no date",
+          "validators": []
+        },
+        {
+          "name": "db_conn",
+          "type_ref": "sqlite3.Connection",
+          "required": true,
+          "default": "",
+          "description": "SQLite database connection with meetings table",
+          "validators": []
+        }
+      ],
+      "output_type": "bool",
+      "error_cases": [
+        {
+          "name": "database_error",
+          "condition": "sqlite3.Error when querying meetings table",
+          "error_type": "TranscriptError",
+          "error_data": {
+            "variant": "INVALID_FORMAT"
+          }
+        }
+      ],
+      "preconditions": [
+        "db_conn must be a valid, open SQLite connection",
+        "Database must have 'meetings' table with columns: source_file, member_id, date"
+      ],
+      "postconditions": [
+        "Returns True if at least one matching row exists in meetings table",
+        "Returns False if no matching rows exist"
+      ],
+      "idempotent": false,
+      "is_async": false,
+      "side_effects": [
+        "Reads from meetings table in database"
+      ],
+      "structured_side_effects": [
+        {
+          "kind": "network_call",
+          "target": "db_conn",
+          "description": "Executes SELECT COUNT query on meetings table"
+        }
+      ],
+      "performance_budget": null
+    },
+    {
+      "name": "_validate_date",
+      "description": "Private helper function to validate a date string using datetime.date.fromisoformat. Returns True if valid ISO format (YYYY-MM-DD), False otherwise.",
+      "inputs": [
+        {
+          "name": "candidate",
+          "type_ref": "str",
+          "required": true,
+          "default": "",
+          "description": "Date string to validate",
+          "validators": []
+        }
+      ],
+      "output_type": "bool",
+      "error_cases": [],
+      "preconditions": [],
+      "postconditions": [
+        "Returns True if candidate is valid ISO 8601 date format (YYYY-MM-DD)",
+        "Returns False if candidate is invalid or cannot be parsed"
+      ],
+      "idempotent": false,
+      "is_async": false,
+      "side_effects": [],
+      "structured_side_effects": [
+        {
+          "kind": "none",
+          "target": "",
+          "description": ""
+        }
+      ],
+      "performance_budget": null
+    },
+    {
+      "name": "__init__",
+      "description": "Constructor for TranscriptError exception. Initializes the ValueError base class with message and stores the variant string.",
+      "inputs": [
+        {
+          "name": "self",
+          "type_ref": "TranscriptError",
+          "required": true,
+          "default": "",
+          "description": "The exception instance",
+          "validators": []
+        },
+        {
+          "name": "message",
+          "type_ref": "str",
+          "required": true,
+          "default": "",
+          "description": "Error message",
+          "validators": []
+        },
+        {
+          "name": "variant",
+          "type_ref": "str",
+          "required": true,
+          "default": "",
+          "description": "Error variant/category constant",
+          "validators": []
+        }
+      ],
+      "output_type": "None",
+      "error_cases": [],
+      "preconditions": [],
+      "postconditions": [
+        "Sets self.variant to provided variant string",
+        "Calls super().__init__(message) to initialize ValueError"
+      ],
+      "idempotent": false,
+      "is_async": false,
+      "side_effects": [],
+      "structured_side_effects": [
+        {
+          "kind": "mutates_state",
+          "target": "self",
+          "description": "Sets variant attribute on exception instance"
+        }
+      ],
+      "performance_budget": null
+    }
+  ],
+  "dependencies": [
+    "datetime",
+    "logging",
+    "re",
+    "sqlite3",
+    "difflib",
+    "pathlib",
+    "typing",
+    "pydantic"
+  ],
+  "dependency_contracts": {},
+  "invariants": [
+    "SPEAKER_PATTERN matches lines like 'Name: text' or '**Name**: text' with speaker names 2-60 chars",
+    "FILENAME_DATE_PATTERN matches 'YYYY-MM-DD_Name.txt' or 'YYYY-MM-DD_Name.md' (case-insensitive)",
+    "CONTENT_DATE_PATTERN matches YYYY-MM-DD anywhere in text",
+    "MAX_RAW_TEXT = 100,000 characters (files are truncated at this limit)",
+    "FUZZY_THRESHOLD = 0.6 for SequenceMatcher similarity matching",
+    "TranscriptTurn instances are immutable (frozen=True)",
+    "Date strings are always in YYYY-MM-DD ISO format when present",
+    "Only .txt and .md file extensions are recognized as transcripts",
+    "Speaker turns accumulate continuation lines until next speaker pattern match",
+    "Database queries use IS operator for NULL-safe comparison of optional fields"
+  ],
+  "requires": [],
+  "processing_register": "",
+  "data_access": {
+    "reads": [
+      "filesystem",
+      "sqlite3.members",
+      "sqlite3.meetings"
+    ],
+    "writes": [],
+    "rationale": "Module reads transcript files from filesystem and queries members/meetings tables for resolution and duplicate checking. No writes to database or filesystem.",
+    "side_effects": [
+      {
+        "type": "file_read",
+        "classification": "filesystem",
+        "fields": [
+          "transcript_files"
+        ],
+        "rationale": "parse_transcript reads file content, scan_directory reads directory metadata"
+      },
+      {
+        "type": "database_read",
+        "classification": "sqlite3",
+        "fields": [
+          "members.id",
+          "members.name",
+          "members.email",
+          "members.slack",
+          "meetings.source_file",
+          "meetings.member_id",
+          "meetings.date"
+        ],
+        "rationale": "resolve_member queries members table, check_duplicate queries meetings table"
+      },
+      {
+        "type": "logging",
+        "classification": "observability",
+        "fields": [
+          "warning"
+        ],
+        "rationale": "parse_transcript logs warning when truncating oversized files"
+      }
+    ]
+  },
+  "authority": {
+    "domains": [
+      "transcript_parsing"
+    ],
+    "rationale": "This module owns the parsing logic for Ascend meeting transcript files, including speaker turn extraction, date detection, and filename-based metadata extraction. It is the authoritative parser for the transcript format."
+  }
+}

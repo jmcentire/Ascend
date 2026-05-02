@@ -1,0 +1,685 @@
+{
+  "component_id": "src_ascend_summarizer",
+  "name": "Meeting Summarizer",
+  "description": "Meeting transcript processing using Claude API. Provides summarization, structured item extraction (action items, decisions, topics, concerns, wins), sentiment analysis, and 1:1 meeting preparation generation. All functions fail gracefully, returning None or empty collections on error.",
+  "version": 1,
+  "types": [
+    {
+      "name": "MeetingItemKind",
+      "kind": "enum",
+      "fields": [],
+      "item_type": "",
+      "variants": [
+        "action_item",
+        "decision",
+        "topic",
+        "concern",
+        "win"
+      ],
+      "inner_types": [],
+      "description": "Enumeration of meeting item types extracted from transcripts",
+      "owner_component": ""
+    },
+    {
+      "name": "MeetingItemExtract",
+      "kind": "struct",
+      "fields": [
+        {
+          "name": "kind",
+          "type_ref": "MeetingItemKind",
+          "required": true,
+          "default": "",
+          "description": "Type of meeting item",
+          "validators": []
+        },
+        {
+          "name": "content",
+          "type_ref": "str",
+          "required": true,
+          "default": "",
+          "description": "Non-empty content of the item",
+          "validators": [
+            {
+              "kind": "custom",
+              "expression": "len(v) > 0",
+              "error_message": "content must be non-empty"
+            }
+          ]
+        },
+        {
+          "name": "owner",
+          "type_ref": "Optional[str]",
+          "required": false,
+          "default": "None",
+          "description": "Owner of the item (if applicable)",
+          "validators": []
+        }
+      ],
+      "item_type": "",
+      "variants": [],
+      "inner_types": [],
+      "description": "Validated structure for a single extracted meeting item with content validation",
+      "owner_component": ""
+    }
+  ],
+  "functions": [
+    {
+      "name": "_truncate",
+      "description": "Truncates text to MAX_INPUT_CHARS (100,000), attempting to break at sentence boundary if possible. Appends ' [TRUNCATED]' marker if truncation occurs.",
+      "inputs": [
+        {
+          "name": "text",
+          "type_ref": "str",
+          "required": true,
+          "default": "",
+          "description": "Text to truncate",
+          "validators": []
+        }
+      ],
+      "output_type": "str",
+      "error_cases": [],
+      "preconditions": [],
+      "postconditions": [
+        "Returns original text if len(text) <= 100000",
+        "Returns truncated text + ' [TRUNCATED]' if len(text) > 100000",
+        "Attempts to break at sentence boundary ('. ') if found after 50000 chars"
+      ],
+      "idempotent": false,
+      "is_async": false,
+      "side_effects": [],
+      "structured_side_effects": [],
+      "performance_budget": null
+    },
+    {
+      "name": "_parse_json",
+      "description": "Parses JSON text, stripping markdown code fences (```json...```) if present. Uses regex to detect and remove fence markers before parsing.",
+      "inputs": [
+        {
+          "name": "text",
+          "type_ref": "str",
+          "required": true,
+          "default": "",
+          "description": "JSON text to parse, possibly wrapped in markdown fences",
+          "validators": []
+        }
+      ],
+      "output_type": "Any",
+      "error_cases": [
+        {
+          "name": "invalid_json",
+          "condition": "text is not valid JSON after fence stripping",
+          "error_type": "json.JSONDecodeError",
+          "error_data": {}
+        }
+      ],
+      "preconditions": [],
+      "postconditions": [
+        "Returns parsed JSON object/array/primitive"
+      ],
+      "idempotent": false,
+      "is_async": false,
+      "side_effects": [],
+      "structured_side_effects": [],
+      "performance_budget": null
+    },
+    {
+      "name": "get_client",
+      "description": "Creates an Anthropic API client using API key from environment variable specified in config. Returns None if API key is missing or client creation fails.",
+      "inputs": [
+        {
+          "name": "config",
+          "type_ref": "AscendConfig",
+          "required": true,
+          "default": "",
+          "description": "Configuration containing anthropic_api_key_env variable name",
+          "validators": []
+        }
+      ],
+      "output_type": "Optional[anthropic.Anthropic]",
+      "error_cases": [
+        {
+          "name": "api_key_missing",
+          "condition": "Environment variable not set or empty",
+          "error_type": "None (logged warning, returns None)",
+          "error_data": {}
+        },
+        {
+          "name": "client_creation_failed",
+          "condition": "Exception during Anthropic() instantiation",
+          "error_type": "Exception (caught, logged, returns None)",
+          "error_data": {}
+        }
+      ],
+      "preconditions": [],
+      "postconditions": [
+        "Returns Anthropic client if API key is available and valid",
+        "Returns None if API key is missing, empty, or client creation fails"
+      ],
+      "idempotent": false,
+      "is_async": false,
+      "side_effects": [
+        "Reads environment variable via os.environ.get",
+        "Logs warning if API key is missing",
+        "Logs error if client creation fails"
+      ],
+      "structured_side_effects": [
+        {
+          "kind": "logging",
+          "target": "logger.warning/error",
+          "description": "Logs warnings and errors for missing keys or failures"
+        }
+      ],
+      "performance_budget": null
+    },
+    {
+      "name": "summarize_transcript",
+      "description": "Summarizes a meeting transcript using Claude API. Returns 2-4 sentence summary capturing key points, decisions, and action items. Returns None on any failure (empty input, no client, API error).",
+      "inputs": [
+        {
+          "name": "raw_text",
+          "type_ref": "str",
+          "required": true,
+          "default": "",
+          "description": "Meeting transcript text",
+          "validators": []
+        },
+        {
+          "name": "config",
+          "type_ref": "AscendConfig",
+          "required": true,
+          "default": "",
+          "description": "Ascend configuration for model and API settings",
+          "validators": []
+        },
+        {
+          "name": "client",
+          "type_ref": "Optional[anthropic.Anthropic]",
+          "required": false,
+          "default": "None",
+          "description": "Optional pre-initialized Anthropic client",
+          "validators": []
+        }
+      ],
+      "output_type": "Optional[str]",
+      "error_cases": [
+        {
+          "name": "empty_input",
+          "condition": "raw_text is empty or whitespace-only",
+          "error_type": "None (returns None)",
+          "error_data": {}
+        },
+        {
+          "name": "client_unavailable",
+          "condition": "client is None and get_client returns None",
+          "error_type": "None (returns None)",
+          "error_data": {}
+        },
+        {
+          "name": "api_error",
+          "condition": "Any exception during API call",
+          "error_type": "Exception (caught, logged, returns None)",
+          "error_data": {}
+        }
+      ],
+      "preconditions": [
+        "raw_text must be non-empty after strip()",
+        "Valid Anthropic client available (provided or creatable)"
+      ],
+      "postconditions": [
+        "Returns summary string on success",
+        "Returns None if input is empty/whitespace",
+        "Returns None if client unavailable",
+        "Returns None if API call fails",
+        "Logs operation success/failure via log_operation"
+      ],
+      "idempotent": false,
+      "is_async": false,
+      "side_effects": [
+        "Calls Claude API via client.messages.create",
+        "Logs operation result via log_operation",
+        "Logs error on exception"
+      ],
+      "structured_side_effects": [
+        {
+          "kind": "network_call",
+          "target": "anthropic.Anthropic.messages.create",
+          "description": "Makes API call to Claude with truncated transcript"
+        },
+        {
+          "kind": "logging",
+          "target": "log_operation, logger.error",
+          "description": "Logs operation success/failure"
+        }
+      ],
+      "performance_budget": null
+    },
+    {
+      "name": "extract_items",
+      "description": "Extracts structured meeting items (action items, decisions, topics, concerns, wins) from transcript using Claude API. Returns validated list of dictionaries. Returns empty list on any failure.",
+      "inputs": [
+        {
+          "name": "raw_text",
+          "type_ref": "str",
+          "required": true,
+          "default": "",
+          "description": "Meeting transcript text",
+          "validators": []
+        },
+        {
+          "name": "config",
+          "type_ref": "AscendConfig",
+          "required": true,
+          "default": "",
+          "description": "Ascend configuration for model and API settings",
+          "validators": []
+        },
+        {
+          "name": "client",
+          "type_ref": "Optional[anthropic.Anthropic]",
+          "required": false,
+          "default": "None",
+          "description": "Optional pre-initialized Anthropic client",
+          "validators": []
+        }
+      ],
+      "output_type": "list[dict[str, Any]]",
+      "error_cases": [
+        {
+          "name": "empty_input",
+          "condition": "raw_text is empty or whitespace-only",
+          "error_type": "None (returns [])",
+          "error_data": {}
+        },
+        {
+          "name": "client_unavailable",
+          "condition": "client is None and get_client returns None",
+          "error_type": "None (returns [])",
+          "error_data": {}
+        },
+        {
+          "name": "json_parse_error",
+          "condition": "API response is not valid JSON",
+          "error_type": "json.JSONDecodeError, ValueError (caught, logged, returns [])",
+          "error_data": {}
+        },
+        {
+          "name": "invalid_response_type",
+          "condition": "Parsed JSON is not a list",
+          "error_type": "None (returns [])",
+          "error_data": {}
+        },
+        {
+          "name": "validation_error",
+          "condition": "Individual item fails MeetingItemExtract validation",
+          "error_type": "Exception (caught, logged warning, item dropped)",
+          "error_data": {}
+        },
+        {
+          "name": "api_error",
+          "condition": "Any exception during API call",
+          "error_type": "Exception (caught, logged, returns [])",
+          "error_data": {}
+        }
+      ],
+      "preconditions": [
+        "raw_text must be non-empty after strip()",
+        "Valid Anthropic client available"
+      ],
+      "postconditions": [
+        "Returns list of validated MeetingItemExtract.model_dump() dictionaries",
+        "Each item has 'kind', 'content', 'owner' fields",
+        "Returns [] if input is empty/whitespace",
+        "Returns [] if client unavailable",
+        "Returns [] if API response is malformed or unparseable",
+        "Invalid items are dropped with warning",
+        "Logs operation with item count"
+      ],
+      "idempotent": false,
+      "is_async": false,
+      "side_effects": [
+        "Calls Claude API via client.messages.create",
+        "Logs operation result with item count",
+        "Logs warnings for malformed JSON or invalid items",
+        "Logs error on exception"
+      ],
+      "structured_side_effects": [
+        {
+          "kind": "network_call",
+          "target": "anthropic.Anthropic.messages.create",
+          "description": "Makes API call to Claude for item extraction"
+        },
+        {
+          "kind": "logging",
+          "target": "log_operation, logger.warning, logger.error",
+          "description": "Logs operation results, warnings, and errors"
+        }
+      ],
+      "performance_budget": null
+    },
+    {
+      "name": "analyze_sentiment",
+      "description": "Analyzes sentiment of meeting transcript using Claude API. Returns float score in [0.0, 1.0] where 0.0 is very negative and 1.0 is very positive. Clamps out-of-range scores. Returns None on failure.",
+      "inputs": [
+        {
+          "name": "raw_text",
+          "type_ref": "str",
+          "required": true,
+          "default": "",
+          "description": "Meeting transcript text",
+          "validators": []
+        },
+        {
+          "name": "config",
+          "type_ref": "AscendConfig",
+          "required": true,
+          "default": "",
+          "description": "Ascend configuration for model and API settings",
+          "validators": []
+        },
+        {
+          "name": "client",
+          "type_ref": "Optional[anthropic.Anthropic]",
+          "required": false,
+          "default": "None",
+          "description": "Optional pre-initialized Anthropic client",
+          "validators": []
+        }
+      ],
+      "output_type": "Optional[float]",
+      "error_cases": [
+        {
+          "name": "empty_input",
+          "condition": "raw_text is empty or whitespace-only",
+          "error_type": "None (returns None)",
+          "error_data": {}
+        },
+        {
+          "name": "client_unavailable",
+          "condition": "client is None and get_client returns None",
+          "error_type": "None (returns None)",
+          "error_data": {}
+        },
+        {
+          "name": "unparseable_score",
+          "condition": "API response cannot be parsed as JSON or float",
+          "error_type": "json.JSONDecodeError, ValueError, TypeError (caught, returns None)",
+          "error_data": {}
+        },
+        {
+          "name": "api_error",
+          "condition": "Any exception during API call",
+          "error_type": "Exception (caught, logged, returns None)",
+          "error_data": {}
+        }
+      ],
+      "preconditions": [
+        "raw_text must be non-empty after strip()",
+        "Valid Anthropic client available"
+      ],
+      "postconditions": [
+        "Returns float in [0.0, 1.0] on success",
+        "Out-of-range scores are clamped to [0.0, 1.0]",
+        "Returns None if input is empty/whitespace",
+        "Returns None if client unavailable",
+        "Returns None if score cannot be parsed",
+        "Returns None on API error",
+        "Logs operation success"
+      ],
+      "idempotent": false,
+      "is_async": false,
+      "side_effects": [
+        "Calls Claude API via client.messages.create",
+        "Logs operation success",
+        "Logs warning if score is out of range (before clamping)",
+        "Logs error on exception"
+      ],
+      "structured_side_effects": [
+        {
+          "kind": "network_call",
+          "target": "anthropic.Anthropic.messages.create",
+          "description": "Makes API call to Claude for sentiment analysis"
+        },
+        {
+          "kind": "logging",
+          "target": "log_operation, logger.warning, logger.error",
+          "description": "Logs operation results, warnings, and errors"
+        }
+      ],
+      "performance_budget": null
+    },
+    {
+      "name": "generate_prep",
+      "description": "Generates a 1:1 meeting preparation plan using Claude API. Synthesizes recent meetings, open action items, and optional performance data into a structured conversation prep. Returns None on failure.",
+      "inputs": [
+        {
+          "name": "member_name",
+          "type_ref": "str",
+          "required": true,
+          "default": "",
+          "description": "Name of team member for 1:1 meeting",
+          "validators": []
+        },
+        {
+          "name": "recent_meetings",
+          "type_ref": "list[dict]",
+          "required": true,
+          "default": "",
+          "description": "List of recent meeting dictionaries with 'date', 'summary', 'items' keys",
+          "validators": []
+        },
+        {
+          "name": "open_items",
+          "type_ref": "list[dict]",
+          "required": true,
+          "default": "",
+          "description": "List of open action item dictionaries with 'content', 'date' keys",
+          "validators": []
+        },
+        {
+          "name": "performance_data",
+          "type_ref": "Optional[dict]",
+          "required": false,
+          "default": "None",
+          "description": "Optional performance data with 'goals', 'flags', 'notes' keys",
+          "validators": []
+        },
+        {
+          "name": "config",
+          "type_ref": "Optional[AscendConfig]",
+          "required": false,
+          "default": "None",
+          "description": "Optional Ascend configuration (loaded if None)",
+          "validators": []
+        },
+        {
+          "name": "client",
+          "type_ref": "Optional[anthropic.Anthropic]",
+          "required": false,
+          "default": "None",
+          "description": "Optional pre-initialized Anthropic client",
+          "validators": []
+        }
+      ],
+      "output_type": "Optional[str]",
+      "error_cases": [
+        {
+          "name": "empty_member_name",
+          "condition": "member_name is empty or whitespace-only",
+          "error_type": "None (returns None)",
+          "error_data": {}
+        },
+        {
+          "name": "config_unavailable",
+          "condition": "config is None and load_config() fails",
+          "error_type": "Exception (caught, logged, returns None)",
+          "error_data": {}
+        },
+        {
+          "name": "client_unavailable",
+          "condition": "client is None and get_client returns None",
+          "error_type": "None (returns None)",
+          "error_data": {}
+        },
+        {
+          "name": "api_error",
+          "condition": "Any exception during API call",
+          "error_type": "Exception (caught, logged, returns None)",
+          "error_data": {}
+        }
+      ],
+      "preconditions": [
+        "member_name must be non-empty after strip()",
+        "Valid Anthropic client available (provided or creatable)",
+        "Config available (provided or loadable)"
+      ],
+      "postconditions": [
+        "Returns structured prep plan string on success",
+        "Returns None if member_name is empty/whitespace",
+        "Returns None if config cannot be loaded",
+        "Returns None if client unavailable",
+        "Returns None on API error",
+        "Logs operation success"
+      ],
+      "idempotent": false,
+      "is_async": false,
+      "side_effects": [
+        "Dynamically imports ascend.config.load_config if config is None",
+        "Calls Claude API via client.messages.create",
+        "Logs operation success",
+        "Logs error on exception"
+      ],
+      "structured_side_effects": [
+        {
+          "kind": "network_call",
+          "target": "anthropic.Anthropic.messages.create",
+          "description": "Makes API call to Claude for prep plan generation"
+        },
+        {
+          "kind": "logging",
+          "target": "log_operation, logger.error",
+          "description": "Logs operation results and errors"
+        }
+      ],
+      "performance_budget": null
+    },
+    {
+      "name": "content_must_be_nonempty",
+      "description": "Pydantic field validator for MeetingItemExtract.content. Ensures content field is non-empty string.",
+      "inputs": [
+        {
+          "name": "cls",
+          "type_ref": "type",
+          "required": true,
+          "default": "",
+          "description": "Class reference (Pydantic classmethod)",
+          "validators": []
+        },
+        {
+          "name": "v",
+          "type_ref": "str",
+          "required": true,
+          "default": "",
+          "description": "Value to validate",
+          "validators": []
+        }
+      ],
+      "output_type": "str",
+      "error_cases": [
+        {
+          "name": "empty_content",
+          "condition": "v is empty string or falsy",
+          "error_type": "ValueError",
+          "error_data": {
+            "message": "content must be non-empty"
+          }
+        }
+      ],
+      "preconditions": [],
+      "postconditions": [
+        "Returns v unchanged if non-empty"
+      ],
+      "idempotent": false,
+      "is_async": false,
+      "side_effects": [],
+      "structured_side_effects": [],
+      "performance_budget": null
+    }
+  ],
+  "dependencies": [
+    "json",
+    "logging",
+    "os",
+    "re",
+    "enum",
+    "typing",
+    "anthropic",
+    "pydantic",
+    "ascend.audit",
+    "ascend.config"
+  ],
+  "dependency_contracts": {
+    "ascend.audit": [
+      "log_operation"
+    ],
+    "ascend.config": [
+      "AscendConfig",
+      "load_config"
+    ],
+    "anthropic": [
+      "Anthropic"
+    ],
+    "pydantic": [
+      "BaseModel",
+      "field_validator"
+    ]
+  },
+  "invariants": [
+    "_MAX_INPUT_CHARS = 100000 (constant maximum input text length)",
+    "All public functions return None or empty collections on error (no exceptions propagate)",
+    "All API calls use truncated input via _truncate()",
+    "All API calls log operations via ascend.audit.log_operation",
+    "Sentiment scores are always clamped to [0.0, 1.0] range",
+    "MeetingItemExtract.content is always non-empty (enforced by validator)"
+  ],
+  "requires": [],
+  "processing_register": "",
+  "data_access": {
+    "reads": [
+      "environment_variables"
+    ],
+    "writes": [],
+    "rationale": "Reads API keys from environment variables via os.environ.get. No persistent data writes.",
+    "side_effects": [
+      {
+        "type": "network_call",
+        "classification": "external_api",
+        "fields": [
+          "anthropic.Anthropic.messages.create"
+        ],
+        "rationale": "All transcript processing functions make HTTP calls to Claude API"
+      },
+      {
+        "type": "logging",
+        "classification": "observability",
+        "fields": [
+          "logger.warning",
+          "logger.error",
+          "log_operation"
+        ],
+        "rationale": "Extensive logging for errors, warnings, and operation tracking"
+      },
+      {
+        "type": "environment_read",
+        "classification": "configuration",
+        "fields": [
+          "os.environ.get"
+        ],
+        "rationale": "Reads Anthropic API key from environment variable specified in config"
+      }
+    ]
+  },
+  "authority": {
+    "domains": [],
+    "rationale": null
+  }
+}

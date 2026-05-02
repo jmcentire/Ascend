@@ -1,0 +1,321 @@
+{
+  "component_id": "contracts_src_ascend_db_interface",
+  "name": "Ascend SQLite Database Layer",
+  "description": "SQLite database layer for the Ascend engineering management CLI. Provides connection management, schema initialization with versioning, and health checks for a database storing teams, members, meetings, goals, performance snapshots, coaching entries, and schedules. Implements FTS5 full-text search on meeting transcripts.",
+  "version": 1,
+  "types": [
+    {
+      "name": "Path",
+      "kind": "primitive",
+      "fields": [],
+      "item_type": "",
+      "variants": [],
+      "inner_types": [],
+      "description": "pathlib.Path - filesystem path object",
+      "owner_component": ""
+    },
+    {
+      "name": "Connection",
+      "kind": "primitive",
+      "fields": [],
+      "item_type": "",
+      "variants": [],
+      "inner_types": [],
+      "description": "sqlite3.Connection - SQLite database connection",
+      "owner_component": ""
+    },
+    {
+      "name": "HealthCheckResult",
+      "kind": "struct",
+      "fields": [
+        {
+          "name": "ok",
+          "type_ref": "bool",
+          "required": true,
+          "default": "",
+          "description": "True if database is healthy and accessible",
+          "validators": []
+        },
+        {
+          "name": "error",
+          "type_ref": "str",
+          "required": false,
+          "default": "None",
+          "description": "Error message if ok is False",
+          "validators": []
+        },
+        {
+          "name": "version",
+          "type_ref": "int",
+          "required": false,
+          "default": "None",
+          "description": "Current schema version if ok is True",
+          "validators": []
+        },
+        {
+          "name": "tables",
+          "type_ref": "dict[str, int]",
+          "required": false,
+          "default": "None",
+          "description": "Mapping of table names to row counts if ok is True",
+          "validators": []
+        }
+      ],
+      "item_type": "",
+      "variants": [],
+      "inner_types": [],
+      "description": "Health check result dictionary returned by check_db",
+      "owner_component": ""
+    }
+  ],
+  "functions": [
+    {
+      "name": "get_connection",
+      "description": "Opens a SQLite connection to the specified database path with WAL mode and foreign keys enabled. Sets row_factory to sqlite3.Row for dict-like row access.",
+      "inputs": [
+        {
+          "name": "db_path",
+          "type_ref": "Path",
+          "required": true,
+          "default": "",
+          "description": "Path to the SQLite database file",
+          "validators": []
+        }
+      ],
+      "output_type": "sqlite3.Connection",
+      "error_cases": [
+        {
+          "name": "database_error",
+          "condition": "If SQLite cannot open or configure the database",
+          "error_type": "sqlite3.Error",
+          "error_data": {}
+        }
+      ],
+      "preconditions": [],
+      "postconditions": [
+        "Returns an open sqlite3.Connection",
+        "Connection has row_factory set to sqlite3.Row",
+        "Connection has WAL mode enabled (PRAGMA journal_mode=WAL)",
+        "Connection has foreign keys enabled (PRAGMA foreign_keys=ON)"
+      ],
+      "idempotent": false,
+      "is_async": false,
+      "side_effects": [
+        "Opens a file connection to the database",
+        "Executes PRAGMA statements to configure connection"
+      ],
+      "structured_side_effects": [
+        {
+          "kind": "writes_file",
+          "target": "db_path",
+          "description": "Opens database file connection"
+        },
+        {
+          "kind": "mutates_state",
+          "target": "database connection",
+          "description": "Configures connection with WAL mode and foreign keys"
+        }
+      ],
+      "performance_budget": null
+    },
+    {
+      "name": "init_db",
+      "description": "Creates the database and applies the schema if needed. Checks the current schema version and upgrades to SCHEMA_VERSION (2) if necessary. Creates parent directories if they don't exist. Returns an open connection to the initialized database.",
+      "inputs": [
+        {
+          "name": "db_path",
+          "type_ref": "Path",
+          "required": true,
+          "default": "",
+          "description": "Path where the database should be created or initialized",
+          "validators": []
+        }
+      ],
+      "output_type": "sqlite3.Connection",
+      "error_cases": [
+        {
+          "name": "permission_error",
+          "condition": "If parent directory cannot be created due to insufficient permissions",
+          "error_type": "PermissionError",
+          "error_data": {}
+        },
+        {
+          "name": "database_error",
+          "condition": "If SQLite cannot create tables or execute schema SQL",
+          "error_type": "sqlite3.Error",
+          "error_data": {}
+        }
+      ],
+      "preconditions": [],
+      "postconditions": [
+        "Database file exists at db_path",
+        "Parent directories of db_path exist",
+        "Schema version is at least SCHEMA_VERSION (2)",
+        "All tables from _SCHEMA_SQL are created",
+        "Returns an open sqlite3.Connection with WAL mode and foreign keys enabled",
+        "Changes are committed to the database"
+      ],
+      "idempotent": true,
+      "is_async": false,
+      "side_effects": [
+        "Creates parent directories if they don't exist",
+        "Creates or opens database file",
+        "Executes schema SQL if version is outdated",
+        "Inserts schema version record",
+        "Commits transaction"
+      ],
+      "structured_side_effects": [
+        {
+          "kind": "writes_file",
+          "target": "parent directories",
+          "description": "Creates parent directories if needed"
+        },
+        {
+          "kind": "writes_file",
+          "target": "db_path",
+          "description": "Creates or opens database file"
+        },
+        {
+          "kind": "mutates_state",
+          "target": "database schema",
+          "description": "Executes schema DDL and version updates"
+        }
+      ],
+      "performance_budget": null
+    },
+    {
+      "name": "check_db",
+      "description": "Health check function that returns table counts and schema version. Returns a dictionary with ok, version, and tables keys on success, or ok and error keys on failure. Closes the connection before returning.",
+      "inputs": [
+        {
+          "name": "db_path",
+          "type_ref": "Path",
+          "required": true,
+          "default": "",
+          "description": "Path to the database to check",
+          "validators": []
+        }
+      ],
+      "output_type": "dict",
+      "error_cases": [
+        {
+          "name": "database_not_found",
+          "condition": "If db_path does not exist",
+          "error_type": "dict",
+          "error_data": {
+            "ok": "False",
+            "error": "Database not found"
+          }
+        },
+        {
+          "name": "schema_not_initialized",
+          "condition": "If schema_version table does not exist (OperationalError)",
+          "error_type": "dict",
+          "error_data": {
+            "ok": "False",
+            "error": "Schema not initialized"
+          }
+        }
+      ],
+      "preconditions": [],
+      "postconditions": [
+        "Returns dict with 'ok': bool key",
+        "If ok is False, dict contains 'error': str",
+        "If ok is True, dict contains 'version': int and 'tables': dict[str, int]",
+        "Connection is closed before returning",
+        "Tables checked: members, member_flags, teams, team_members, meetings, meeting_items, goals, performance_snapshots, coaching_entries, schedules"
+      ],
+      "idempotent": true,
+      "is_async": false,
+      "side_effects": [
+        "Opens and closes database connection",
+        "Executes SELECT queries on schema_version and all listed tables"
+      ],
+      "structured_side_effects": [
+        {
+          "kind": "reads_file",
+          "target": "db_path",
+          "description": "Opens database connection for reading"
+        },
+        {
+          "kind": "mutates_state",
+          "target": "database connection",
+          "description": "Opens and closes connection"
+        }
+      ],
+      "performance_budget": null
+    }
+  ],
+  "dependencies": [
+    "sqlite3",
+    "pathlib"
+  ],
+  "dependency_contracts": {},
+  "invariants": [
+    "SCHEMA_VERSION = 2",
+    "_SCHEMA_SQL contains DDL for: schema_version, teams, members, member_flags, team_members, meetings, meetings_fts, meeting_items, goals, performance_snapshots, coaching_entries, schedules",
+    "All connections have WAL mode enabled",
+    "All connections have foreign keys enabled",
+    "All connections use sqlite3.Row as row_factory"
+  ],
+  "requires": [
+    "HealthCheckResult",
+    "get_connection",
+    "init_db",
+    "check_db"
+  ],
+  "processing_register": "",
+  "data_access": {
+    "reads": [
+      "filesystem",
+      "database"
+    ],
+    "writes": [
+      "filesystem",
+      "database"
+    ],
+    "rationale": "Manages SQLite database for Ascend engineering management CLI",
+    "side_effects": [
+      {
+        "type": "database_read",
+        "classification": "read",
+        "fields": [
+          "schema_version",
+          "members",
+          "member_flags",
+          "teams",
+          "team_members",
+          "meetings",
+          "meeting_items",
+          "goals",
+          "performance_snapshots",
+          "coaching_entries",
+          "schedules"
+        ],
+        "rationale": "Reads schema version and table counts for health checks"
+      },
+      {
+        "type": "database_write",
+        "classification": "write",
+        "fields": [
+          "schema_version",
+          "all tables"
+        ],
+        "rationale": "Creates and initializes database schema, inserts version records"
+      },
+      {
+        "type": "filesystem_write",
+        "classification": "write",
+        "fields": [
+          "database files",
+          "directories"
+        ],
+        "rationale": "Creates database files and parent directories"
+      }
+    ]
+  },
+  "authority": {
+    "domains": [],
+    "rationale": null
+  }
+}
