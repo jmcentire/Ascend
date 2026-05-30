@@ -1,0 +1,1145 @@
+{
+  "domains": [
+    "code",
+    "python"
+  ],
+  "node_count": 103,
+  "nodes": [
+    {
+      "domains": [
+        "code",
+        "python"
+      ],
+      "id": "code-mod-ascend-0742dfec6f67",
+      "title": "src/ascend/db.py",
+      "type": "artifact",
+      "updated_at": "2026-05-30T14:47:09",
+      "weight": 0.5
+    },
+    {
+      "domains": [
+        "code",
+        "python"
+      ],
+      "id": "code-mod-ascend-13927e0d513a",
+      "title": "src/ascend/tui/screens/coaching.py",
+      "type": "artifact",
+      "updated_at": "2026-05-30T14:47:09",
+      "weight": 0.5
+    },
+    {
+      "domains": [
+        "code",
+        "python"
+      ],
+      "id": "code-mod-ascend-1680ae19e7e8",
+      "title": "src/ascend/integrations/slack.py",
+      "type": "artifact",
+      "updated_at": "2026-05-30T14:47:09",
+      "weight": 0.5
+    },
+    {
+      "domains": [
+        "code",
+        "python"
+      ],
+      "id": "code-mod-ascend-17336787c33a",
+      "title": "src/ascend/commands/sync.py",
+      "type": "artifact",
+      "updated_at": "2026-05-30T14:47:09",
+      "weight": 0.5
+    },
+    {
+      "domains": [
+        "code",
+        "python"
+      ],
+      "id": "code-mod-ascend-188ac4fb563a",
+      "title": "src/ascend/commands/init.py",
+      "type": "artifact",
+      "updated_at": "2026-05-30T14:47:09",
+      "weight": 0.5
+    },
+    {
+      "domains": [
+        "code",
+        "python"
+      ],
+      "id": "code-mod-ascend-1ac9d1f2e41c",
+      "title": "src/ascend/commands/coach.py",
+      "type": "artifact",
+      "updated_at": "2026-05-30T14:47:09",
+      "weight": 0.5
+    },
+    {
+      "domains": [
+        "code",
+        "python"
+      ],
+      "id": "code-mod-ascend-1c86b2708494",
+      "title": "src/ascend/cli.py",
+      "type": "artifact",
+      "updated_at": "2026-05-30T14:47:09",
+      "weight": 0.5
+    },
+    {
+      "domains": [
+        "code",
+        "python"
+      ],
+      "id": "code-mod-ascend-2666665cd713",
+      "title": "contracts/contracts_contracts_src_ascend_output_interface_interface/interface.py",
+      "type": "artifact",
+      "updated_at": "2026-05-30T14:47:09",
+      "weight": 0.5
+    },
+    {
+      "domains": [
+        "code",
+        "python"
+      ],
+      "id": "code-mod-ascend-342770d311ac",
+      "title": "contracts/contracts_src_ascend_scheduler_interface/interface.py",
+      "type": "artifact",
+      "updated_at": "2026-05-30T14:47:09",
+      "weight": 0.5
+    },
+    {
+      "domains": [
+        "code",
+        "python"
+      ],
+      "id": "code-mod-ascend-445464bab6d7",
+      "title": "contracts/contracts_src_ascend_audit_interface/interface.py",
+      "type": "artifact",
+      "updated_at": "2026-05-30T14:47:09",
+      "weight": 0.5
+    },
+    {
+      "domains": [
+        "code",
+        "python"
+      ],
+      "id": "code-mod-ascend-44a4e7716903",
+      "title": "src/ascend/integrations/snapshot.py",
+      "type": "artifact",
+      "updated_at": "2026-05-30T14:47:09",
+      "weight": 0.5
+    },
+    {
+      "domains": [
+        "code",
+        "python"
+      ],
+      "id": "code-mod-ascend-44ed6090291b",
+      "title": "contracts/contracts_contracts_src_ascend_cli_interface_interface/interface.py",
+      "type": "artifact",
+      "updated_at": "2026-05-30T14:47:09",
+      "weight": 0.5
+    },
+    {
+      "domains": [
+        "code",
+        "python"
+      ],
+      "id": "code-mod-ascend-471fa8d5c833",
+      "title": "src/ascend/tui/screens/schedules.py",
+      "type": "artifact",
+      "updated_at": "2026-05-30T14:47:09",
+      "weight": 0.5
+    },
+    {
+      "domains": [
+        "code",
+        "python"
+      ],
+      "id": "code-mod-ascend-4af453c987e3",
+      "title": "contracts/src_ascend_scheduler/interface.py",
+      "type": "artifact",
+      "updated_at": "2026-05-30T14:47:09",
+      "weight": 0.5
+    },
+    {
+      "domains": [
+        "code",
+        "python"
+      ],
+      "id": "code-mod-ascend-4c0b78329eba",
+      "title": "contracts/contracts_src_ascend_config_interface/interface.py",
+      "type": "artifact",
+      "updated_at": "2026-05-30T14:47:09",
+      "weight": 0.5
+    },
+    {
+      "domains": [
+        "code",
+        "python"
+      ],
+      "id": "code-mod-ascend-4d3db4ca2522",
+      "title": "src/ascend/integrations/github.py",
+      "type": "artifact",
+      "updated_at": "2026-05-30T14:47:09",
+      "weight": 0.5
+    },
+    {
+      "domains": [
+        "code",
+        "python"
+      ],
+      "id": "code-mod-ascend-59364203d951",
+      "title": "contracts/contracts_contracts_src_ascend_summarizer_interface_interface/interface.py",
+      "type": "artifact",
+      "updated_at": "2026-05-30T14:47:09",
+      "weight": 0.5
+    },
+    {
+      "domains": [
+        "code",
+        "python"
+      ],
+      "id": "code-mod-ascend-5e60ab6a1224",
+      "title": "src/ascend/tui/app.py",
+      "type": "artifact",
+      "updated_at": "2026-05-30T14:47:09",
+      "weight": 0.5
+    },
+    {
+      "domains": [
+        "code",
+        "python"
+      ],
+      "id": "code-mod-ascend-62abf3f28ee3",
+      "title": "contracts/contracts_src_ascend_db_interface/interface.py",
+      "type": "artifact",
+      "updated_at": "2026-05-30T14:47:09",
+      "weight": 0.5
+    },
+    {
+      "domains": [
+        "code",
+        "python"
+      ],
+      "id": "code-mod-ascend-6906bdfdd2de",
+      "title": "contracts/contracts_contracts_src_ascend_config_interface_interface/interface.py",
+      "type": "artifact",
+      "updated_at": "2026-05-30T14:47:09",
+      "weight": 0.5
+    },
+    {
+      "domains": [
+        "code",
+        "python"
+      ],
+      "id": "code-mod-ascend-6f11be332804",
+      "title": "contracts/src_ascend_cli/interface.py",
+      "type": "artifact",
+      "updated_at": "2026-05-30T14:47:09",
+      "weight": 0.5
+    },
+    {
+      "domains": [
+        "code",
+        "python"
+      ],
+      "id": "code-mod-ascend-725f66c774d4",
+      "title": "src/ascend/__init__.py",
+      "type": "artifact",
+      "updated_at": "2026-05-30T14:47:09",
+      "weight": 0.5
+    },
+    {
+      "domains": [
+        "code",
+        "python"
+      ],
+      "id": "code-mod-ascend-7d4db8eba8d0",
+      "title": "contracts/src_ascend_output/interface.py",
+      "type": "artifact",
+      "updated_at": "2026-05-30T14:47:09",
+      "weight": 0.5
+    },
+    {
+      "domains": [
+        "code",
+        "python"
+      ],
+      "id": "code-mod-ascend-7fe7ce3e6f7b",
+      "title": "src/ascend/commands/report.py",
+      "type": "artifact",
+      "updated_at": "2026-05-30T14:47:09",
+      "weight": 0.5
+    },
+    {
+      "domains": [
+        "code",
+        "python"
+      ],
+      "id": "code-mod-ascend-845582807cc8",
+      "title": "src/ascend/audit.py",
+      "type": "artifact",
+      "updated_at": "2026-05-30T14:47:09",
+      "weight": 0.5
+    },
+    {
+      "domains": [
+        "code",
+        "python"
+      ],
+      "id": "code-mod-ascend-85b659c0b2d3",
+      "title": "src/ascend/commands/team.py",
+      "type": "artifact",
+      "updated_at": "2026-05-30T14:47:09",
+      "weight": 0.5
+    },
+    {
+      "domains": [
+        "code",
+        "python"
+      ],
+      "id": "code-mod-ascend-8852bd533b73",
+      "title": "src/ascend/config.py",
+      "type": "artifact",
+      "updated_at": "2026-05-30T14:47:09",
+      "weight": 0.5
+    },
+    {
+      "domains": [
+        "code",
+        "python"
+      ],
+      "id": "code-mod-ascend-8b9ab9e91f82",
+      "title": "src/ascend/commands/plan.py",
+      "type": "artifact",
+      "updated_at": "2026-05-30T14:47:09",
+      "weight": 0.5
+    },
+    {
+      "domains": [
+        "code",
+        "python"
+      ],
+      "id": "code-mod-ascend-8fe207d1853c",
+      "title": "src/ascend/commands/schedule.py",
+      "type": "artifact",
+      "updated_at": "2026-05-30T14:47:09",
+      "weight": 0.5
+    },
+    {
+      "domains": [
+        "code",
+        "python"
+      ],
+      "id": "code-mod-ascend-9125b127dc83",
+      "title": "src/ascend/tui/widgets/member_card.py",
+      "type": "artifact",
+      "updated_at": "2026-05-30T14:47:09",
+      "weight": 0.5
+    },
+    {
+      "domains": [
+        "code",
+        "python"
+      ],
+      "id": "code-mod-ascend-99872290f376",
+      "title": "contracts/src_ascend_transcript/interface.py",
+      "type": "artifact",
+      "updated_at": "2026-05-30T14:47:09",
+      "weight": 0.5
+    },
+    {
+      "domains": [
+        "code",
+        "python"
+      ],
+      "id": "code-mod-ascend-9be03e50c869",
+      "title": "src/ascend/summarizer.py",
+      "type": "artifact",
+      "updated_at": "2026-05-30T14:47:09",
+      "weight": 0.5
+    },
+    {
+      "domains": [
+        "code",
+        "python"
+      ],
+      "id": "code-mod-ascend-9f3b8aafa993",
+      "title": "contracts/src_ascend_config/interface.py",
+      "type": "artifact",
+      "updated_at": "2026-05-30T14:47:09",
+      "weight": 0.5
+    },
+    {
+      "domains": [
+        "code",
+        "python"
+      ],
+      "id": "code-mod-ascend-a216eb390608",
+      "title": "contracts/contracts_contracts_src_ascend_db_interface_interface/interface.py",
+      "type": "artifact",
+      "updated_at": "2026-05-30T14:47:09",
+      "weight": 0.5
+    },
+    {
+      "domains": [
+        "code",
+        "python"
+      ],
+      "id": "code-mod-ascend-a287b356b2c0",
+      "title": "contracts/contracts_src_ascend_output_interface/interface.py",
+      "type": "artifact",
+      "updated_at": "2026-05-30T14:47:09",
+      "weight": 0.5
+    },
+    {
+      "domains": [
+        "code",
+        "python"
+      ],
+      "id": "code-mod-ascend-a2ce0a13a2af",
+      "title": "src/ascend/integrations/linear.py",
+      "type": "artifact",
+      "updated_at": "2026-05-30T14:47:09",
+      "weight": 0.5
+    },
+    {
+      "domains": [
+        "code",
+        "python"
+      ],
+      "id": "code-mod-ascend-a80692c41e02",
+      "title": "contracts/src_ascend_db/interface.py",
+      "type": "artifact",
+      "updated_at": "2026-05-30T14:47:09",
+      "weight": 0.5
+    },
+    {
+      "domains": [
+        "code",
+        "python"
+      ],
+      "id": "code-mod-ascend-a9dae5e26959",
+      "title": "contracts/contracts_contracts_src_ascend_audit_interface_interface/interface.py",
+      "type": "artifact",
+      "updated_at": "2026-05-30T14:47:09",
+      "weight": 0.5
+    },
+    {
+      "domains": [
+        "code",
+        "python"
+      ],
+      "id": "code-mod-ascend-acdea81e5d6f",
+      "title": "src/ascend/output.py",
+      "type": "artifact",
+      "updated_at": "2026-05-30T14:47:09",
+      "weight": 0.5
+    },
+    {
+      "domains": [
+        "code",
+        "python"
+      ],
+      "id": "code-mod-ascend-adc83c8d24d9",
+      "title": "src/ascend/scheduler.py",
+      "type": "artifact",
+      "updated_at": "2026-05-30T14:47:09",
+      "weight": 0.5
+    },
+    {
+      "domains": [
+        "code",
+        "python"
+      ],
+      "id": "code-mod-ascend-af3c631454c7",
+      "title": "src/ascend/tui/screens/meetings.py",
+      "type": "artifact",
+      "updated_at": "2026-05-30T14:47:09",
+      "weight": 0.5
+    },
+    {
+      "domains": [
+        "code",
+        "python"
+      ],
+      "id": "code-mod-ascend-bfdf06a397b8",
+      "title": "contracts/contracts_src_ascend_cli_interface/interface.py",
+      "type": "artifact",
+      "updated_at": "2026-05-30T14:47:09",
+      "weight": 0.5
+    },
+    {
+      "domains": [
+        "code",
+        "python"
+      ],
+      "id": "code-mod-ascend-c08d22ce9175",
+      "title": "contracts/contracts_contracts_src_ascend_scheduler_interface_interface/interface.py",
+      "type": "artifact",
+      "updated_at": "2026-05-30T14:47:09",
+      "weight": 0.5
+    },
+    {
+      "domains": [
+        "code",
+        "python"
+      ],
+      "id": "code-mod-ascend-c5ae00cf9251",
+      "title": "contracts/src_ascend_summarizer/interface.py",
+      "type": "artifact",
+      "updated_at": "2026-05-30T14:47:09",
+      "weight": 0.5
+    },
+    {
+      "domains": [
+        "code",
+        "python"
+      ],
+      "id": "code-mod-ascend-ccb3adeab190",
+      "title": "src/ascend/tui/screens/reports.py",
+      "type": "artifact",
+      "updated_at": "2026-05-30T14:47:09",
+      "weight": 0.5
+    },
+    {
+      "domains": [
+        "code",
+        "python"
+      ],
+      "id": "code-mod-ascend-cebca0b666e6",
+      "title": "contracts/src_ascend_audit/interface.py",
+      "type": "artifact",
+      "updated_at": "2026-05-30T14:47:09",
+      "weight": 0.5
+    },
+    {
+      "domains": [
+        "code",
+        "python"
+      ],
+      "id": "code-mod-ascend-da7eac8b507e",
+      "title": "src/ascend/commands/roster.py",
+      "type": "artifact",
+      "updated_at": "2026-05-30T14:47:09",
+      "weight": 0.5
+    },
+    {
+      "domains": [
+        "code",
+        "python"
+      ],
+      "id": "code-mod-ascend-df6380ff17e8",
+      "title": "contracts/contracts_src_ascend_summarizer_interface/interface.py",
+      "type": "artifact",
+      "updated_at": "2026-05-30T14:47:09",
+      "weight": 0.5
+    },
+    {
+      "domains": [
+        "code",
+        "python"
+      ],
+      "id": "code-mod-ascend-dffef2702eff",
+      "title": "src/ascend/transcript.py",
+      "type": "artifact",
+      "updated_at": "2026-05-30T14:47:09",
+      "weight": 0.5
+    },
+    {
+      "domains": [
+        "code",
+        "python"
+      ],
+      "id": "code-mod-ascend-e51bef8eaafb",
+      "title": "src/ascend/commands/meeting.py",
+      "type": "artifact",
+      "updated_at": "2026-05-30T14:47:09",
+      "weight": 0.5
+    },
+    {
+      "domains": [
+        "code",
+        "python"
+      ],
+      "id": "code-mod-ascend-ea9fb3a03d98",
+      "title": "src/ascend/tui/widgets/metric_bar.py",
+      "type": "artifact",
+      "updated_at": "2026-05-30T14:47:09",
+      "weight": 0.5
+    },
+    {
+      "domains": [
+        "code",
+        "python"
+      ],
+      "id": "code-mod-ascend-ed4ee3dc8020",
+      "title": "src/ascend/tui/screens/dashboard.py",
+      "type": "artifact",
+      "updated_at": "2026-05-30T14:47:09",
+      "weight": 0.5
+    },
+    {
+      "domains": [
+        "code",
+        "python"
+      ],
+      "id": "code-mod-ascend-f91401ba2498",
+      "title": "src/ascend/tui/screens/roster.py",
+      "type": "artifact",
+      "updated_at": "2026-05-30T14:47:09",
+      "weight": 0.5
+    },
+    {
+      "domains": [
+        "code",
+        "python"
+      ],
+      "id": "code-mod-ascend-fa1d2c8dea8f",
+      "title": "src/ascend/models/member.py",
+      "type": "artifact",
+      "updated_at": "2026-05-30T14:47:09",
+      "weight": 0.5
+    },
+    {
+      "domains": [
+        "code",
+        "python"
+      ],
+      "id": "code-sym-ascend-0a04bf88c945",
+      "title": "Goal",
+      "type": "concept",
+      "updated_at": "2026-05-30T14:47:09",
+      "weight": 0.5
+    },
+    {
+      "domains": [
+        "code",
+        "python"
+      ],
+      "id": "code-sym-ascend-10e7104890da",
+      "title": "MeetingItemKind",
+      "type": "concept",
+      "updated_at": "2026-05-30T14:47:09",
+      "weight": 0.5
+    },
+    {
+      "domains": [
+        "code",
+        "python"
+      ],
+      "id": "code-sym-ascend-122b776800c9",
+      "title": "Sidebar",
+      "type": "concept",
+      "updated_at": "2026-05-30T14:47:09",
+      "weight": 0.5
+    },
+    {
+      "domains": [
+        "code",
+        "python"
+      ],
+      "id": "code-sym-ascend-154decdd72d5",
+      "title": "AscendConfig",
+      "type": "concept",
+      "updated_at": "2026-05-30T14:47:09",
+      "weight": 0.5
+    },
+    {
+      "domains": [
+        "code",
+        "python"
+      ],
+      "id": "code-sym-ascend-1a2d04a3411a",
+      "title": "Path",
+      "type": "concept",
+      "updated_at": "2026-05-30T14:47:09",
+      "weight": 0.5
+    },
+    {
+      "domains": [
+        "code",
+        "python"
+      ],
+      "id": "code-sym-ascend-1e56b5218000",
+      "title": "CronFields",
+      "type": "concept",
+      "updated_at": "2026-05-30T14:47:09",
+      "weight": 0.5
+    },
+    {
+      "domains": [
+        "code",
+        "python"
+      ],
+      "id": "code-sym-ascend-3869fe7094ec",
+      "title": "CoachingEntry",
+      "type": "concept",
+      "updated_at": "2026-05-30T14:47:09",
+      "weight": 0.5
+    },
+    {
+      "domains": [
+        "code",
+        "python"
+      ],
+      "id": "code-sym-ascend-3b596f63055b",
+      "title": "PerformanceSnapshot",
+      "type": "concept",
+      "updated_at": "2026-05-30T14:47:09",
+      "weight": 0.5
+    },
+    {
+      "domains": [
+        "code",
+        "python"
+      ],
+      "id": "code-sym-ascend-439350c3ab43",
+      "title": "AscendConfig",
+      "type": "concept",
+      "updated_at": "2026-05-30T14:47:09",
+      "weight": 0.5
+    },
+    {
+      "domains": [
+        "code",
+        "python"
+      ],
+      "id": "code-sym-ascend-477f8cf8c177",
+      "title": "Meeting",
+      "type": "concept",
+      "updated_at": "2026-05-30T14:47:09",
+      "weight": 0.5
+    },
+    {
+      "domains": [
+        "code",
+        "python"
+      ],
+      "id": "code-sym-ascend-47be48307072",
+      "title": "MeetingsPanel",
+      "type": "concept",
+      "updated_at": "2026-05-30T14:47:09",
+      "weight": 0.5
+    },
+    {
+      "domains": [
+        "code",
+        "python"
+      ],
+      "id": "code-sym-ascend-4cdbf5cade0a",
+      "title": "HealthCheckResult",
+      "type": "concept",
+      "updated_at": "2026-05-30T14:47:09",
+      "weight": 0.5
+    },
+    {
+      "domains": [
+        "code",
+        "python"
+      ],
+      "id": "code-sym-ascend-4cfbb3385900",
+      "title": "MeetingItem",
+      "type": "concept",
+      "updated_at": "2026-05-30T14:47:09",
+      "weight": 0.5
+    },
+    {
+      "domains": [
+        "code",
+        "python"
+      ],
+      "id": "code-sym-ascend-557fe71a29ba",
+      "title": "CoachingPanel",
+      "type": "concept",
+      "updated_at": "2026-05-30T14:47:09",
+      "weight": 0.5
+    },
+    {
+      "domains": [
+        "code",
+        "python"
+      ],
+      "id": "code-sym-ascend-55f232e0787e",
+      "title": "TranscriptTurn",
+      "type": "concept",
+      "updated_at": "2026-05-30T14:47:09",
+      "weight": 0.5
+    },
+    {
+      "domains": [
+        "code",
+        "python"
+      ],
+      "id": "code-sym-ascend-624b1dd7e336",
+      "title": "MetricBar",
+      "type": "concept",
+      "updated_at": "2026-05-30T14:47:09",
+      "weight": 0.5
+    },
+    {
+      "domains": [
+        "code",
+        "python"
+      ],
+      "id": "code-sym-ascend-6305ee2a797b",
+      "title": "CronFields",
+      "type": "concept",
+      "updated_at": "2026-05-30T14:47:09",
+      "weight": 0.5
+    },
+    {
+      "domains": [
+        "code",
+        "python"
+      ],
+      "id": "code-sym-ascend-6466e5fccead",
+      "title": "Team",
+      "type": "concept",
+      "updated_at": "2026-05-30T14:47:09",
+      "weight": 0.5
+    },
+    {
+      "domains": [
+        "code",
+        "python"
+      ],
+      "id": "code-sym-ascend-6f10937f8ae4",
+      "title": "HealthCheckResult",
+      "type": "concept",
+      "updated_at": "2026-05-30T14:47:09",
+      "weight": 0.5
+    },
+    {
+      "domains": [
+        "code",
+        "python"
+      ],
+      "id": "code-sym-ascend-73f75d0cc6bd",
+      "title": "TranscriptError",
+      "type": "concept",
+      "updated_at": "2026-05-30T14:47:09",
+      "weight": 0.5
+    },
+    {
+      "domains": [
+        "code",
+        "python"
+      ],
+      "id": "code-sym-ascend-76bf6706daf9",
+      "title": "MeetingItemKind",
+      "type": "concept",
+      "updated_at": "2026-05-30T14:47:09",
+      "weight": 0.5
+    },
+    {
+      "domains": [
+        "code",
+        "python"
+      ],
+      "id": "code-sym-ascend-7de3970d8724",
+      "title": "MeetingItemKind",
+      "type": "concept",
+      "updated_at": "2026-05-30T14:47:09",
+      "weight": 0.5
+    },
+    {
+      "domains": [
+        "code",
+        "python"
+      ],
+      "id": "code-sym-ascend-808c418deefc",
+      "title": "AscendConfig",
+      "type": "concept",
+      "updated_at": "2026-05-30T14:47:09",
+      "weight": 0.5
+    },
+    {
+      "domains": [
+        "code",
+        "python"
+      ],
+      "id": "code-sym-ascend-83e47b3c2f63",
+      "title": "ParsedTranscript",
+      "type": "concept",
+      "updated_at": "2026-05-30T14:47:09",
+      "weight": 0.5
+    },
+    {
+      "domains": [
+        "code",
+        "python"
+      ],
+      "id": "code-sym-ascend-84032c4f20f7",
+      "title": "ReportsPanel",
+      "type": "concept",
+      "updated_at": "2026-05-30T14:47:09",
+      "weight": 0.5
+    },
+    {
+      "domains": [
+        "code",
+        "python"
+      ],
+      "id": "code-sym-ascend-85228f87fa7b",
+      "title": "AuditEntry",
+      "type": "concept",
+      "updated_at": "2026-05-30T14:47:09",
+      "weight": 0.5
+    },
+    {
+      "domains": [
+        "code",
+        "python"
+      ],
+      "id": "code-sym-ascend-8920aba6ff22",
+      "title": "TranscriptError",
+      "type": "concept",
+      "updated_at": "2026-05-30T14:47:09",
+      "weight": 0.5
+    },
+    {
+      "domains": [
+        "code",
+        "python"
+      ],
+      "id": "code-sym-ascend-8a7356e4092b",
+      "title": "MeetingItemKind",
+      "type": "concept",
+      "updated_at": "2026-05-30T14:47:09",
+      "weight": 0.5
+    },
+    {
+      "domains": [
+        "code",
+        "python"
+      ],
+      "id": "code-sym-ascend-989ad60b640d",
+      "title": "MeetingItemExtract",
+      "type": "concept",
+      "updated_at": "2026-05-30T14:47:09",
+      "weight": 0.5
+    },
+    {
+      "domains": [
+        "code",
+        "python"
+      ],
+      "id": "code-sym-ascend-98aa298c838c",
+      "title": "RosterPanel",
+      "type": "concept",
+      "updated_at": "2026-05-30T14:47:09",
+      "weight": 0.5
+    },
+    {
+      "domains": [
+        "code",
+        "python"
+      ],
+      "id": "code-sym-ascend-a699173579e4",
+      "title": "AscendConfig",
+      "type": "concept",
+      "updated_at": "2026-05-30T14:47:09",
+      "weight": 0.5
+    },
+    {
+      "domains": [
+        "code",
+        "python"
+      ],
+      "id": "code-sym-ascend-a8a050fad2e6",
+      "title": "SchedulesPanel",
+      "type": "concept",
+      "updated_at": "2026-05-30T14:47:09",
+      "weight": 0.5
+    },
+    {
+      "domains": [
+        "code",
+        "python"
+      ],
+      "id": "code-sym-ascend-aeb7957f8620",
+      "title": "Member",
+      "type": "concept",
+      "updated_at": "2026-05-30T14:47:09",
+      "weight": 0.5
+    },
+    {
+      "domains": [
+        "code",
+        "python"
+      ],
+      "id": "code-sym-ascend-c201a7482519",
+      "title": "AscendCommands",
+      "type": "concept",
+      "updated_at": "2026-05-30T14:47:09",
+      "weight": 0.5
+    },
+    {
+      "domains": [
+        "code",
+        "python"
+      ],
+      "id": "code-sym-ascend-c59d0d08d764",
+      "title": "AscendConfig",
+      "type": "concept",
+      "updated_at": "2026-05-30T14:47:09",
+      "weight": 0.5
+    },
+    {
+      "domains": [
+        "code",
+        "python"
+      ],
+      "id": "code-sym-ascend-c75295eb43a5",
+      "title": "MeetingItemExtract",
+      "type": "concept",
+      "updated_at": "2026-05-30T14:47:09",
+      "weight": 0.5
+    },
+    {
+      "domains": [
+        "code",
+        "python"
+      ],
+      "id": "code-sym-ascend-d0494b3b962a",
+      "title": "AuditEntry",
+      "type": "concept",
+      "updated_at": "2026-05-30T14:47:09",
+      "weight": 0.5
+    },
+    {
+      "domains": [
+        "code",
+        "python"
+      ],
+      "id": "code-sym-ascend-d2aada0f8c22",
+      "title": "TranscriptTurn",
+      "type": "concept",
+      "updated_at": "2026-05-30T14:47:09",
+      "weight": 0.5
+    },
+    {
+      "domains": [
+        "code",
+        "python"
+      ],
+      "id": "code-sym-ascend-d807fae4241e",
+      "title": "HealthCheckResult",
+      "type": "concept",
+      "updated_at": "2026-05-30T14:47:09",
+      "weight": 0.5
+    },
+    {
+      "domains": [
+        "code",
+        "python"
+      ],
+      "id": "code-sym-ascend-e5a35793824b",
+      "title": "AscendConfig",
+      "type": "concept",
+      "updated_at": "2026-05-30T14:47:09",
+      "weight": 0.5
+    },
+    {
+      "domains": [
+        "code",
+        "python"
+      ],
+      "id": "code-sym-ascend-e66b5b4aa247",
+      "title": "MeetingItemExtract",
+      "type": "concept",
+      "updated_at": "2026-05-30T14:47:09",
+      "weight": 0.5
+    },
+    {
+      "domains": [
+        "code",
+        "python"
+      ],
+      "id": "code-sym-ascend-e73d8ac3f5e6",
+      "title": "ParsedTranscript",
+      "type": "concept",
+      "updated_at": "2026-05-30T14:47:09",
+      "weight": 0.5
+    },
+    {
+      "domains": [
+        "code",
+        "python"
+      ],
+      "id": "code-sym-ascend-e8e54e479a20",
+      "title": "AscendApp",
+      "type": "concept",
+      "updated_at": "2026-05-30T14:47:09",
+      "weight": 0.5
+    },
+    {
+      "domains": [
+        "code",
+        "python"
+      ],
+      "id": "code-sym-ascend-e915a78ceb8f",
+      "title": "HelpScreen",
+      "type": "concept",
+      "updated_at": "2026-05-30T14:47:09",
+      "weight": 0.5
+    },
+    {
+      "domains": [
+        "code",
+        "python"
+      ],
+      "id": "code-sym-ascend-eb1fb9b3874e",
+      "title": "MeetingItemExtract",
+      "type": "concept",
+      "updated_at": "2026-05-30T14:47:09",
+      "weight": 0.5
+    },
+    {
+      "domains": [
+        "code",
+        "python"
+      ],
+      "id": "code-sym-ascend-ec924f1cc443",
+      "title": "Schedule",
+      "type": "concept",
+      "updated_at": "2026-05-30T14:47:09",
+      "weight": 0.5
+    },
+    {
+      "domains": [
+        "code",
+        "python"
+      ],
+      "id": "code-sym-ascend-f0a1ce47ba06",
+      "title": "MemberCard",
+      "type": "concept",
+      "updated_at": "2026-05-30T14:47:09",
+      "weight": 0.5
+    },
+    {
+      "domains": [
+        "code",
+        "python"
+      ],
+      "id": "code-sym-ascend-f707de54f9f9",
+      "title": "DashboardPanel",
+      "type": "concept",
+      "updated_at": "2026-05-30T14:47:09",
+      "weight": 0.5
+    },
+    {
+      "domains": [
+        "code",
+        "python"
+      ],
+      "id": "code-sym-ascend-fbc9627d7424",
+      "title": "CronFields",
+      "type": "concept",
+      "updated_at": "2026-05-30T14:47:09",
+      "weight": 0.5
+    }
+  ],
+  "repo": "ascend",
+  "source_updated_at": "2026-05-30T14:47:09",
+  "version": 1
+}

@@ -1,2539 +1,354 @@
 {
-  "version": "1.0.0",
-  "project": {
-    "name": "Ascend",
-    "description": "Code map exported from Kindex for Ascend.",
-    "languages": [
-      "Python",
-      "python"
-    ],
-    "frameworks": [],
-    "analyzedAt": "2026-05-24T14:49:05",
-    "gitCommitHash": "acac8d32eea2d2f89b1895c7fb8a9f0141f6210b"
-  },
-  "nodes": [
-    {
-      "id": "code-mod-ascend-17336787c33a",
-      "type": "file",
-      "name": "src/ascend/commands/sync.py",
-      "filePath": "src/ascend/commands/sync.py",
-      "summary": "Language: Python | Path: src/ascend/commands/sync.py | ~347 lines ## Functions - cmd_sync(args: argparse.Namespace) -> None",
-      "tags": [
-        "code",
-        "python"
-      ],
-      "complexity": 17,
-      "languageNotes": {
-        "language": "Python",
-        "kindexType": "artifact",
-        "toolTier": "C"
-      }
-    },
-    {
-      "id": "code-mod-ascend-85b659c0b2d3",
-      "type": "file",
-      "name": "src/ascend/commands/team.py",
-      "filePath": "src/ascend/commands/team.py",
-      "summary": "Language: Python | Path: src/ascend/commands/team.py | ~156 lines ## Functions - cmd_team_add(args: argparse.Namespace) -> None",
-      "tags": [
-        "code",
-        "python"
-      ],
-      "complexity": 5,
-      "languageNotes": {
-        "language": "Python",
-        "kindexType": "artifact",
-        "toolTier": "C"
-      }
-    },
-    {
-      "id": "code-mod-ascend-188ac4fb563a",
-      "type": "file",
-      "name": "src/ascend/commands/init.py",
-      "filePath": "src/ascend/commands/init.py",
-      "summary": "Language: Python | Path: src/ascend/commands/init.py | ~124 lines ## Functions - cmd_config_set(args: argparse.Namespace) -> None",
-      "tags": [
-        "code",
-        "python"
-      ],
-      "complexity": 4,
-      "languageNotes": {
-        "language": "Python",
-        "kindexType": "artifact",
-        "toolTier": "C"
-      }
-    },
-    {
-      "id": "code-sym-ascend-e73d8ac3f5e6",
-      "type": "class",
-      "name": "ParsedTranscript",
-      "filePath": "contracts/src_ascend_transcript/interface.py",
-      "summary": "class ParsedTranscript (contracts/src_ascend_transcript/interface.py:27)",
-      "tags": [
-        "code",
-        "python"
-      ],
-      "complexity": 1,
-      "languageNotes": {
-        "language": "Python",
-        "kindexType": "concept",
-        "toolTier": ""
-      }
-    },
-    {
-      "id": "code-sym-ascend-83e47b3c2f63",
-      "type": "class",
-      "name": "ParsedTranscript",
-      "filePath": "src/ascend/transcript.py",
-      "summary": "class ParsedTranscript(BaseModel) (src/ascend/transcript.py:53)",
-      "tags": [
-        "code",
-        "python"
-      ],
-      "complexity": 1,
-      "languageNotes": {
-        "language": "Python",
-        "kindexType": "concept",
-        "toolTier": ""
-      }
-    },
-    {
-      "id": "code-mod-ascend-a9dae5e26959",
-      "type": "file",
-      "name": "contracts/contracts_contracts_src_ascend_audit_interface_interface/interface.py",
-      "filePath": "contracts/contracts_contracts_src_ascend_audit_interface_interface/interface.py",
-      "summary": "Language: Python | Path: contracts/contracts_contracts_src_ascend_audit_interface_interface/interface.py | ~63 lines ## Classes - AuditEntry",
-      "tags": [
-        "code",
-        "python"
-      ],
-      "complexity": 4,
-      "languageNotes": {
-        "language": "Python",
-        "kindexType": "artifact",
-        "toolTier": "C"
-      }
-    },
-    {
-      "id": "code-mod-ascend-445464bab6d7",
-      "type": "file",
-      "name": "contracts/contracts_src_ascend_audit_interface/interface.py",
-      "filePath": "contracts/contracts_src_ascend_audit_interface/interface.py",
-      "summary": "Language: Python | Path: contracts/contracts_src_ascend_audit_interface/interface.py | ~61 lines ## Classes - AuditEntry",
-      "tags": [
-        "code",
-        "python"
-      ],
-      "complexity": 4,
-      "languageNotes": {
-        "language": "Python",
-        "kindexType": "artifact",
-        "toolTier": "C"
-      }
-    },
-    {
-      "id": "code-mod-ascend-c08d22ce9175",
-      "type": "file",
-      "name": "contracts/contracts_contracts_src_ascend_scheduler_interface_interface/interface.py",
-      "filePath": "contracts/contracts_contracts_src_ascend_scheduler_interface_interface/interface.py",
-      "summary": "Language: Python | Path: contracts/contracts_contracts_src_ascend_scheduler_interface_interface/interface.py | ~265 lines ## Classes - CronFields",
-      "tags": [
-        "code",
-        "python"
-      ],
-      "complexity": 13,
-      "languageNotes": {
-        "language": "Python",
-        "kindexType": "artifact",
-        "toolTier": "C"
-      }
-    },
-    {
-      "id": "code-mod-ascend-342770d311ac",
-      "type": "file",
-      "name": "contracts/contracts_src_ascend_scheduler_interface/interface.py",
-      "filePath": "contracts/contracts_src_ascend_scheduler_interface/interface.py",
-      "summary": "Language: Python | Path: contracts/contracts_src_ascend_scheduler_interface/interface.py | ~258 lines ## Classes - CronFields",
-      "tags": [
-        "code",
-        "python"
-      ],
-      "complexity": 13,
-      "languageNotes": {
-        "language": "Python",
-        "kindexType": "artifact",
-        "toolTier": "C"
-      }
-    },
-    {
-      "id": "code-mod-ascend-a2ce0a13a2af",
-      "type": "file",
-      "name": "src/ascend/integrations/linear.py",
-      "filePath": "src/ascend/integrations/linear.py",
-      "summary": "Language: Python | Path: src/ascend/integrations/linear.py | ~343 lines ## Functions - fetch_all_issues(api_key: str, team_id: str) -> list[dict[str,Any]]",
-      "tags": [
-        "code",
-        "python"
-      ],
-      "complexity": 8,
-      "languageNotes": {
-        "language": "Python",
-        "kindexType": "artifact",
-        "toolTier": "C"
-      }
-    },
-    {
-      "id": "code-sym-ascend-73f75d0cc6bd",
-      "type": "class",
-      "name": "TranscriptError",
-      "filePath": "contracts/src_ascend_transcript/interface.py",
-      "summary": "class TranscriptError (contracts/src_ascend_transcript/interface.py:17)",
-      "tags": [
-        "code",
-        "python"
-      ],
-      "complexity": 1,
-      "languageNotes": {
-        "language": "Python",
-        "kindexType": "concept",
-        "toolTier": ""
-      }
-    },
-    {
-      "id": "code-sym-ascend-55f232e0787e",
-      "type": "class",
-      "name": "TranscriptTurn",
-      "filePath": "contracts/src_ascend_transcript/interface.py",
-      "summary": "class TranscriptTurn (contracts/src_ascend_transcript/interface.py:22)",
-      "tags": [
-        "code",
-        "python"
-      ],
-      "complexity": 1,
-      "languageNotes": {
-        "language": "Python",
-        "kindexType": "concept",
-        "toolTier": ""
-      }
-    },
-    {
-      "id": "code-sym-ascend-8920aba6ff22",
-      "type": "class",
-      "name": "TranscriptError",
-      "filePath": "src/ascend/transcript.py",
-      "summary": "class TranscriptError(ValueError) (src/ascend/transcript.py:33)",
-      "tags": [
-        "code",
-        "python"
-      ],
-      "complexity": 1,
-      "languageNotes": {
-        "language": "Python",
-        "kindexType": "concept",
-        "toolTier": ""
-      }
-    },
-    {
-      "id": "code-sym-ascend-d2aada0f8c22",
-      "type": "class",
-      "name": "TranscriptTurn",
-      "filePath": "src/ascend/transcript.py",
-      "summary": "class TranscriptTurn(BaseModel) (src/ascend/transcript.py:46)",
-      "tags": [
-        "code",
-        "python"
-      ],
-      "complexity": 1,
-      "languageNotes": {
-        "language": "Python",
-        "kindexType": "concept",
-        "toolTier": ""
-      }
-    },
-    {
-      "id": "code-sym-ascend-154decdd72d5",
-      "type": "class",
-      "name": "AscendConfig",
-      "filePath": "contracts/contracts_src_ascend_summarizer_interface/interface.py",
-      "summary": "class AscendConfig (contracts/contracts_src_ascend_summarizer_interface/interface.py:32) [Merged from: AscendConfig] class AscendConfig (contracts/contracts_contracts_src_ascend_summarizer_interface_interface/interface.py:32)",
-      "tags": [
-        "code",
-        "python"
-      ],
-      "complexity": 1,
-      "languageNotes": {
-        "language": "Python",
-        "kindexType": "concept",
-        "toolTier": ""
-      }
-    },
-    {
-      "id": "code-sym-ascend-439350c3ab43",
-      "type": "class",
-      "name": "AscendConfig",
-      "filePath": "contracts/src_ascend_config/interface.py",
-      "summary": "class AscendConfig (contracts/src_ascend_config/interface.py:17) [Merged from: AscendConfig] class AscendConfig (contracts/contracts_src_ascend_config_interface/interface.py:14)",
-      "tags": [
-        "code",
-        "python"
-      ],
-      "complexity": 1,
-      "languageNotes": {
-        "language": "Python",
-        "kindexType": "concept",
-        "toolTier": ""
-      }
-    },
-    {
-      "id": "code-sym-ascend-85228f87fa7b",
-      "type": "class",
-      "name": "AuditEntry",
-      "filePath": "contracts/contracts_src_ascend_audit_interface/interface.py",
-      "summary": "class AuditEntry (contracts/contracts_src_ascend_audit_interface/interface.py:11) [Merged from: AuditEntry] class AuditEntry (contracts/contracts_contracts_src_ascend_audit_interface_interface/interface.py:12)",
-      "tags": [
-        "code",
-        "python"
-      ],
-      "complexity": 1,
-      "languageNotes": {
-        "language": "Python",
-        "kindexType": "concept",
-        "toolTier": ""
-      }
-    },
-    {
-      "id": "code-sym-ascend-d807fae4241e",
-      "type": "class",
-      "name": "HealthCheckResult",
-      "filePath": "contracts/src_ascend_db/interface.py",
-      "summary": "class HealthCheckResult (contracts/src_ascend_db/interface.py:16) [Merged from: HealthCheckResult] class HealthCheckResult (contracts/contracts_src_ascend_db_interface/interface.py:21)",
-      "tags": [
-        "code",
-        "python"
-      ],
-      "complexity": 1,
-      "languageNotes": {
-        "language": "Python",
-        "kindexType": "concept",
-        "toolTier": ""
-      }
-    },
-    {
-      "id": "code-sym-ascend-1e56b5218000",
-      "type": "class",
-      "name": "CronFields",
-      "filePath": "contracts/src_ascend_scheduler/interface.py",
-      "summary": "class CronFields (contracts/src_ascend_scheduler/interface.py:44) [Merged from: CronFields] class CronFields (contracts/contracts_src_ascend_scheduler_interface/interface.py:16)",
-      "tags": [
-        "code",
-        "python"
-      ],
-      "complexity": 1,
-      "languageNotes": {
-        "language": "Python",
-        "kindexType": "concept",
-        "toolTier": ""
-      }
-    },
-    {
-      "id": "code-sym-ascend-989ad60b640d",
-      "type": "class",
-      "name": "MeetingItemExtract",
-      "filePath": "contracts/src_ascend_summarizer/interface.py",
-      "summary": "class MeetingItemExtract (contracts/src_ascend_summarizer/interface.py:21) [Merged from: MeetingItemExtract] class MeetingItemExtract (contracts/contracts_src_ascend_summarizer_interface/interface.py:26)",
-      "tags": [
-        "code",
-        "python"
-      ],
-      "complexity": 1,
-      "languageNotes": {
-        "language": "Python",
-        "kindexType": "concept",
-        "toolTier": ""
-      }
-    },
-    {
-      "id": "code-sym-ascend-76bf6706daf9",
-      "type": "class",
-      "name": "MeetingItemKind",
-      "filePath": "contracts/src_ascend_summarizer/interface.py",
-      "summary": "class MeetingItemKind(Enum) (contracts/src_ascend_summarizer/interface.py:13) [Merged from: MeetingItemKind] class MeetingItemKind(Enum) (contracts/contracts_src_ascend_summarizer_interface/interface.py:18)",
-      "tags": [
-        "code",
-        "python"
-      ],
-      "complexity": 1,
-      "languageNotes": {
-        "language": "Python",
-        "kindexType": "concept",
-        "toolTier": ""
-      }
-    },
-    {
-      "id": "code-mod-ascend-7d4db8eba8d0",
-      "type": "file",
-      "name": "contracts/src_ascend_output/interface.py",
-      "filePath": "contracts/src_ascend_output/interface.py",
-      "summary": "Language: Python | Path: contracts/src_ascend_output/interface.py | ~126 lines ## Functions - copy_to_clipboard( text: str, ) -> bool",
-      "tags": [
-        "code",
-        "python"
-      ],
-      "complexity": 7,
-      "languageNotes": {
-        "language": "Python",
-        "kindexType": "artifact",
-        "toolTier": "C"
-      }
-    },
-    {
-      "id": "code-mod-ascend-6906bdfdd2de",
-      "type": "file",
-      "name": "contracts/contracts_contracts_src_ascend_config_interface_interface/interface.py",
-      "filePath": "contracts/contracts_contracts_src_ascend_config_interface_interface/interface.py",
-      "summary": "Language: Python | Path: contracts/contracts_contracts_src_ascend_config_interface_interface/interface.py | ~101 lines ## Classes - AscendConfig",
-      "tags": [
-        "code",
-        "python"
-      ],
-      "complexity": 5,
-      "languageNotes": {
-        "language": "Python",
-        "kindexType": "artifact",
-        "toolTier": "C"
-      }
-    },
-    {
-      "id": "code-mod-ascend-59364203d951",
-      "type": "file",
-      "name": "contracts/contracts_contracts_src_ascend_summarizer_interface_interface/interface.py",
-      "filePath": "contracts/contracts_contracts_src_ascend_summarizer_interface_interface/interface.py",
-      "summary": "Language: Python | Path: contracts/contracts_contracts_src_ascend_summarizer_interface_interface/interface.py | ~190 lines ## Classes - AscendConfig",
-      "tags": [
-        "code",
-        "python"
-      ],
-      "complexity": 11,
-      "languageNotes": {
-        "language": "Python",
-        "kindexType": "artifact",
-        "toolTier": "C"
-      }
-    },
-    {
-      "id": "code-mod-ascend-4c0b78329eba",
-      "type": "file",
-      "name": "contracts/contracts_src_ascend_config_interface/interface.py",
-      "filePath": "contracts/contracts_src_ascend_config_interface/interface.py",
-      "summary": "Language: Python | Path: contracts/contracts_src_ascend_config_interface/interface.py | ~101 lines ## Classes - AscendConfig",
-      "tags": [
-        "code",
-        "python"
-      ],
-      "complexity": 5,
-      "languageNotes": {
-        "language": "Python",
-        "kindexType": "artifact",
-        "toolTier": "C"
-      }
-    },
-    {
-      "id": "code-mod-ascend-df6380ff17e8",
-      "type": "file",
-      "name": "contracts/contracts_src_ascend_summarizer_interface/interface.py",
-      "filePath": "contracts/contracts_src_ascend_summarizer_interface/interface.py",
-      "summary": "Language: Python | Path: contracts/contracts_src_ascend_summarizer_interface/interface.py | ~190 lines ## Classes - AscendConfig",
-      "tags": [
-        "code",
-        "python"
-      ],
-      "complexity": 11,
-      "languageNotes": {
-        "language": "Python",
-        "kindexType": "artifact",
-        "toolTier": "C"
-      }
-    },
-    {
-      "id": "code-mod-ascend-9f3b8aafa993",
-      "type": "file",
-      "name": "contracts/src_ascend_config/interface.py",
-      "filePath": "contracts/src_ascend_config/interface.py",
-      "summary": "Language: Python | Path: contracts/src_ascend_config/interface.py | ~106 lines ## Classes - AscendConfig",
-      "tags": [
-        "code",
-        "python"
-      ],
-      "complexity": 6,
-      "languageNotes": {
-        "language": "Python",
-        "kindexType": "artifact",
-        "toolTier": "C"
-      }
-    },
-    {
-      "id": "code-sym-ascend-1a2d04a3411a",
-      "type": "class",
-      "name": "Path",
-      "filePath": "contracts/src_ascend_config/interface.py",
-      "summary": "class Path (contracts/src_ascend_config/interface.py:33)",
-      "tags": [
-        "code",
-        "python"
-      ],
-      "complexity": 1,
-      "languageNotes": {
-        "language": "Python",
-        "kindexType": "concept",
-        "toolTier": ""
-      }
-    },
-    {
-      "id": "code-mod-ascend-a216eb390608",
-      "type": "file",
-      "name": "contracts/contracts_contracts_src_ascend_db_interface_interface/interface.py",
-      "filePath": "contracts/contracts_contracts_src_ascend_db_interface_interface/interface.py",
-      "summary": "Language: Python | Path: contracts/contracts_contracts_src_ascend_db_interface_interface/interface.py | ~79 lines ## Classes - HealthCheckResult",
-      "tags": [
-        "code",
-        "python"
-      ],
-      "complexity": 4,
-      "languageNotes": {
-        "language": "Python",
-        "kindexType": "artifact",
-        "toolTier": "C"
-      }
-    },
-    {
-      "id": "code-mod-ascend-62abf3f28ee3",
-      "type": "file",
-      "name": "contracts/contracts_src_ascend_db_interface/interface.py",
-      "filePath": "contracts/contracts_src_ascend_db_interface/interface.py",
-      "summary": "Language: Python | Path: contracts/contracts_src_ascend_db_interface/interface.py | ~79 lines ## Classes - HealthCheckResult",
-      "tags": [
-        "code",
-        "python"
-      ],
-      "complexity": 4,
-      "languageNotes": {
-        "language": "Python",
-        "kindexType": "artifact",
-        "toolTier": "C"
-      }
-    },
-    {
-      "id": "code-mod-ascend-a80692c41e02",
-      "type": "file",
-      "name": "contracts/src_ascend_db/interface.py",
-      "filePath": "contracts/src_ascend_db/interface.py",
-      "summary": "Language: Python | Path: contracts/src_ascend_db/interface.py | ~75 lines ## Classes - HealthCheckResult",
-      "tags": [
-        "code",
-        "python"
-      ],
-      "complexity": 4,
-      "languageNotes": {
-        "language": "Python",
-        "kindexType": "artifact",
-        "toolTier": "C"
-      }
-    },
-    {
-      "id": "code-mod-ascend-4af453c987e3",
-      "type": "file",
-      "name": "contracts/src_ascend_scheduler/interface.py",
-      "filePath": "contracts/src_ascend_scheduler/interface.py",
-      "summary": "Language: Python | Path: contracts/src_ascend_scheduler/interface.py | ~287 lines ## Classes - CronFields",
-      "tags": [
-        "code",
-        "python"
-      ],
-      "complexity": 15,
-      "languageNotes": {
-        "language": "Python",
-        "kindexType": "artifact",
-        "toolTier": "C"
-      }
-    },
-    {
-      "id": "code-mod-ascend-c5ae00cf9251",
-      "type": "file",
-      "name": "contracts/src_ascend_summarizer/interface.py",
-      "filePath": "contracts/src_ascend_summarizer/interface.py",
-      "summary": "Language: Python | Path: contracts/src_ascend_summarizer/interface.py | ~209 lines ## Classes - MeetingItemExtract",
-      "tags": [
-        "code",
-        "python"
-      ],
-      "complexity": 10,
-      "languageNotes": {
-        "language": "Python",
-        "kindexType": "artifact",
-        "toolTier": "C"
-      }
-    },
-    {
-      "id": "code-mod-ascend-99872290f376",
-      "type": "file",
-      "name": "contracts/src_ascend_transcript/interface.py",
-      "filePath": "contracts/src_ascend_transcript/interface.py",
-      "summary": "Language: Python | Path: contracts/src_ascend_transcript/interface.py | ~185 lines ## Classes - ParsedTranscript",
-      "tags": [
-        "code",
-        "python"
-      ],
-      "complexity": 10,
-      "languageNotes": {
-        "language": "Python",
-        "kindexType": "artifact",
-        "toolTier": "C"
-      }
-    },
-    {
-      "id": "code-mod-ascend-44ed6090291b",
-      "type": "file",
-      "name": "contracts/contracts_contracts_src_ascend_cli_interface_interface/interface.py",
-      "filePath": "contracts/contracts_contracts_src_ascend_cli_interface_interface/interface.py",
-      "summary": "Language: Python | Path: contracts/contracts_contracts_src_ascend_cli_interface_interface/interface.py | ~45 lines ## Functions - main( argv: list[str] | None = None, ) -> None",
-      "tags": [
-        "code",
-        "python"
-      ],
-      "complexity": 3,
-      "languageNotes": {
-        "language": "Python",
-        "kindexType": "artifact",
-        "toolTier": "C"
-      }
-    },
-    {
-      "id": "code-mod-ascend-bfdf06a397b8",
-      "type": "file",
-      "name": "contracts/contracts_src_ascend_cli_interface/interface.py",
-      "filePath": "contracts/contracts_src_ascend_cli_interface/interface.py",
-      "summary": "Language: Python | Path: contracts/contracts_src_ascend_cli_interface/interface.py | ~45 lines ## Functions - main( argv: list[str] | None = None, ) -> None",
-      "tags": [
-        "code",
-        "python"
-      ],
-      "complexity": 3,
-      "languageNotes": {
-        "language": "Python",
-        "kindexType": "artifact",
-        "toolTier": "C"
-      }
-    },
-    {
-      "id": "code-mod-ascend-cebca0b666e6",
-      "type": "file",
-      "name": "contracts/src_ascend_audit/interface.py",
-      "filePath": "contracts/src_ascend_audit/interface.py",
-      "summary": "Language: Python | Path: contracts/src_ascend_audit/interface.py | ~59 lines ## Functions - log_operation( command: str, args: Optional[dict] = None, result: Optional[str] = None, error: Optional[str] = None, ) -> None",
-      "tags": [
-        "code",
-        "python"
-      ],
-      "complexity": 3,
-      "languageNotes": {
-        "language": "Python",
-        "kindexType": "artifact",
-        "toolTier": "C"
-      }
-    },
-    {
-      "id": "code-mod-ascend-6f11be332804",
-      "type": "file",
-      "name": "contracts/src_ascend_cli/interface.py",
-      "filePath": "contracts/src_ascend_cli/interface.py",
-      "summary": "Language: Python | Path: contracts/src_ascend_cli/interface.py | ~48 lines ## Functions - main( argv: list[str] | None = None, ) -> None",
-      "tags": [
-        "code",
-        "python"
-      ],
-      "complexity": 3,
-      "languageNotes": {
-        "language": "Python",
-        "kindexType": "artifact",
-        "toolTier": "C"
-      }
-    },
-    {
-      "id": "code-mod-ascend-2666665cd713",
-      "type": "file",
-      "name": "contracts/contracts_contracts_src_ascend_output_interface_interface/interface.py",
-      "filePath": "contracts/contracts_contracts_src_ascend_output_interface_interface/interface.py",
-      "summary": "Language: Python | Path: contracts/contracts_contracts_src_ascend_output_interface_interface/interface.py | ~126 lines ## Functions - copy_to_clipboard( text: str, ) -> bool",
-      "tags": [
-        "code",
-        "python"
-      ],
-      "complexity": 7,
-      "languageNotes": {
-        "language": "Python",
-        "kindexType": "artifact",
-        "toolTier": "C"
-      }
-    },
-    {
-      "id": "code-mod-ascend-a287b356b2c0",
-      "type": "file",
-      "name": "contracts/contracts_src_ascend_output_interface/interface.py",
-      "filePath": "contracts/contracts_src_ascend_output_interface/interface.py",
-      "summary": "Language: Python | Path: contracts/contracts_src_ascend_output_interface/interface.py | ~126 lines ## Functions - copy_to_clipboard( text: str, ) -> bool",
-      "tags": [
-        "code",
-        "python"
-      ],
-      "complexity": 7,
-      "languageNotes": {
-        "language": "Python",
-        "kindexType": "artifact",
-        "toolTier": "C"
-      }
-    },
-    {
-      "id": "code-mod-ascend-8b9ab9e91f82",
-      "type": "file",
-      "name": "src/ascend/commands/plan.py",
-      "filePath": "src/ascend/commands/plan.py",
-      "summary": "Language: Python | Path: src/ascend/commands/plan.py | ~556 lines ## Functions - cmd_plan_career(args: argparse.Namespace) -> None",
-      "tags": [
-        "code",
-        "python"
-      ],
-      "complexity": 12,
-      "languageNotes": {
-        "language": "Python",
-        "kindexType": "artifact",
-        "toolTier": "C"
-      }
-    },
-    {
-      "id": "code-mod-ascend-da7eac8b507e",
-      "type": "file",
-      "name": "src/ascend/commands/roster.py",
-      "filePath": "src/ascend/commands/roster.py",
-      "summary": "Language: Python | Path: src/ascend/commands/roster.py | ~507 lines ## Functions - cmd_roster_add(args: argparse.Namespace) -> None",
-      "tags": [
-        "code",
-        "python"
-      ],
-      "complexity": 16,
-      "languageNotes": {
-        "language": "Python",
-        "kindexType": "artifact",
-        "toolTier": "C"
-      }
-    },
-    {
-      "id": "code-mod-ascend-4d3db4ca2522",
-      "type": "file",
-      "name": "src/ascend/integrations/github.py",
-      "filePath": "src/ascend/integrations/github.py",
-      "summary": "Language: Python | Path: src/ascend/integrations/github.py | ~306 lines ## Functions - clear_pr_cache() -> None",
-      "tags": [
-        "code",
-        "python"
-      ],
-      "complexity": 9,
-      "languageNotes": {
-        "language": "Python",
-        "kindexType": "artifact",
-        "toolTier": "C"
-      }
-    },
-    {
-      "id": "code-mod-ascend-e51bef8eaafb",
-      "type": "file",
-      "name": "src/ascend/commands/meeting.py",
-      "filePath": "src/ascend/commands/meeting.py",
-      "summary": "Language: Python | Path: src/ascend/commands/meeting.py | ~348 lines ## Functions - cmd_meeting_ingest(args: argparse.Namespace) -> None",
-      "tags": [
-        "code",
-        "python"
-      ],
-      "complexity": 9,
-      "languageNotes": {
-        "language": "Python",
-        "kindexType": "artifact",
-        "toolTier": "C"
-      }
-    },
-    {
-      "id": "code-mod-ascend-8fe207d1853c",
-      "type": "file",
-      "name": "src/ascend/commands/schedule.py",
-      "filePath": "src/ascend/commands/schedule.py",
-      "summary": "Language: Python | Path: src/ascend/commands/schedule.py | ~266 lines ## Functions - cmd_schedule_add(args: argparse.Namespace) -> None",
-      "tags": [
-        "code",
-        "python"
-      ],
-      "complexity": 7,
-      "languageNotes": {
-        "language": "Python",
-        "kindexType": "artifact",
-        "toolTier": "C"
-      }
-    },
-    {
-      "id": "code-mod-ascend-8852bd533b73",
-      "type": "file",
-      "name": "src/ascend/config.py",
-      "filePath": "src/ascend/config.py",
-      "summary": "Language: Python | Path: src/ascend/config.py | ~79 lines ## Classes - AscendConfig(BaseModel)",
-      "tags": [
-        "code",
-        "python"
-      ],
-      "complexity": 5,
-      "languageNotes": {
-        "language": "Python",
-        "kindexType": "artifact",
-        "toolTier": "C"
-      }
-    },
-    {
-      "id": "code-sym-ascend-a699173579e4",
-      "type": "class",
-      "name": "AscendConfig",
-      "filePath": "src/ascend/config.py",
-      "summary": "class AscendConfig(BaseModel) (src/ascend/config.py:35)",
-      "tags": [
-        "code",
-        "python"
-      ],
-      "complexity": 1,
-      "languageNotes": {
-        "language": "Python",
-        "kindexType": "concept",
-        "toolTier": ""
-      }
-    },
-    {
-      "id": "code-mod-ascend-5e60ab6a1224",
-      "type": "file",
-      "name": "src/ascend/tui/app.py",
-      "filePath": "src/ascend/tui/app.py",
-      "summary": "Language: Python | Path: src/ascend/tui/app.py | ~184 lines ## Classes - AscendApp(App)",
-      "tags": [
-        "code",
-        "python"
-      ],
-      "complexity": 4,
-      "languageNotes": {
-        "language": "Python",
-        "kindexType": "artifact",
-        "toolTier": "C"
-      }
-    },
-    {
-      "id": "code-sym-ascend-e8e54e479a20",
-      "type": "class",
-      "name": "AscendApp",
-      "filePath": "src/ascend/tui/app.py",
-      "summary": "class AscendApp(App) (src/ascend/tui/app.py:112) ## Methods - action_help_overlay(self) -> None",
-      "tags": [
-        "code",
-        "python"
-      ],
-      "complexity": 7,
-      "languageNotes": {
-        "language": "Python",
-        "kindexType": "concept",
-        "toolTier": ""
-      }
-    },
-    {
-      "id": "code-sym-ascend-c201a7482519",
-      "type": "class",
-      "name": "AscendCommands",
-      "filePath": "src/ascend/tui/app.py",
-      "summary": "class AscendCommands(Provider) (src/ascend/tui/app.py:56) ## Methods - search(self, query: str) -> Hits",
-      "tags": [
-        "code",
-        "python"
-      ],
-      "complexity": 1,
-      "languageNotes": {
-        "language": "Python",
-        "kindexType": "concept",
-        "toolTier": ""
-      }
-    },
-    {
-      "id": "code-sym-ascend-e915a78ceb8f",
-      "type": "class",
-      "name": "HelpScreen",
-      "filePath": "src/ascend/tui/app.py",
-      "summary": "class HelpScreen(ModalScreen) (src/ascend/tui/app.py:92) ## Methods - compose(self) -> ComposeResult",
-      "tags": [
-        "code",
-        "python"
-      ],
-      "complexity": 1,
-      "languageNotes": {
-        "language": "Python",
-        "kindexType": "concept",
-        "toolTier": ""
-      }
-    },
-    {
-      "id": "code-sym-ascend-122b776800c9",
-      "type": "class",
-      "name": "Sidebar",
-      "filePath": "src/ascend/tui/app.py",
-      "summary": "class Sidebar(Vertical) (src/ascend/tui/app.py:103) ## Methods - compose(self) -> ComposeResult",
-      "tags": [
-        "code",
-        "python"
-      ],
-      "complexity": 1,
-      "languageNotes": {
-        "language": "Python",
-        "kindexType": "concept",
-        "toolTier": ""
-      }
-    },
-    {
-      "id": "code-mod-ascend-af3c631454c7",
-      "type": "file",
-      "name": "src/ascend/tui/screens/meetings.py",
-      "filePath": "src/ascend/tui/screens/meetings.py",
-      "summary": "Language: Python | Path: src/ascend/tui/screens/meetings.py | ~156 lines ## Classes - MeetingsPanel(Vertical)",
-      "tags": [
-        "code",
-        "python"
-      ],
-      "complexity": 1,
-      "languageNotes": {
-        "language": "Python",
-        "kindexType": "artifact",
-        "toolTier": "C"
-      }
-    },
-    {
-      "id": "code-sym-ascend-47be48307072",
-      "type": "class",
-      "name": "MeetingsPanel",
-      "filePath": "src/ascend/tui/screens/meetings.py",
-      "summary": "class MeetingsPanel(Vertical) (src/ascend/tui/screens/meetings.py:11) ## Methods - action_focus_search(self) -> None",
-      "tags": [
-        "code",
-        "python"
-      ],
-      "complexity": 6,
-      "languageNotes": {
-        "language": "Python",
-        "kindexType": "concept",
-        "toolTier": ""
-      }
-    },
-    {
-      "id": "code-mod-ascend-ccb3adeab190",
-      "type": "file",
-      "name": "src/ascend/tui/screens/reports.py",
-      "filePath": "src/ascend/tui/screens/reports.py",
-      "summary": "Language: Python | Path: src/ascend/tui/screens/reports.py | ~209 lines ## Classes - ReportsPanel(Vertical)",
-      "tags": [
-        "code",
-        "python"
-      ],
-      "complexity": 1,
-      "languageNotes": {
-        "language": "Python",
-        "kindexType": "artifact",
-        "toolTier": "C"
-      }
-    },
-    {
-      "id": "code-sym-ascend-84032c4f20f7",
-      "type": "class",
-      "name": "ReportsPanel",
-      "filePath": "src/ascend/tui/screens/reports.py",
-      "summary": "class ReportsPanel(Vertical) (src/ascend/tui/screens/reports.py:15) ## Methods - action_regenerate(self) -> None",
-      "tags": [
-        "code",
-        "python"
-      ],
-      "complexity": 4,
-      "languageNotes": {
-        "language": "Python",
-        "kindexType": "concept",
-        "toolTier": ""
-      }
-    },
-    {
-      "id": "code-mod-ascend-f91401ba2498",
-      "type": "file",
-      "name": "src/ascend/tui/screens/roster.py",
-      "filePath": "src/ascend/tui/screens/roster.py",
-      "summary": "Language: Python | Path: src/ascend/tui/screens/roster.py | ~121 lines ## Classes - RosterPanel(Vertical)",
-      "tags": [
-        "code",
-        "python"
-      ],
-      "complexity": 1,
-      "languageNotes": {
-        "language": "Python",
-        "kindexType": "artifact",
-        "toolTier": "C"
-      }
-    },
-    {
-      "id": "code-sym-ascend-98aa298c838c",
-      "type": "class",
-      "name": "RosterPanel",
-      "filePath": "src/ascend/tui/screens/roster.py",
-      "summary": "class RosterPanel(Vertical) (src/ascend/tui/screens/roster.py:13) ## Methods - action_flag_member(self) -> None",
-      "tags": [
-        "code",
-        "python"
-      ],
-      "complexity": 8,
-      "languageNotes": {
-        "language": "Python",
-        "kindexType": "concept",
-        "toolTier": ""
-      }
-    },
-    {
-      "id": "code-mod-ascend-471fa8d5c833",
-      "type": "file",
-      "name": "src/ascend/tui/screens/schedules.py",
-      "filePath": "src/ascend/tui/screens/schedules.py",
-      "summary": "Language: Python | Path: src/ascend/tui/screens/schedules.py | ~177 lines ## Classes - SchedulesPanel(Vertical)",
-      "tags": [
-        "code",
-        "python"
-      ],
-      "complexity": 1,
-      "languageNotes": {
-        "language": "Python",
-        "kindexType": "artifact",
-        "toolTier": "C"
-      }
-    },
-    {
-      "id": "code-sym-ascend-a8a050fad2e6",
-      "type": "class",
-      "name": "SchedulesPanel",
-      "filePath": "src/ascend/tui/screens/schedules.py",
-      "summary": "class SchedulesPanel(Vertical) (src/ascend/tui/screens/schedules.py:11) ## Methods - action_disable_schedule(self) -> None",
-      "tags": [
-        "code",
-        "python"
-      ],
-      "complexity": 7,
-      "languageNotes": {
-        "language": "Python",
-        "kindexType": "concept",
-        "toolTier": ""
-      }
-    },
-    {
-      "id": "code-mod-ascend-dffef2702eff",
-      "type": "file",
-      "name": "src/ascend/transcript.py",
-      "filePath": "src/ascend/transcript.py",
-      "summary": "Language: Python | Path: src/ascend/transcript.py | ~217 lines ## Classes - ParsedTranscript(BaseModel)",
-      "tags": [
-        "code",
-        "python"
-      ],
-      "complexity": 9,
-      "languageNotes": {
-        "language": "Python",
-        "kindexType": "artifact",
-        "toolTier": "C"
-      }
-    },
-    {
-      "id": "code-mod-ascend-fa1d2c8dea8f",
-      "type": "file",
-      "name": "src/ascend/models/member.py",
-      "filePath": "src/ascend/models/member.py",
-      "summary": "Language: Python | Path: src/ascend/models/member.py | ~100 lines ## Classes - CoachingEntry(BaseModel)",
-      "tags": [
-        "code",
-        "python"
-      ],
-      "complexity": 8,
-      "languageNotes": {
-        "language": "Python",
-        "kindexType": "artifact",
-        "toolTier": "C"
-      }
-    },
-    {
-      "id": "code-sym-ascend-3869fe7094ec",
-      "type": "class",
-      "name": "CoachingEntry",
-      "filePath": "src/ascend/models/member.py",
-      "summary": "class CoachingEntry(BaseModel) (src/ascend/models/member.py:84)",
-      "tags": [
-        "code",
-        "python"
-      ],
-      "complexity": 1,
-      "languageNotes": {
-        "language": "Python",
-        "kindexType": "concept",
-        "toolTier": ""
-      }
-    },
-    {
-      "id": "code-sym-ascend-0a04bf88c945",
-      "type": "class",
-      "name": "Goal",
-      "filePath": "src/ascend/models/member.py",
-      "summary": "class Goal(BaseModel) (src/ascend/models/member.py:59)",
-      "tags": [
-        "code",
-        "python"
-      ],
-      "complexity": 1,
-      "languageNotes": {
-        "language": "Python",
-        "kindexType": "concept",
-        "toolTier": ""
-      }
-    },
-    {
-      "id": "code-sym-ascend-477f8cf8c177",
-      "type": "class",
-      "name": "Meeting",
-      "filePath": "src/ascend/models/member.py",
-      "summary": "class Meeting(BaseModel) (src/ascend/models/member.py:47)",
-      "tags": [
-        "code",
-        "python"
-      ],
-      "complexity": 1,
-      "languageNotes": {
-        "language": "Python",
-        "kindexType": "concept",
-        "toolTier": ""
-      }
-    },
-    {
-      "id": "code-sym-ascend-4cfbb3385900",
-      "type": "class",
-      "name": "MeetingItem",
-      "filePath": "src/ascend/models/member.py",
-      "summary": "class MeetingItem(BaseModel) (src/ascend/models/member.py:38)",
-      "tags": [
-        "code",
-        "python"
-      ],
-      "complexity": 1,
-      "languageNotes": {
-        "language": "Python",
-        "kindexType": "concept",
-        "toolTier": ""
-      }
-    },
-    {
-      "id": "code-sym-ascend-aeb7957f8620",
-      "type": "class",
-      "name": "Member",
-      "filePath": "src/ascend/models/member.py",
-      "summary": "class Member(BaseModel) (src/ascend/models/member.py:11)",
-      "tags": [
-        "code",
-        "python"
-      ],
-      "complexity": 1,
-      "languageNotes": {
-        "language": "Python",
-        "kindexType": "concept",
-        "toolTier": ""
-      }
-    },
-    {
-      "id": "code-sym-ascend-3b596f63055b",
-      "type": "class",
-      "name": "PerformanceSnapshot",
-      "filePath": "src/ascend/models/member.py",
-      "summary": "class PerformanceSnapshot(BaseModel) (src/ascend/models/member.py:74)",
-      "tags": [
-        "code",
-        "python"
-      ],
-      "complexity": 1,
-      "languageNotes": {
-        "language": "Python",
-        "kindexType": "concept",
-        "toolTier": ""
-      }
-    },
-    {
-      "id": "code-sym-ascend-ec924f1cc443",
-      "type": "class",
-      "name": "Schedule",
-      "filePath": "src/ascend/models/member.py",
-      "summary": "class Schedule(BaseModel) (src/ascend/models/member.py:92)",
-      "tags": [
-        "code",
-        "python"
-      ],
-      "complexity": 1,
-      "languageNotes": {
-        "language": "Python",
-        "kindexType": "concept",
-        "toolTier": ""
-      }
-    },
-    {
-      "id": "code-sym-ascend-6466e5fccead",
-      "type": "class",
-      "name": "Team",
-      "filePath": "src/ascend/models/member.py",
-      "summary": "class Team(BaseModel) (src/ascend/models/member.py:27)",
-      "tags": [
-        "code",
-        "python"
-      ],
-      "complexity": 1,
-      "languageNotes": {
-        "language": "Python",
-        "kindexType": "concept",
-        "toolTier": ""
-      }
-    },
-    {
-      "id": "code-mod-ascend-13927e0d513a",
-      "type": "file",
-      "name": "src/ascend/tui/screens/coaching.py",
-      "filePath": "src/ascend/tui/screens/coaching.py",
-      "summary": "Language: Python | Path: src/ascend/tui/screens/coaching.py | ~94 lines ## Classes - CoachingPanel(Vertical)",
-      "tags": [
-        "code",
-        "python"
-      ],
-      "complexity": 1,
-      "languageNotes": {
-        "language": "Python",
-        "kindexType": "artifact",
-        "toolTier": "C"
-      }
-    },
-    {
-      "id": "code-sym-ascend-557fe71a29ba",
-      "type": "class",
-      "name": "CoachingPanel",
-      "filePath": "src/ascend/tui/screens/coaching.py",
-      "summary": "class CoachingPanel(Vertical) (src/ascend/tui/screens/coaching.py:10) ## Methods - compose(self) -> ComposeResult",
-      "tags": [
-        "code",
-        "python"
-      ],
-      "complexity": 4,
-      "languageNotes": {
-        "language": "Python",
-        "kindexType": "concept",
-        "toolTier": ""
-      }
-    },
-    {
-      "id": "code-mod-ascend-ed4ee3dc8020",
-      "type": "file",
-      "name": "src/ascend/tui/screens/dashboard.py",
-      "filePath": "src/ascend/tui/screens/dashboard.py",
-      "summary": "Language: Python | Path: src/ascend/tui/screens/dashboard.py | ~127 lines ## Classes - DashboardPanel(ScrollableContainer)",
-      "tags": [
-        "code",
-        "python"
-      ],
-      "complexity": 1,
-      "languageNotes": {
-        "language": "Python",
-        "kindexType": "artifact",
-        "toolTier": "C"
-      }
-    },
-    {
-      "id": "code-sym-ascend-f707de54f9f9",
-      "type": "class",
-      "name": "DashboardPanel",
-      "filePath": "src/ascend/tui/screens/dashboard.py",
-      "summary": "class DashboardPanel(ScrollableContainer) (src/ascend/tui/screens/dashboard.py:10) ## Methods - compose(self) -> ComposeResult",
-      "tags": [
-        "code",
-        "python"
-      ],
-      "complexity": 3,
-      "languageNotes": {
-        "language": "Python",
-        "kindexType": "concept",
-        "toolTier": ""
-      }
-    },
-    {
-      "id": "code-mod-ascend-9be03e50c869",
-      "type": "file",
-      "name": "src/ascend/summarizer.py",
-      "filePath": "src/ascend/summarizer.py",
-      "summary": "Language: Python | Path: src/ascend/summarizer.py | ~221 lines ## Classes - MeetingItemExtract(BaseModel)",
-      "tags": [
-        "code",
-        "python"
-      ],
-      "complexity": 9,
-      "languageNotes": {
-        "language": "Python",
-        "kindexType": "artifact",
-        "toolTier": "C"
-      }
-    },
-    {
-      "id": "code-sym-ascend-e66b5b4aa247",
-      "type": "class",
-      "name": "MeetingItemExtract",
-      "filePath": "src/ascend/summarizer.py",
-      "summary": "class MeetingItemExtract(BaseModel) (src/ascend/summarizer.py:58) ## Methods - content_must_be_nonempty(cls, v: str) -> str",
-      "tags": [
-        "code",
-        "python"
-      ],
-      "complexity": 1,
-      "languageNotes": {
-        "language": "Python",
-        "kindexType": "concept",
-        "toolTier": ""
-      }
-    },
-    {
-      "id": "code-sym-ascend-7de3970d8724",
-      "type": "class",
-      "name": "MeetingItemKind",
-      "filePath": "src/ascend/summarizer.py",
-      "summary": "class MeetingItemKind(str, Enum) (src/ascend/summarizer.py:50)",
-      "tags": [
-        "code",
-        "python"
-      ],
-      "complexity": 1,
-      "languageNotes": {
-        "language": "Python",
-        "kindexType": "concept",
-        "toolTier": ""
-      }
-    },
-    {
-      "id": "code-mod-ascend-9125b127dc83",
-      "type": "file",
-      "name": "src/ascend/tui/widgets/member_card.py",
-      "filePath": "src/ascend/tui/widgets/member_card.py",
-      "summary": "Language: Python | Path: src/ascend/tui/widgets/member_card.py | ~131 lines ## Classes - MemberCard(Widget)",
-      "tags": [
-        "code",
-        "python"
-      ],
-      "complexity": 1,
-      "languageNotes": {
-        "language": "Python",
-        "kindexType": "artifact",
-        "toolTier": "C"
-      }
-    },
-    {
-      "id": "code-sym-ascend-f0a1ce47ba06",
-      "type": "class",
-      "name": "MemberCard",
-      "filePath": "src/ascend/tui/widgets/member_card.py",
-      "summary": "class MemberCard(Widget) (src/ascend/tui/widgets/member_card.py:13) ## Methods - clear_card(self) -> None",
-      "tags": [
-        "code",
-        "python"
-      ],
-      "complexity": 4,
-      "languageNotes": {
-        "language": "Python",
-        "kindexType": "concept",
-        "toolTier": ""
-      }
-    },
-    {
-      "id": "code-mod-ascend-ea9fb3a03d98",
-      "type": "file",
-      "name": "src/ascend/tui/widgets/metric_bar.py",
-      "filePath": "src/ascend/tui/widgets/metric_bar.py",
-      "summary": "Language: Python | Path: src/ascend/tui/widgets/metric_bar.py | ~44 lines ## Classes - MetricBar(Widget)",
-      "tags": [
-        "code",
-        "python"
-      ],
-      "complexity": 1,
-      "languageNotes": {
-        "language": "Python",
-        "kindexType": "artifact",
-        "toolTier": "C"
-      }
-    },
-    {
-      "id": "code-sym-ascend-624b1dd7e336",
-      "type": "class",
-      "name": "MetricBar",
-      "filePath": "src/ascend/tui/widgets/metric_bar.py",
-      "summary": "class MetricBar(Widget) (src/ascend/tui/widgets/metric_bar.py:11) ## Methods - render(self) -> str",
-      "tags": [
-        "code",
-        "python"
-      ],
-      "complexity": 3,
-      "languageNotes": {
-        "language": "Python",
-        "kindexType": "concept",
-        "toolTier": ""
-      }
-    },
-    {
-      "id": "code-mod-ascend-0742dfec6f67",
-      "type": "file",
-      "name": "src/ascend/db.py",
-      "filePath": "src/ascend/db.py",
-      "summary": "Language: Python | Path: src/ascend/db.py | ~196 lines ## Functions - check_db(db_path: Path) -> dict",
-      "tags": [
-        "code",
-        "python"
-      ],
-      "complexity": 3,
-      "languageNotes": {
-        "language": "Python",
-        "kindexType": "artifact",
-        "toolTier": "C"
-      }
-    },
-    {
-      "id": "code-mod-ascend-acdea81e5d6f",
-      "type": "file",
-      "name": "src/ascend/output.py",
-      "filePath": "src/ascend/output.py",
-      "summary": "Language: Python | Path: src/ascend/output.py | ~101 lines ## Functions - copy_to_clipboard(text: str) -> bool",
-      "tags": [
-        "code",
-        "python"
-      ],
-      "complexity": 7,
-      "languageNotes": {
-        "language": "Python",
-        "kindexType": "artifact",
-        "toolTier": "C"
-      }
-    },
-    {
-      "id": "code-mod-ascend-adc83c8d24d9",
-      "type": "file",
-      "name": "src/ascend/scheduler.py",
-      "filePath": "src/ascend/scheduler.py",
-      "summary": "Language: Python | Path: src/ascend/scheduler.py | ~342 lines ## Functions - compute_next_run(cron_expr: str, after: Optional[datetime] = None) -> str",
-      "tags": [
-        "code",
-        "python"
-      ],
-      "complexity": 12,
-      "languageNotes": {
-        "language": "Python",
-        "kindexType": "artifact",
-        "toolTier": "C"
-      }
-    },
-    {
-      "id": "code-mod-ascend-44a4e7716903",
-      "type": "file",
-      "name": "src/ascend/integrations/snapshot.py",
-      "filePath": "src/ascend/integrations/snapshot.py",
-      "summary": "Language: Python | Path: src/ascend/integrations/snapshot.py | ~127 lines ## Functions - take_all_snapshots( conn: sqlite3.Connection, config: AscendConfig, *, hours: int = 24, since: Optional[datetime] = None, until: Optional[datetime] = None, date_str: Optional[str] = None, skip_linear: bool = False, skip_fetch: bool = False, ) -> list[dict[str,Any]]",
-      "tags": [
-        "code",
-        "python"
-      ],
-      "complexity": 2,
-      "languageNotes": {
-        "language": "Python",
-        "kindexType": "artifact",
-        "toolTier": "C"
-      }
-    },
-    {
-      "id": "code-mod-ascend-1680ae19e7e8",
-      "type": "file",
-      "name": "src/ascend/integrations/slack.py",
-      "filePath": "src/ascend/integrations/slack.py",
-      "summary": "Language: Python | Path: src/ascend/integrations/slack.py | ~167 lines ## Functions - detect_signals(text: str) -> list[str]",
-      "tags": [
-        "code",
-        "python"
-      ],
-      "complexity": 5,
-      "languageNotes": {
-        "language": "Python",
-        "kindexType": "artifact",
-        "toolTier": "C"
-      }
-    },
-    {
-      "id": "code-mod-ascend-1c86b2708494",
-      "type": "file",
-      "name": "src/ascend/cli.py",
-      "filePath": "src/ascend/cli.py",
-      "summary": "Language: Python | Path: src/ascend/cli.py | ~425 lines ## Functions - main(argv: list[str] | None = None) -> None",
-      "tags": [
-        "code",
-        "python"
-      ],
-      "complexity": 3,
-      "languageNotes": {
-        "language": "Python",
-        "kindexType": "artifact",
-        "toolTier": "C"
-      }
-    },
-    {
-      "id": "code-mod-ascend-725f66c774d4",
-      "type": "file",
-      "name": "src/ascend/__init__.py",
-      "filePath": "src/ascend/__init__.py",
-      "summary": "Language: Python | Path: src/ascend/__init__.py | ~3 lines",
-      "tags": [
-        "code",
-        "python"
-      ],
-      "complexity": 1,
-      "languageNotes": {
-        "language": "Python",
-        "kindexType": "artifact",
-        "toolTier": "C"
-      }
-    },
-    {
-      "id": "code-mod-ascend-7fe7ce3e6f7b",
-      "type": "file",
-      "name": "src/ascend/commands/report.py",
-      "filePath": "src/ascend/commands/report.py",
-      "summary": "Language: Python | Path: src/ascend/commands/report.py | ~762 lines ## Functions - cmd_report_custom(args: argparse.Namespace) -> None",
-      "tags": [
-        "code",
-        "python"
-      ],
-      "complexity": 19,
-      "languageNotes": {
-        "language": "Python",
-        "kindexType": "artifact",
-        "toolTier": "C"
-      }
-    },
-    {
-      "id": "code-mod-ascend-845582807cc8",
-      "type": "file",
-      "name": "src/ascend/audit.py",
-      "filePath": "src/ascend/audit.py",
-      "summary": "Language: Python | Path: src/ascend/audit.py | ~43 lines ## Functions - log_operation( command: str, *, args: Optional[dict] = None, result: Optional[str] = None, error: Optional[str] = None, ) -> None",
-      "tags": [
-        "code",
-        "python"
-      ],
-      "complexity": 3,
-      "languageNotes": {
-        "language": "Python",
-        "kindexType": "artifact",
-        "toolTier": "C"
-      }
-    },
-    {
-      "id": "code-mod-ascend-1ac9d1f2e41c",
-      "type": "file",
-      "name": "src/ascend/commands/coach.py",
-      "filePath": "src/ascend/commands/coach.py",
-      "summary": "Language: Python | Path: src/ascend/commands/coach.py | ~425 lines ## Functions - cmd_coach_analyze(args: argparse.Namespace) -> None",
-      "tags": [
-        "code",
-        "python"
-      ],
-      "complexity": 8,
-      "languageNotes": {
-        "language": "Python",
-        "kindexType": "artifact",
-        "toolTier": "C"
-      }
-    },
-    {
-      "id": "code-sym-ascend-e5a35793824b",
-      "type": "concept",
-      "name": "AscendConfig",
-      "filePath": "/Users/jmcentire/Code/Ascend/contracts/contracts_contracts_src_ascend_config_interface_interface/interface.py:14",
-      "summary": "class AscendConfig (contracts/contracts_contracts_src_ascend_config_interface_interface/interface.py:14)",
-      "tags": [
-        "code",
-        "python"
-      ],
-      "complexity": 1,
-      "languageNotes": {
-        "language": "python",
-        "kindexType": "concept",
-        "toolTier": ""
-      }
-    },
-    {
-      "id": "code-sym-ascend-808c418deefc",
-      "type": "concept",
-      "name": "AscendConfig",
-      "filePath": "/Users/jmcentire/Code/Ascend/contracts/contracts_contracts_src_ascend_summarizer_interface_interface/interface.py:32",
-      "summary": "class AscendConfig (contracts/contracts_contracts_src_ascend_summarizer_interface_interface/interface.py:32) [Merged from: AscendConfig] class AscendConfig (contracts/contracts_contracts_src_ascend_config_interface_interface/interface.py:14)",
-      "tags": [
-        "code",
-        "python"
-      ],
-      "complexity": 1,
-      "languageNotes": {
-        "language": "python",
-        "kindexType": "concept",
-        "toolTier": ""
-      }
-    },
-    {
-      "id": "code-sym-ascend-eb1fb9b3874e",
-      "type": "concept",
-      "name": "MeetingItemExtract",
-      "filePath": "/Users/jmcentire/Code/Ascend/contracts/contracts_contracts_src_ascend_summarizer_interface_interface/interface.py:26",
-      "summary": "class MeetingItemExtract (contracts/contracts_contracts_src_ascend_summarizer_interface_interface/interface.py:26)",
-      "tags": [
-        "code",
-        "python"
-      ],
-      "complexity": 1,
-      "languageNotes": {
-        "language": "python",
-        "kindexType": "concept",
-        "toolTier": ""
-      }
-    },
-    {
-      "id": "code-sym-ascend-8a7356e4092b",
-      "type": "concept",
-      "name": "MeetingItemKind",
-      "filePath": "/Users/jmcentire/Code/Ascend/contracts/contracts_contracts_src_ascend_summarizer_interface_interface/interface.py:18",
-      "summary": "class MeetingItemKind(Enum) (contracts/contracts_contracts_src_ascend_summarizer_interface_interface/interface.py:18)",
-      "tags": [
-        "code",
-        "python"
-      ],
-      "complexity": 1,
-      "languageNotes": {
-        "language": "python",
-        "kindexType": "concept",
-        "toolTier": ""
-      }
-    },
-    {
-      "id": "code-sym-ascend-c59d0d08d764",
-      "type": "concept",
-      "name": "AscendConfig",
-      "filePath": "/Users/jmcentire/Code/Ascend/contracts/contracts_src_ascend_config_interface/interface.py:14",
-      "summary": "class AscendConfig (contracts/contracts_src_ascend_config_interface/interface.py:14) [Merged from: AscendConfig] class AscendConfig (contracts/contracts_contracts_src_ascend_config_interface_interface/interface.py:14)",
-      "tags": [
-        "code",
-        "python"
-      ],
-      "complexity": 1,
-      "languageNotes": {
-        "language": "python",
-        "kindexType": "concept",
-        "toolTier": ""
-      }
-    },
-    {
-      "id": "code-sym-ascend-c75295eb43a5",
-      "type": "concept",
-      "name": "MeetingItemExtract",
-      "filePath": "/Users/jmcentire/Code/Ascend/contracts/contracts_src_ascend_summarizer_interface/interface.py:26",
-      "summary": "class MeetingItemExtract (contracts/contracts_src_ascend_summarizer_interface/interface.py:26) [Merged from: MeetingItemExtract] class MeetingItemExtract (contracts/contracts_contracts_src_ascend_summarizer_interface_interface/interface.py:26)",
-      "tags": [
-        "code",
-        "python"
-      ],
-      "complexity": 1,
-      "languageNotes": {
-        "language": "python",
-        "kindexType": "concept",
-        "toolTier": ""
-      }
-    },
-    {
-      "id": "code-sym-ascend-10e7104890da",
-      "type": "concept",
-      "name": "MeetingItemKind",
-      "filePath": "/Users/jmcentire/Code/Ascend/contracts/contracts_src_ascend_summarizer_interface/interface.py:18",
-      "summary": "class MeetingItemKind(Enum) (contracts/contracts_src_ascend_summarizer_interface/interface.py:18) [Merged from: MeetingItemKind] class MeetingItemKind(Enum) (contracts/contracts_contracts_src_ascend_summarizer_interface_interface/interface.py:18)",
-      "tags": [
-        "code",
-        "python"
-      ],
-      "complexity": 1,
-      "languageNotes": {
-        "language": "python",
-        "kindexType": "concept",
-        "toolTier": ""
-      }
-    },
-    {
-      "id": "code-sym-ascend-d0494b3b962a",
-      "type": "concept",
-      "name": "AuditEntry",
-      "filePath": "/Users/jmcentire/Code/Ascend/contracts/contracts_contracts_src_ascend_audit_interface_interface/interface.py:12",
-      "summary": "class AuditEntry (contracts/contracts_contracts_src_ascend_audit_interface_interface/interface.py:12)",
-      "tags": [
-        "code",
-        "python"
-      ],
-      "complexity": 1,
-      "languageNotes": {
-        "language": "python",
-        "kindexType": "concept",
-        "toolTier": ""
-      }
-    },
-    {
-      "id": "code-sym-ascend-4cdbf5cade0a",
-      "type": "concept",
-      "name": "HealthCheckResult",
-      "filePath": "/Users/jmcentire/Code/Ascend/contracts/contracts_contracts_src_ascend_db_interface_interface/interface.py:21",
-      "summary": "class HealthCheckResult (contracts/contracts_contracts_src_ascend_db_interface_interface/interface.py:21)",
-      "tags": [
-        "code",
-        "python"
-      ],
-      "complexity": 1,
-      "languageNotes": {
-        "language": "python",
-        "kindexType": "concept",
-        "toolTier": ""
-      }
-    },
-    {
-      "id": "code-sym-ascend-6f10937f8ae4",
-      "type": "concept",
-      "name": "HealthCheckResult",
-      "filePath": "/Users/jmcentire/Code/Ascend/contracts/contracts_src_ascend_db_interface/interface.py:21",
-      "summary": "class HealthCheckResult (contracts/contracts_src_ascend_db_interface/interface.py:21) [Merged from: HealthCheckResult] class HealthCheckResult (contracts/contracts_contracts_src_ascend_db_interface_interface/interface.py:21)",
-      "tags": [
-        "code",
-        "python"
-      ],
-      "complexity": 1,
-      "languageNotes": {
-        "language": "python",
-        "kindexType": "concept",
-        "toolTier": ""
-      }
-    },
-    {
-      "id": "code-sym-ascend-6305ee2a797b",
-      "type": "concept",
-      "name": "CronFields",
-      "filePath": "/Users/jmcentire/Code/Ascend/contracts/contracts_contracts_src_ascend_scheduler_interface_interface/interface.py:19",
-      "summary": "class CronFields (contracts/contracts_contracts_src_ascend_scheduler_interface_interface/interface.py:19)",
-      "tags": [
-        "code",
-        "python"
-      ],
-      "complexity": 1,
-      "languageNotes": {
-        "language": "python",
-        "kindexType": "concept",
-        "toolTier": ""
-      }
-    },
-    {
-      "id": "code-sym-ascend-fbc9627d7424",
-      "type": "concept",
-      "name": "CronFields",
-      "filePath": "/Users/jmcentire/Code/Ascend/contracts/contracts_src_ascend_scheduler_interface/interface.py:16",
-      "summary": "class CronFields (contracts/contracts_src_ascend_scheduler_interface/interface.py:16) [Merged from: CronFields] class CronFields (contracts/contracts_contracts_src_ascend_scheduler_interface_interface/interface.py:19)",
-      "tags": [
-        "code",
-        "python"
-      ],
-      "complexity": 1,
-      "languageNotes": {
-        "language": "python",
-        "kindexType": "concept",
-        "toolTier": ""
-      }
-    }
-  ],
   "edges": [
     {
-      "source": "code-sym-ascend-e73d8ac3f5e6",
-      "target": "code-mod-ascend-99872290f376",
-      "type": "contains",
       "direction": "outbound",
-      "weight": 0.0108
-    },
-    {
-      "source": "code-sym-ascend-e73d8ac3f5e6",
-      "target": "code-sym-ascend-83e47b3c2f63",
-      "type": "related",
-      "direction": "outbound",
-      "weight": 0.0108
-    },
-    {
-      "source": "code-sym-ascend-83e47b3c2f63",
-      "target": "code-mod-ascend-dffef2702eff",
-      "type": "contains",
-      "direction": "outbound",
-      "weight": 0.0108
-    },
-    {
-      "source": "code-sym-ascend-83e47b3c2f63",
-      "target": "code-sym-ascend-e73d8ac3f5e6",
-      "type": "related",
-      "direction": "outbound",
-      "weight": 0.0108
-    },
-    {
-      "source": "code-mod-ascend-a9dae5e26959",
-      "target": "code-sym-ascend-85228f87fa7b",
-      "type": "contains",
-      "direction": "outbound",
-      "weight": 0.0108
-    },
-    {
-      "source": "code-mod-ascend-a9dae5e26959",
-      "target": "code-mod-ascend-445464bab6d7",
-      "type": "related",
-      "direction": "outbound",
-      "weight": 0.0108
-    },
-    {
-      "source": "code-mod-ascend-445464bab6d7",
-      "target": "code-mod-ascend-a9dae5e26959",
-      "type": "related",
-      "direction": "outbound",
-      "weight": 0.0108
-    },
-    {
-      "source": "code-mod-ascend-c08d22ce9175",
-      "target": "code-sym-ascend-fbc9627d7424",
-      "type": "contains",
-      "direction": "outbound",
-      "weight": 0.0108
-    },
-    {
-      "source": "code-mod-ascend-c08d22ce9175",
-      "target": "code-sym-ascend-1e56b5218000",
-      "type": "contains",
-      "direction": "outbound",
-      "weight": 0.0108
-    },
-    {
-      "source": "code-mod-ascend-c08d22ce9175",
-      "target": "code-mod-ascend-342770d311ac",
-      "type": "related",
-      "direction": "outbound",
-      "weight": 0.0108
-    },
-    {
-      "source": "code-mod-ascend-342770d311ac",
-      "target": "code-sym-ascend-1e56b5218000",
-      "type": "contains",
-      "direction": "outbound",
-      "weight": 0.0108
-    },
-    {
-      "source": "code-mod-ascend-342770d311ac",
-      "target": "code-mod-ascend-c08d22ce9175",
-      "type": "related",
-      "direction": "outbound",
-      "weight": 0.0108
-    },
-    {
-      "source": "code-sym-ascend-73f75d0cc6bd",
-      "target": "code-mod-ascend-99872290f376",
-      "type": "contains",
-      "direction": "outbound",
-      "weight": 0.0108
-    },
-    {
-      "source": "code-sym-ascend-73f75d0cc6bd",
-      "target": "code-sym-ascend-8920aba6ff22",
-      "type": "related",
-      "direction": "outbound",
-      "weight": 0.0108
-    },
-    {
-      "source": "code-sym-ascend-55f232e0787e",
-      "target": "code-mod-ascend-99872290f376",
-      "type": "contains",
-      "direction": "outbound",
-      "weight": 0.0108
-    },
-    {
-      "source": "code-sym-ascend-55f232e0787e",
-      "target": "code-sym-ascend-d2aada0f8c22",
-      "type": "related",
-      "direction": "outbound",
-      "weight": 0.0108
-    },
-    {
-      "source": "code-sym-ascend-8920aba6ff22",
-      "target": "code-mod-ascend-dffef2702eff",
-      "type": "contains",
-      "direction": "outbound",
-      "weight": 0.0108
-    },
-    {
-      "source": "code-sym-ascend-8920aba6ff22",
-      "target": "code-sym-ascend-73f75d0cc6bd",
-      "type": "related",
-      "direction": "outbound",
-      "weight": 0.0108
-    },
-    {
-      "source": "code-sym-ascend-d2aada0f8c22",
-      "target": "code-mod-ascend-dffef2702eff",
-      "type": "contains",
-      "direction": "outbound",
-      "weight": 0.0108
-    },
-    {
-      "source": "code-sym-ascend-d2aada0f8c22",
-      "target": "code-sym-ascend-55f232e0787e",
-      "type": "related",
-      "direction": "outbound",
-      "weight": 0.0108
-    },
-    {
-      "source": "code-sym-ascend-154decdd72d5",
-      "target": "code-mod-ascend-df6380ff17e8",
-      "type": "contains",
-      "direction": "outbound",
-      "weight": 0.0108
-    },
-    {
-      "source": "code-sym-ascend-154decdd72d5",
-      "target": "code-mod-ascend-59364203d951",
-      "type": "contains",
-      "direction": "outbound",
-      "weight": 0.0108
-    },
-    {
-      "source": "code-sym-ascend-154decdd72d5",
-      "target": "code-mod-ascend-4c0b78329eba",
-      "type": "contains",
-      "direction": "outbound",
-      "weight": 0.0108
-    },
-    {
-      "source": "code-sym-ascend-154decdd72d5",
-      "target": "code-mod-ascend-6906bdfdd2de",
-      "type": "contains",
-      "direction": "outbound",
-      "weight": 0.0108
-    },
-    {
-      "source": "code-sym-ascend-439350c3ab43",
-      "target": "code-mod-ascend-9f3b8aafa993",
-      "type": "contains",
-      "direction": "outbound",
-      "weight": 0.0108
-    },
-    {
-      "source": "code-sym-ascend-439350c3ab43",
-      "target": "code-mod-ascend-4c0b78329eba",
-      "type": "contains",
-      "direction": "outbound",
-      "weight": 0.0108
-    },
-    {
-      "source": "code-sym-ascend-439350c3ab43",
-      "target": "code-mod-ascend-6906bdfdd2de",
-      "type": "contains",
-      "direction": "outbound",
-      "weight": 0.0108
-    },
-    {
-      "source": "code-sym-ascend-85228f87fa7b",
-      "target": "code-mod-ascend-445464bab6d7",
-      "type": "contains",
-      "direction": "outbound",
-      "weight": 0.0108
-    },
-    {
-      "source": "code-sym-ascend-85228f87fa7b",
-      "target": "code-mod-ascend-a9dae5e26959",
-      "type": "contains",
-      "direction": "outbound",
-      "weight": 0.0108
-    },
-    {
-      "source": "code-sym-ascend-d807fae4241e",
-      "target": "code-mod-ascend-a80692c41e02",
-      "type": "contains",
-      "direction": "outbound",
-      "weight": 0.0108
-    },
-    {
-      "source": "code-sym-ascend-d807fae4241e",
-      "target": "code-mod-ascend-62abf3f28ee3",
-      "type": "contains",
-      "direction": "outbound",
-      "weight": 0.0108
-    },
-    {
-      "source": "code-sym-ascend-d807fae4241e",
-      "target": "code-mod-ascend-a216eb390608",
-      "type": "contains",
-      "direction": "outbound",
-      "weight": 0.0108
-    },
-    {
-      "source": "code-sym-ascend-1e56b5218000",
-      "target": "code-mod-ascend-4af453c987e3",
-      "type": "contains",
-      "direction": "outbound",
-      "weight": 0.0108
-    },
-    {
-      "source": "code-sym-ascend-1e56b5218000",
-      "target": "code-mod-ascend-342770d311ac",
-      "type": "contains",
-      "direction": "outbound",
-      "weight": 0.0108
-    },
-    {
-      "source": "code-sym-ascend-1e56b5218000",
-      "target": "code-mod-ascend-c08d22ce9175",
-      "type": "contains",
-      "direction": "outbound",
-      "weight": 0.0108
-    },
-    {
-      "source": "code-sym-ascend-989ad60b640d",
-      "target": "code-mod-ascend-c5ae00cf9251",
-      "type": "contains",
-      "direction": "outbound",
-      "weight": 0.0108
-    },
-    {
-      "source": "code-sym-ascend-989ad60b640d",
-      "target": "code-mod-ascend-df6380ff17e8",
-      "type": "contains",
-      "direction": "outbound",
-      "weight": 0.0108
-    },
-    {
-      "source": "code-sym-ascend-989ad60b640d",
-      "target": "code-mod-ascend-59364203d951",
-      "type": "contains",
-      "direction": "outbound",
-      "weight": 0.0108
-    },
-    {
-      "source": "code-sym-ascend-76bf6706daf9",
-      "target": "code-mod-ascend-c5ae00cf9251",
-      "type": "contains",
-      "direction": "outbound",
-      "weight": 0.0108
-    },
-    {
-      "source": "code-sym-ascend-76bf6706daf9",
-      "target": "code-mod-ascend-df6380ff17e8",
-      "type": "contains",
-      "direction": "outbound",
-      "weight": 0.0108
-    },
-    {
-      "source": "code-sym-ascend-76bf6706daf9",
-      "target": "code-mod-ascend-59364203d951",
-      "type": "contains",
-      "direction": "outbound",
-      "weight": 0.0108
-    },
-    {
-      "source": "code-mod-ascend-6906bdfdd2de",
-      "target": "code-sym-ascend-808c418deefc",
-      "type": "contains",
-      "direction": "outbound",
-      "weight": 0.0108
-    },
-    {
-      "source": "code-mod-ascend-6906bdfdd2de",
-      "target": "code-sym-ascend-c59d0d08d764",
-      "type": "contains",
-      "direction": "outbound",
-      "weight": 0.0108
-    },
-    {
-      "source": "code-mod-ascend-6906bdfdd2de",
-      "target": "code-sym-ascend-154decdd72d5",
-      "type": "contains",
-      "direction": "outbound",
-      "weight": 0.0108
-    },
-    {
-      "source": "code-mod-ascend-6906bdfdd2de",
-      "target": "code-sym-ascend-439350c3ab43",
-      "type": "contains",
-      "direction": "outbound",
-      "weight": 0.0108
-    },
-    {
-      "source": "code-mod-ascend-59364203d951",
-      "target": "code-sym-ascend-154decdd72d5",
-      "type": "contains",
-      "direction": "outbound",
-      "weight": 0.0108
-    },
-    {
-      "source": "code-mod-ascend-59364203d951",
-      "target": "code-sym-ascend-c75295eb43a5",
-      "type": "contains",
-      "direction": "outbound",
-      "weight": 0.0108
-    },
-    {
-      "source": "code-mod-ascend-59364203d951",
-      "target": "code-sym-ascend-10e7104890da",
-      "type": "contains",
-      "direction": "outbound",
-      "weight": 0.0108
-    },
-    {
-      "source": "code-mod-ascend-59364203d951",
-      "target": "code-sym-ascend-989ad60b640d",
-      "type": "contains",
-      "direction": "outbound",
-      "weight": 0.0108
-    },
-    {
-      "source": "code-mod-ascend-59364203d951",
-      "target": "code-sym-ascend-76bf6706daf9",
-      "type": "contains",
-      "direction": "outbound",
-      "weight": 0.0108
-    },
-    {
-      "source": "code-mod-ascend-4c0b78329eba",
-      "target": "code-sym-ascend-154decdd72d5",
-      "type": "contains",
-      "direction": "outbound",
-      "weight": 0.0108
-    },
-    {
-      "source": "code-mod-ascend-4c0b78329eba",
-      "target": "code-sym-ascend-439350c3ab43",
-      "type": "contains",
-      "direction": "outbound",
-      "weight": 0.0108
-    },
-    {
-      "source": "code-mod-ascend-df6380ff17e8",
-      "target": "code-sym-ascend-989ad60b640d",
-      "type": "contains",
-      "direction": "outbound",
-      "weight": 0.0108
-    },
-    {
-      "source": "code-mod-ascend-df6380ff17e8",
-      "target": "code-sym-ascend-76bf6706daf9",
-      "type": "contains",
-      "direction": "outbound",
-      "weight": 0.0108
-    },
-    {
-      "source": "code-sym-ascend-1a2d04a3411a",
-      "target": "code-mod-ascend-9f3b8aafa993",
-      "type": "contains",
-      "direction": "outbound",
-      "weight": 0.0108
-    },
-    {
-      "source": "code-mod-ascend-a216eb390608",
-      "target": "code-sym-ascend-6f10937f8ae4",
-      "type": "contains",
-      "direction": "outbound",
-      "weight": 0.0108
-    },
-    {
-      "source": "code-mod-ascend-a216eb390608",
-      "target": "code-sym-ascend-d807fae4241e",
-      "type": "contains",
-      "direction": "outbound",
-      "weight": 0.0108
-    },
-    {
-      "source": "code-mod-ascend-62abf3f28ee3",
-      "target": "code-sym-ascend-d807fae4241e",
-      "type": "contains",
-      "direction": "outbound",
-      "weight": 0.0108
-    },
-    {
-      "source": "code-sym-ascend-a699173579e4",
-      "target": "code-mod-ascend-8852bd533b73",
-      "type": "contains",
-      "direction": "outbound",
-      "weight": 0.0108
-    },
-    {
-      "source": "code-sym-ascend-e8e54e479a20",
-      "target": "code-mod-ascend-5e60ab6a1224",
-      "type": "contains",
-      "direction": "outbound",
-      "weight": 0.0108
-    },
-    {
-      "source": "code-sym-ascend-c201a7482519",
-      "target": "code-mod-ascend-5e60ab6a1224",
-      "type": "contains",
-      "direction": "outbound",
-      "weight": 0.0108
-    },
-    {
-      "source": "code-sym-ascend-e915a78ceb8f",
-      "target": "code-mod-ascend-5e60ab6a1224",
-      "type": "contains",
-      "direction": "outbound",
-      "weight": 0.0108
-    },
-    {
-      "source": "code-sym-ascend-122b776800c9",
-      "target": "code-mod-ascend-5e60ab6a1224",
-      "type": "contains",
-      "direction": "outbound",
-      "weight": 0.0108
-    },
-    {
-      "source": "code-mod-ascend-af3c631454c7",
-      "target": "code-mod-ascend-acdea81e5d6f",
-      "type": "related",
-      "direction": "outbound",
-      "weight": 0.0108
-    },
-    {
-      "source": "code-mod-ascend-af3c631454c7",
-      "target": "code-mod-ascend-ccb3adeab190",
-      "type": "related",
-      "direction": "outbound",
-      "weight": 0.0108
-    },
-    {
-      "source": "code-sym-ascend-47be48307072",
-      "target": "code-mod-ascend-af3c631454c7",
-      "type": "contains",
-      "direction": "outbound",
-      "weight": 0.0108
-    },
-    {
-      "source": "code-mod-ascend-ccb3adeab190",
-      "target": "code-mod-ascend-af3c631454c7",
-      "type": "related",
-      "direction": "outbound",
-      "weight": 0.0108
-    },
-    {
-      "source": "code-sym-ascend-84032c4f20f7",
-      "target": "code-mod-ascend-ccb3adeab190",
-      "type": "contains",
-      "direction": "outbound",
-      "weight": 0.0108
-    },
-    {
-      "source": "code-sym-ascend-98aa298c838c",
-      "target": "code-mod-ascend-f91401ba2498",
-      "type": "contains",
-      "direction": "outbound",
-      "weight": 0.0108
-    },
-    {
-      "source": "code-sym-ascend-a8a050fad2e6",
-      "target": "code-mod-ascend-471fa8d5c833",
-      "type": "contains",
-      "direction": "outbound",
-      "weight": 0.0108
-    },
-    {
-      "source": "code-mod-ascend-dffef2702eff",
-      "target": "code-mod-ascend-0742dfec6f67",
-      "type": "related",
-      "direction": "outbound",
-      "weight": 0.0108
-    },
-    {
-      "source": "code-sym-ascend-3869fe7094ec",
-      "target": "code-mod-ascend-fa1d2c8dea8f",
-      "type": "contains",
-      "direction": "outbound",
-      "weight": 0.0108
-    },
-    {
       "source": "code-sym-ascend-0a04bf88c945",
       "target": "code-mod-ascend-fa1d2c8dea8f",
       "type": "contains",
-      "direction": "outbound",
-      "weight": 0.0108
+      "weight": 0.6
     },
     {
-      "source": "code-sym-ascend-477f8cf8c177",
+      "direction": "outbound",
+      "source": "code-sym-ascend-10e7104890da",
+      "target": "code-mod-ascend-df6380ff17e8",
+      "type": "contains",
+      "weight": 0.6
+    },
+    {
+      "direction": "outbound",
+      "source": "code-sym-ascend-122b776800c9",
+      "target": "code-mod-ascend-5e60ab6a1224",
+      "type": "contains",
+      "weight": 0.6
+    },
+    {
+      "direction": "outbound",
+      "source": "code-sym-ascend-154decdd72d5",
+      "target": "code-mod-ascend-df6380ff17e8",
+      "type": "contains",
+      "weight": 0.6
+    },
+    {
+      "direction": "outbound",
+      "source": "code-sym-ascend-1a2d04a3411a",
+      "target": "code-mod-ascend-9f3b8aafa993",
+      "type": "contains",
+      "weight": 0.6
+    },
+    {
+      "direction": "outbound",
+      "source": "code-sym-ascend-1e56b5218000",
+      "target": "code-mod-ascend-4af453c987e3",
+      "type": "contains",
+      "weight": 0.6
+    },
+    {
+      "direction": "outbound",
+      "source": "code-sym-ascend-3869fe7094ec",
       "target": "code-mod-ascend-fa1d2c8dea8f",
       "type": "contains",
-      "direction": "outbound",
-      "weight": 0.0108
+      "weight": 0.6
     },
     {
-      "source": "code-sym-ascend-4cfbb3385900",
-      "target": "code-mod-ascend-fa1d2c8dea8f",
-      "type": "contains",
       "direction": "outbound",
-      "weight": 0.0108
-    },
-    {
-      "source": "code-sym-ascend-aeb7957f8620",
-      "target": "code-mod-ascend-fa1d2c8dea8f",
-      "type": "contains",
-      "direction": "outbound",
-      "weight": 0.0108
-    },
-    {
       "source": "code-sym-ascend-3b596f63055b",
       "target": "code-mod-ascend-fa1d2c8dea8f",
       "type": "contains",
-      "direction": "outbound",
-      "weight": 0.0108
+      "weight": 0.6
     },
     {
-      "source": "code-sym-ascend-ec924f1cc443",
+      "direction": "outbound",
+      "source": "code-sym-ascend-439350c3ab43",
+      "target": "code-mod-ascend-9f3b8aafa993",
+      "type": "contains",
+      "weight": 0.6
+    },
+    {
+      "direction": "outbound",
+      "source": "code-sym-ascend-477f8cf8c177",
       "target": "code-mod-ascend-fa1d2c8dea8f",
       "type": "contains",
-      "direction": "outbound",
-      "weight": 0.0108
+      "weight": 0.6
     },
     {
-      "source": "code-sym-ascend-6466e5fccead",
-      "target": "code-mod-ascend-fa1d2c8dea8f",
-      "type": "contains",
       "direction": "outbound",
-      "weight": 0.0108
-    },
-    {
-      "source": "code-sym-ascend-557fe71a29ba",
-      "target": "code-mod-ascend-13927e0d513a",
-      "type": "contains",
-      "direction": "outbound",
-      "weight": 0.0108
-    },
-    {
-      "source": "code-sym-ascend-f707de54f9f9",
-      "target": "code-mod-ascend-ed4ee3dc8020",
-      "type": "contains",
-      "direction": "outbound",
-      "weight": 0.0108
-    },
-    {
-      "source": "code-sym-ascend-e66b5b4aa247",
-      "target": "code-mod-ascend-9be03e50c869",
-      "type": "contains",
-      "direction": "outbound",
-      "weight": 0.0108
-    },
-    {
-      "source": "code-sym-ascend-7de3970d8724",
-      "target": "code-mod-ascend-9be03e50c869",
-      "type": "contains",
-      "direction": "outbound",
-      "weight": 0.0108
-    },
-    {
-      "source": "code-sym-ascend-f0a1ce47ba06",
-      "target": "code-mod-ascend-9125b127dc83",
-      "type": "contains",
-      "direction": "outbound",
-      "weight": 0.0108
-    },
-    {
-      "source": "code-sym-ascend-624b1dd7e336",
-      "target": "code-mod-ascend-ea9fb3a03d98",
-      "type": "contains",
-      "direction": "outbound",
-      "weight": 0.0108
-    },
-    {
-      "source": "code-mod-ascend-0742dfec6f67",
-      "target": "code-mod-ascend-dffef2702eff",
-      "type": "related",
-      "direction": "outbound",
-      "weight": 0.0108
-    },
-    {
-      "source": "code-mod-ascend-0742dfec6f67",
-      "target": "code-mod-ascend-725f66c774d4",
-      "type": "related",
-      "direction": "outbound",
-      "weight": 0.0108
-    },
-    {
-      "source": "code-mod-ascend-acdea81e5d6f",
+      "source": "code-sym-ascend-47be48307072",
       "target": "code-mod-ascend-af3c631454c7",
-      "type": "related",
-      "direction": "outbound",
-      "weight": 0.0108
-    },
-    {
-      "source": "code-mod-ascend-725f66c774d4",
-      "target": "code-mod-ascend-0742dfec6f67",
-      "type": "related",
-      "direction": "outbound",
-      "weight": 0.0108
-    },
-    {
-      "source": "code-mod-ascend-725f66c774d4",
-      "target": "code-mod-ascend-845582807cc8",
-      "type": "related",
-      "direction": "outbound",
-      "weight": 0.0108
-    },
-    {
-      "source": "code-mod-ascend-845582807cc8",
-      "target": "code-mod-ascend-725f66c774d4",
-      "type": "related",
-      "direction": "outbound",
-      "weight": 0.0108
-    },
-    {
-      "source": "code-sym-ascend-e5a35793824b",
-      "target": "code-mod-ascend-6906bdfdd2de",
       "type": "contains",
-      "direction": "outbound",
-      "weight": 0.0108
+      "weight": 0.6
     },
     {
-      "source": "code-sym-ascend-808c418deefc",
-      "target": "code-mod-ascend-59364203d951",
-      "type": "contains",
       "direction": "outbound",
-      "weight": 0.0108
-    },
-    {
-      "source": "code-sym-ascend-808c418deefc",
-      "target": "code-mod-ascend-6906bdfdd2de",
-      "type": "contains",
-      "direction": "outbound",
-      "weight": 0.0108
-    },
-    {
-      "source": "code-sym-ascend-eb1fb9b3874e",
-      "target": "code-mod-ascend-59364203d951",
-      "type": "contains",
-      "direction": "outbound",
-      "weight": 0.0108
-    },
-    {
-      "source": "code-sym-ascend-8a7356e4092b",
-      "target": "code-mod-ascend-59364203d951",
-      "type": "contains",
-      "direction": "outbound",
-      "weight": 0.0108
-    },
-    {
-      "source": "code-sym-ascend-c59d0d08d764",
-      "target": "code-mod-ascend-4c0b78329eba",
-      "type": "contains",
-      "direction": "outbound",
-      "weight": 0.0108
-    },
-    {
-      "source": "code-sym-ascend-c59d0d08d764",
-      "target": "code-mod-ascend-6906bdfdd2de",
-      "type": "contains",
-      "direction": "outbound",
-      "weight": 0.0108
-    },
-    {
-      "source": "code-sym-ascend-c75295eb43a5",
-      "target": "code-mod-ascend-df6380ff17e8",
-      "type": "contains",
-      "direction": "outbound",
-      "weight": 0.0108
-    },
-    {
-      "source": "code-sym-ascend-c75295eb43a5",
-      "target": "code-mod-ascend-59364203d951",
-      "type": "contains",
-      "direction": "outbound",
-      "weight": 0.0108
-    },
-    {
-      "source": "code-sym-ascend-10e7104890da",
-      "target": "code-mod-ascend-df6380ff17e8",
-      "type": "contains",
-      "direction": "outbound",
-      "weight": 0.0108
-    },
-    {
-      "source": "code-sym-ascend-10e7104890da",
-      "target": "code-mod-ascend-59364203d951",
-      "type": "contains",
-      "direction": "outbound",
-      "weight": 0.0108
-    },
-    {
-      "source": "code-sym-ascend-d0494b3b962a",
-      "target": "code-mod-ascend-a9dae5e26959",
-      "type": "contains",
-      "direction": "outbound",
-      "weight": 0.0108
-    },
-    {
       "source": "code-sym-ascend-4cdbf5cade0a",
       "target": "code-mod-ascend-a216eb390608",
       "type": "contains",
-      "direction": "outbound",
-      "weight": 0.0108
+      "weight": 0.6
     },
     {
-      "source": "code-sym-ascend-6f10937f8ae4",
-      "target": "code-mod-ascend-62abf3f28ee3",
+      "direction": "outbound",
+      "source": "code-sym-ascend-4cfbb3385900",
+      "target": "code-mod-ascend-fa1d2c8dea8f",
       "type": "contains",
-      "direction": "outbound",
-      "weight": 0.0108
+      "weight": 0.6
     },
     {
-      "source": "code-sym-ascend-6f10937f8ae4",
-      "target": "code-mod-ascend-a216eb390608",
+      "direction": "outbound",
+      "source": "code-sym-ascend-557fe71a29ba",
+      "target": "code-mod-ascend-13927e0d513a",
       "type": "contains",
-      "direction": "outbound",
-      "weight": 0.0108
+      "weight": 0.6
     },
     {
+      "direction": "outbound",
+      "source": "code-sym-ascend-55f232e0787e",
+      "target": "code-mod-ascend-99872290f376",
+      "type": "contains",
+      "weight": 0.6
+    },
+    {
+      "direction": "outbound",
+      "source": "code-sym-ascend-624b1dd7e336",
+      "target": "code-mod-ascend-ea9fb3a03d98",
+      "type": "contains",
+      "weight": 0.6
+    },
+    {
+      "direction": "outbound",
       "source": "code-sym-ascend-6305ee2a797b",
       "target": "code-mod-ascend-c08d22ce9175",
       "type": "contains",
-      "direction": "outbound",
-      "weight": 0.0108
+      "weight": 0.6
     },
     {
+      "direction": "outbound",
+      "source": "code-sym-ascend-6466e5fccead",
+      "target": "code-mod-ascend-fa1d2c8dea8f",
+      "type": "contains",
+      "weight": 0.6
+    },
+    {
+      "direction": "outbound",
+      "source": "code-sym-ascend-6f10937f8ae4",
+      "target": "code-mod-ascend-62abf3f28ee3",
+      "type": "contains",
+      "weight": 0.6
+    },
+    {
+      "direction": "outbound",
+      "source": "code-sym-ascend-73f75d0cc6bd",
+      "target": "code-mod-ascend-99872290f376",
+      "type": "contains",
+      "weight": 0.6
+    },
+    {
+      "direction": "outbound",
+      "source": "code-sym-ascend-76bf6706daf9",
+      "target": "code-mod-ascend-c5ae00cf9251",
+      "type": "contains",
+      "weight": 0.6
+    },
+    {
+      "direction": "outbound",
+      "source": "code-sym-ascend-7de3970d8724",
+      "target": "code-mod-ascend-9be03e50c869",
+      "type": "contains",
+      "weight": 0.6
+    },
+    {
+      "direction": "outbound",
+      "source": "code-sym-ascend-808c418deefc",
+      "target": "code-mod-ascend-59364203d951",
+      "type": "contains",
+      "weight": 0.6
+    },
+    {
+      "direction": "outbound",
+      "source": "code-sym-ascend-83e47b3c2f63",
+      "target": "code-mod-ascend-dffef2702eff",
+      "type": "contains",
+      "weight": 0.6
+    },
+    {
+      "direction": "outbound",
+      "source": "code-sym-ascend-84032c4f20f7",
+      "target": "code-mod-ascend-ccb3adeab190",
+      "type": "contains",
+      "weight": 0.6
+    },
+    {
+      "direction": "outbound",
+      "source": "code-sym-ascend-85228f87fa7b",
+      "target": "code-mod-ascend-445464bab6d7",
+      "type": "contains",
+      "weight": 0.6
+    },
+    {
+      "direction": "outbound",
+      "source": "code-sym-ascend-8920aba6ff22",
+      "target": "code-mod-ascend-dffef2702eff",
+      "type": "contains",
+      "weight": 0.6
+    },
+    {
+      "direction": "outbound",
+      "source": "code-sym-ascend-8a7356e4092b",
+      "target": "code-mod-ascend-59364203d951",
+      "type": "contains",
+      "weight": 0.6
+    },
+    {
+      "direction": "outbound",
+      "source": "code-sym-ascend-989ad60b640d",
+      "target": "code-mod-ascend-c5ae00cf9251",
+      "type": "contains",
+      "weight": 0.6
+    },
+    {
+      "direction": "outbound",
+      "source": "code-sym-ascend-98aa298c838c",
+      "target": "code-mod-ascend-f91401ba2498",
+      "type": "contains",
+      "weight": 0.6
+    },
+    {
+      "direction": "outbound",
+      "source": "code-sym-ascend-a699173579e4",
+      "target": "code-mod-ascend-8852bd533b73",
+      "type": "contains",
+      "weight": 0.6
+    },
+    {
+      "direction": "outbound",
+      "source": "code-sym-ascend-a8a050fad2e6",
+      "target": "code-mod-ascend-471fa8d5c833",
+      "type": "contains",
+      "weight": 0.6
+    },
+    {
+      "direction": "outbound",
+      "source": "code-sym-ascend-aeb7957f8620",
+      "target": "code-mod-ascend-fa1d2c8dea8f",
+      "type": "contains",
+      "weight": 0.6
+    },
+    {
+      "direction": "outbound",
+      "source": "code-sym-ascend-c201a7482519",
+      "target": "code-mod-ascend-5e60ab6a1224",
+      "type": "contains",
+      "weight": 0.6
+    },
+    {
+      "direction": "outbound",
+      "source": "code-sym-ascend-c59d0d08d764",
+      "target": "code-mod-ascend-4c0b78329eba",
+      "type": "contains",
+      "weight": 0.6
+    },
+    {
+      "direction": "outbound",
+      "source": "code-sym-ascend-c75295eb43a5",
+      "target": "code-mod-ascend-df6380ff17e8",
+      "type": "contains",
+      "weight": 0.6
+    },
+    {
+      "direction": "outbound",
+      "source": "code-sym-ascend-d0494b3b962a",
+      "target": "code-mod-ascend-a9dae5e26959",
+      "type": "contains",
+      "weight": 0.6
+    },
+    {
+      "direction": "outbound",
+      "source": "code-sym-ascend-d2aada0f8c22",
+      "target": "code-mod-ascend-dffef2702eff",
+      "type": "contains",
+      "weight": 0.6
+    },
+    {
+      "direction": "outbound",
+      "source": "code-sym-ascend-d807fae4241e",
+      "target": "code-mod-ascend-a80692c41e02",
+      "type": "contains",
+      "weight": 0.6
+    },
+    {
+      "direction": "outbound",
+      "source": "code-sym-ascend-e5a35793824b",
+      "target": "code-mod-ascend-6906bdfdd2de",
+      "type": "contains",
+      "weight": 0.6
+    },
+    {
+      "direction": "outbound",
+      "source": "code-sym-ascend-e66b5b4aa247",
+      "target": "code-mod-ascend-9be03e50c869",
+      "type": "contains",
+      "weight": 0.6
+    },
+    {
+      "direction": "outbound",
+      "source": "code-sym-ascend-e73d8ac3f5e6",
+      "target": "code-mod-ascend-99872290f376",
+      "type": "contains",
+      "weight": 0.6
+    },
+    {
+      "direction": "outbound",
+      "source": "code-sym-ascend-e8e54e479a20",
+      "target": "code-mod-ascend-5e60ab6a1224",
+      "type": "contains",
+      "weight": 0.6
+    },
+    {
+      "direction": "outbound",
+      "source": "code-sym-ascend-e915a78ceb8f",
+      "target": "code-mod-ascend-5e60ab6a1224",
+      "type": "contains",
+      "weight": 0.6
+    },
+    {
+      "direction": "outbound",
+      "source": "code-sym-ascend-eb1fb9b3874e",
+      "target": "code-mod-ascend-59364203d951",
+      "type": "contains",
+      "weight": 0.6
+    },
+    {
+      "direction": "outbound",
+      "source": "code-sym-ascend-ec924f1cc443",
+      "target": "code-mod-ascend-fa1d2c8dea8f",
+      "type": "contains",
+      "weight": 0.6
+    },
+    {
+      "direction": "outbound",
+      "source": "code-sym-ascend-f0a1ce47ba06",
+      "target": "code-mod-ascend-9125b127dc83",
+      "type": "contains",
+      "weight": 0.6
+    },
+    {
+      "direction": "outbound",
+      "source": "code-sym-ascend-f707de54f9f9",
+      "target": "code-mod-ascend-ed4ee3dc8020",
+      "type": "contains",
+      "weight": 0.6
+    },
+    {
+      "direction": "outbound",
       "source": "code-sym-ascend-fbc9627d7424",
       "target": "code-mod-ascend-342770d311ac",
       "type": "contains",
-      "direction": "outbound",
-      "weight": 0.0108
-    },
-    {
-      "source": "code-sym-ascend-fbc9627d7424",
-      "target": "code-mod-ascend-c08d22ce9175",
-      "type": "contains",
-      "direction": "outbound",
-      "weight": 0.0108
+      "weight": 0.6
     }
   ],
   "layers": [
     {
+      "description": "Kindex-inferred core layer.",
       "id": "core",
       "name": "Core",
-      "description": "Kindex-inferred core layer.",
       "nodeIds": [
         "code-mod-ascend-1680ae19e7e8",
         "code-mod-ascend-17336787c33a",
@@ -2573,23 +388,13 @@
         "code-mod-ascend-da7eac8b507e",
         "code-mod-ascend-df6380ff17e8",
         "code-mod-ascend-dffef2702eff",
-        "code-mod-ascend-e51bef8eaafb",
-        "code-sym-ascend-10e7104890da",
-        "code-sym-ascend-6305ee2a797b",
-        "code-sym-ascend-808c418deefc",
-        "code-sym-ascend-8a7356e4092b",
-        "code-sym-ascend-c59d0d08d764",
-        "code-sym-ascend-c75295eb43a5",
-        "code-sym-ascend-d0494b3b962a",
-        "code-sym-ascend-e5a35793824b",
-        "code-sym-ascend-eb1fb9b3874e",
-        "code-sym-ascend-fbc9627d7424"
+        "code-mod-ascend-e51bef8eaafb"
       ]
     },
     {
+      "description": "Kindex-inferred data layer.",
       "id": "data",
       "name": "Data",
-      "description": "Kindex-inferred data layer.",
       "nodeIds": [
         "code-mod-ascend-0742dfec6f67",
         "code-mod-ascend-62abf3f28ee3",
@@ -2597,17 +402,16 @@
         "code-mod-ascend-a216eb390608",
         "code-mod-ascend-a80692c41e02",
         "code-mod-ascend-ccb3adeab190",
-        "code-mod-ascend-fa1d2c8dea8f",
-        "code-sym-ascend-4cdbf5cade0a",
-        "code-sym-ascend-6f10937f8ae4"
+        "code-mod-ascend-fa1d2c8dea8f"
       ]
     },
     {
+      "description": "Kindex-inferred domain layer.",
       "id": "domain",
       "name": "Domain",
-      "description": "Kindex-inferred domain layer.",
       "nodeIds": [
         "code-sym-ascend-0a04bf88c945",
+        "code-sym-ascend-10e7104890da",
         "code-sym-ascend-122b776800c9",
         "code-sym-ascend-154decdd72d5",
         "code-sym-ascend-1a2d04a3411a",
@@ -2617,39 +421,50 @@
         "code-sym-ascend-439350c3ab43",
         "code-sym-ascend-477f8cf8c177",
         "code-sym-ascend-47be48307072",
+        "code-sym-ascend-4cdbf5cade0a",
         "code-sym-ascend-4cfbb3385900",
         "code-sym-ascend-557fe71a29ba",
         "code-sym-ascend-55f232e0787e",
         "code-sym-ascend-624b1dd7e336",
+        "code-sym-ascend-6305ee2a797b",
         "code-sym-ascend-6466e5fccead",
+        "code-sym-ascend-6f10937f8ae4",
         "code-sym-ascend-73f75d0cc6bd",
         "code-sym-ascend-76bf6706daf9",
         "code-sym-ascend-7de3970d8724",
+        "code-sym-ascend-808c418deefc",
         "code-sym-ascend-83e47b3c2f63",
         "code-sym-ascend-84032c4f20f7",
         "code-sym-ascend-85228f87fa7b",
         "code-sym-ascend-8920aba6ff22",
+        "code-sym-ascend-8a7356e4092b",
         "code-sym-ascend-989ad60b640d",
         "code-sym-ascend-98aa298c838c",
         "code-sym-ascend-a699173579e4",
         "code-sym-ascend-a8a050fad2e6",
         "code-sym-ascend-aeb7957f8620",
         "code-sym-ascend-c201a7482519",
+        "code-sym-ascend-c59d0d08d764",
+        "code-sym-ascend-c75295eb43a5",
+        "code-sym-ascend-d0494b3b962a",
         "code-sym-ascend-d2aada0f8c22",
         "code-sym-ascend-d807fae4241e",
+        "code-sym-ascend-e5a35793824b",
         "code-sym-ascend-e66b5b4aa247",
         "code-sym-ascend-e73d8ac3f5e6",
         "code-sym-ascend-e8e54e479a20",
         "code-sym-ascend-e915a78ceb8f",
+        "code-sym-ascend-eb1fb9b3874e",
         "code-sym-ascend-ec924f1cc443",
         "code-sym-ascend-f0a1ce47ba06",
-        "code-sym-ascend-f707de54f9f9"
+        "code-sym-ascend-f707de54f9f9",
+        "code-sym-ascend-fbc9627d7424"
       ]
     },
     {
+      "description": "Kindex-inferred ui layer.",
       "id": "ui",
       "name": "Ui",
-      "description": "Kindex-inferred ui layer.",
       "nodeIds": [
         "code-mod-ascend-13927e0d513a",
         "code-mod-ascend-471fa8d5c833",
@@ -2662,11 +477,1772 @@
       ]
     }
   ],
+  "nodes": [
+    {
+      "complexity": 1,
+      "filePath": "contracts/contracts_contracts_src_ascend_audit_interface_interface/interface.py",
+      "id": "code-sym-ascend-d0494b3b962a",
+      "languageNotes": {
+        "kindexType": "concept",
+        "language": "Python",
+        "toolTier": ""
+      },
+      "name": "AuditEntry",
+      "summary": "class AuditEntry (contracts/contracts_contracts_src_ascend_audit_interface_interface/interface.py:12)",
+      "tags": [
+        "code",
+        "python"
+      ],
+      "type": "class"
+    },
+    {
+      "complexity": 4,
+      "filePath": "contracts/contracts_contracts_src_ascend_audit_interface_interface/interface.py",
+      "id": "code-mod-ascend-a9dae5e26959",
+      "languageNotes": {
+        "kindexType": "artifact",
+        "language": "Python",
+        "toolTier": "C"
+      },
+      "name": "contracts/contracts_contracts_src_ascend_audit_interface_interface/interface.py",
+      "summary": "Language: Python | Path: contracts/contracts_contracts_src_ascend_audit_interface_interface/interface.py | ~63 lines ## Classes - AuditEntry",
+      "tags": [
+        "code",
+        "python"
+      ],
+      "type": "file"
+    },
+    {
+      "complexity": 3,
+      "filePath": "contracts/contracts_contracts_src_ascend_cli_interface_interface/interface.py",
+      "id": "code-mod-ascend-44ed6090291b",
+      "languageNotes": {
+        "kindexType": "artifact",
+        "language": "Python",
+        "toolTier": "C"
+      },
+      "name": "contracts/contracts_contracts_src_ascend_cli_interface_interface/interface.py",
+      "summary": "Language: Python | Path: contracts/contracts_contracts_src_ascend_cli_interface_interface/interface.py | ~45 lines ## Functions - main( argv: list[str] | None = None, ) -> None",
+      "tags": [
+        "code",
+        "python"
+      ],
+      "type": "file"
+    },
+    {
+      "complexity": 1,
+      "filePath": "contracts/contracts_contracts_src_ascend_config_interface_interface/interface.py",
+      "id": "code-sym-ascend-e5a35793824b",
+      "languageNotes": {
+        "kindexType": "concept",
+        "language": "Python",
+        "toolTier": ""
+      },
+      "name": "AscendConfig",
+      "summary": "class AscendConfig (contracts/contracts_contracts_src_ascend_config_interface_interface/interface.py:14)",
+      "tags": [
+        "code",
+        "python"
+      ],
+      "type": "class"
+    },
+    {
+      "complexity": 5,
+      "filePath": "contracts/contracts_contracts_src_ascend_config_interface_interface/interface.py",
+      "id": "code-mod-ascend-6906bdfdd2de",
+      "languageNotes": {
+        "kindexType": "artifact",
+        "language": "Python",
+        "toolTier": "C"
+      },
+      "name": "contracts/contracts_contracts_src_ascend_config_interface_interface/interface.py",
+      "summary": "Language: Python | Path: contracts/contracts_contracts_src_ascend_config_interface_interface/interface.py | ~101 lines ## Classes - AscendConfig",
+      "tags": [
+        "code",
+        "python"
+      ],
+      "type": "file"
+    },
+    {
+      "complexity": 1,
+      "filePath": "contracts/contracts_contracts_src_ascend_db_interface_interface/interface.py",
+      "id": "code-sym-ascend-4cdbf5cade0a",
+      "languageNotes": {
+        "kindexType": "concept",
+        "language": "Python",
+        "toolTier": ""
+      },
+      "name": "HealthCheckResult",
+      "summary": "class HealthCheckResult (contracts/contracts_contracts_src_ascend_db_interface_interface/interface.py:21)",
+      "tags": [
+        "code",
+        "python"
+      ],
+      "type": "class"
+    },
+    {
+      "complexity": 4,
+      "filePath": "contracts/contracts_contracts_src_ascend_db_interface_interface/interface.py",
+      "id": "code-mod-ascend-a216eb390608",
+      "languageNotes": {
+        "kindexType": "artifact",
+        "language": "Python",
+        "toolTier": "C"
+      },
+      "name": "contracts/contracts_contracts_src_ascend_db_interface_interface/interface.py",
+      "summary": "Language: Python | Path: contracts/contracts_contracts_src_ascend_db_interface_interface/interface.py | ~79 lines ## Classes - HealthCheckResult",
+      "tags": [
+        "code",
+        "python"
+      ],
+      "type": "file"
+    },
+    {
+      "complexity": 7,
+      "filePath": "contracts/contracts_contracts_src_ascend_output_interface_interface/interface.py",
+      "id": "code-mod-ascend-2666665cd713",
+      "languageNotes": {
+        "kindexType": "artifact",
+        "language": "Python",
+        "toolTier": "C"
+      },
+      "name": "contracts/contracts_contracts_src_ascend_output_interface_interface/interface.py",
+      "summary": "Language: Python | Path: contracts/contracts_contracts_src_ascend_output_interface_interface/interface.py | ~126 lines ## Functions - copy_to_clipboard( text: str, ) -> bool",
+      "tags": [
+        "code",
+        "python"
+      ],
+      "type": "file"
+    },
+    {
+      "complexity": 1,
+      "filePath": "contracts/contracts_contracts_src_ascend_scheduler_interface_interface/interface.py",
+      "id": "code-sym-ascend-6305ee2a797b",
+      "languageNotes": {
+        "kindexType": "concept",
+        "language": "Python",
+        "toolTier": ""
+      },
+      "name": "CronFields",
+      "summary": "class CronFields (contracts/contracts_contracts_src_ascend_scheduler_interface_interface/interface.py:19)",
+      "tags": [
+        "code",
+        "python"
+      ],
+      "type": "class"
+    },
+    {
+      "complexity": 13,
+      "filePath": "contracts/contracts_contracts_src_ascend_scheduler_interface_interface/interface.py",
+      "id": "code-mod-ascend-c08d22ce9175",
+      "languageNotes": {
+        "kindexType": "artifact",
+        "language": "Python",
+        "toolTier": "C"
+      },
+      "name": "contracts/contracts_contracts_src_ascend_scheduler_interface_interface/interface.py",
+      "summary": "Language: Python | Path: contracts/contracts_contracts_src_ascend_scheduler_interface_interface/interface.py | ~265 lines ## Classes - CronFields",
+      "tags": [
+        "code",
+        "python"
+      ],
+      "type": "file"
+    },
+    {
+      "complexity": 1,
+      "filePath": "contracts/contracts_contracts_src_ascend_summarizer_interface_interface/interface.py",
+      "id": "code-sym-ascend-808c418deefc",
+      "languageNotes": {
+        "kindexType": "concept",
+        "language": "Python",
+        "toolTier": ""
+      },
+      "name": "AscendConfig",
+      "summary": "class AscendConfig (contracts/contracts_contracts_src_ascend_summarizer_interface_interface/interface.py:32)",
+      "tags": [
+        "code",
+        "python"
+      ],
+      "type": "class"
+    },
+    {
+      "complexity": 1,
+      "filePath": "contracts/contracts_contracts_src_ascend_summarizer_interface_interface/interface.py",
+      "id": "code-sym-ascend-8a7356e4092b",
+      "languageNotes": {
+        "kindexType": "concept",
+        "language": "Python",
+        "toolTier": ""
+      },
+      "name": "MeetingItemKind",
+      "summary": "class MeetingItemKind(Enum) (contracts/contracts_contracts_src_ascend_summarizer_interface_interface/interface.py:18)",
+      "tags": [
+        "code",
+        "python"
+      ],
+      "type": "class"
+    },
+    {
+      "complexity": 1,
+      "filePath": "contracts/contracts_contracts_src_ascend_summarizer_interface_interface/interface.py",
+      "id": "code-sym-ascend-eb1fb9b3874e",
+      "languageNotes": {
+        "kindexType": "concept",
+        "language": "Python",
+        "toolTier": ""
+      },
+      "name": "MeetingItemExtract",
+      "summary": "class MeetingItemExtract (contracts/contracts_contracts_src_ascend_summarizer_interface_interface/interface.py:26)",
+      "tags": [
+        "code",
+        "python"
+      ],
+      "type": "class"
+    },
+    {
+      "complexity": 11,
+      "filePath": "contracts/contracts_contracts_src_ascend_summarizer_interface_interface/interface.py",
+      "id": "code-mod-ascend-59364203d951",
+      "languageNotes": {
+        "kindexType": "artifact",
+        "language": "Python",
+        "toolTier": "C"
+      },
+      "name": "contracts/contracts_contracts_src_ascend_summarizer_interface_interface/interface.py",
+      "summary": "Language: Python | Path: contracts/contracts_contracts_src_ascend_summarizer_interface_interface/interface.py | ~190 lines ## Classes - AscendConfig",
+      "tags": [
+        "code",
+        "python"
+      ],
+      "type": "file"
+    },
+    {
+      "complexity": 1,
+      "filePath": "contracts/contracts_src_ascend_audit_interface/interface.py",
+      "id": "code-sym-ascend-85228f87fa7b",
+      "languageNotes": {
+        "kindexType": "concept",
+        "language": "Python",
+        "toolTier": ""
+      },
+      "name": "AuditEntry",
+      "summary": "class AuditEntry (contracts/contracts_src_ascend_audit_interface/interface.py:11)",
+      "tags": [
+        "code",
+        "python"
+      ],
+      "type": "class"
+    },
+    {
+      "complexity": 4,
+      "filePath": "contracts/contracts_src_ascend_audit_interface/interface.py",
+      "id": "code-mod-ascend-445464bab6d7",
+      "languageNotes": {
+        "kindexType": "artifact",
+        "language": "Python",
+        "toolTier": "C"
+      },
+      "name": "contracts/contracts_src_ascend_audit_interface/interface.py",
+      "summary": "Language: Python | Path: contracts/contracts_src_ascend_audit_interface/interface.py | ~61 lines ## Classes - AuditEntry",
+      "tags": [
+        "code",
+        "python"
+      ],
+      "type": "file"
+    },
+    {
+      "complexity": 3,
+      "filePath": "contracts/contracts_src_ascend_cli_interface/interface.py",
+      "id": "code-mod-ascend-bfdf06a397b8",
+      "languageNotes": {
+        "kindexType": "artifact",
+        "language": "Python",
+        "toolTier": "C"
+      },
+      "name": "contracts/contracts_src_ascend_cli_interface/interface.py",
+      "summary": "Language: Python | Path: contracts/contracts_src_ascend_cli_interface/interface.py | ~45 lines ## Functions - main( argv: list[str] | None = None, ) -> None",
+      "tags": [
+        "code",
+        "python"
+      ],
+      "type": "file"
+    },
+    {
+      "complexity": 1,
+      "filePath": "contracts/contracts_src_ascend_config_interface/interface.py",
+      "id": "code-sym-ascend-c59d0d08d764",
+      "languageNotes": {
+        "kindexType": "concept",
+        "language": "Python",
+        "toolTier": ""
+      },
+      "name": "AscendConfig",
+      "summary": "class AscendConfig (contracts/contracts_src_ascend_config_interface/interface.py:14)",
+      "tags": [
+        "code",
+        "python"
+      ],
+      "type": "class"
+    },
+    {
+      "complexity": 5,
+      "filePath": "contracts/contracts_src_ascend_config_interface/interface.py",
+      "id": "code-mod-ascend-4c0b78329eba",
+      "languageNotes": {
+        "kindexType": "artifact",
+        "language": "Python",
+        "toolTier": "C"
+      },
+      "name": "contracts/contracts_src_ascend_config_interface/interface.py",
+      "summary": "Language: Python | Path: contracts/contracts_src_ascend_config_interface/interface.py | ~101 lines ## Classes - AscendConfig",
+      "tags": [
+        "code",
+        "python"
+      ],
+      "type": "file"
+    },
+    {
+      "complexity": 1,
+      "filePath": "contracts/contracts_src_ascend_db_interface/interface.py",
+      "id": "code-sym-ascend-6f10937f8ae4",
+      "languageNotes": {
+        "kindexType": "concept",
+        "language": "Python",
+        "toolTier": ""
+      },
+      "name": "HealthCheckResult",
+      "summary": "class HealthCheckResult (contracts/contracts_src_ascend_db_interface/interface.py:21)",
+      "tags": [
+        "code",
+        "python"
+      ],
+      "type": "class"
+    },
+    {
+      "complexity": 4,
+      "filePath": "contracts/contracts_src_ascend_db_interface/interface.py",
+      "id": "code-mod-ascend-62abf3f28ee3",
+      "languageNotes": {
+        "kindexType": "artifact",
+        "language": "Python",
+        "toolTier": "C"
+      },
+      "name": "contracts/contracts_src_ascend_db_interface/interface.py",
+      "summary": "Language: Python | Path: contracts/contracts_src_ascend_db_interface/interface.py | ~79 lines ## Classes - HealthCheckResult",
+      "tags": [
+        "code",
+        "python"
+      ],
+      "type": "file"
+    },
+    {
+      "complexity": 7,
+      "filePath": "contracts/contracts_src_ascend_output_interface/interface.py",
+      "id": "code-mod-ascend-a287b356b2c0",
+      "languageNotes": {
+        "kindexType": "artifact",
+        "language": "Python",
+        "toolTier": "C"
+      },
+      "name": "contracts/contracts_src_ascend_output_interface/interface.py",
+      "summary": "Language: Python | Path: contracts/contracts_src_ascend_output_interface/interface.py | ~126 lines ## Functions - copy_to_clipboard( text: str, ) -> bool",
+      "tags": [
+        "code",
+        "python"
+      ],
+      "type": "file"
+    },
+    {
+      "complexity": 1,
+      "filePath": "contracts/contracts_src_ascend_scheduler_interface/interface.py",
+      "id": "code-sym-ascend-fbc9627d7424",
+      "languageNotes": {
+        "kindexType": "concept",
+        "language": "Python",
+        "toolTier": ""
+      },
+      "name": "CronFields",
+      "summary": "class CronFields (contracts/contracts_src_ascend_scheduler_interface/interface.py:16)",
+      "tags": [
+        "code",
+        "python"
+      ],
+      "type": "class"
+    },
+    {
+      "complexity": 13,
+      "filePath": "contracts/contracts_src_ascend_scheduler_interface/interface.py",
+      "id": "code-mod-ascend-342770d311ac",
+      "languageNotes": {
+        "kindexType": "artifact",
+        "language": "Python",
+        "toolTier": "C"
+      },
+      "name": "contracts/contracts_src_ascend_scheduler_interface/interface.py",
+      "summary": "Language: Python | Path: contracts/contracts_src_ascend_scheduler_interface/interface.py | ~258 lines ## Classes - CronFields",
+      "tags": [
+        "code",
+        "python"
+      ],
+      "type": "file"
+    },
+    {
+      "complexity": 1,
+      "filePath": "contracts/contracts_src_ascend_summarizer_interface/interface.py",
+      "id": "code-sym-ascend-10e7104890da",
+      "languageNotes": {
+        "kindexType": "concept",
+        "language": "Python",
+        "toolTier": ""
+      },
+      "name": "MeetingItemKind",
+      "summary": "class MeetingItemKind(Enum) (contracts/contracts_src_ascend_summarizer_interface/interface.py:18)",
+      "tags": [
+        "code",
+        "python"
+      ],
+      "type": "class"
+    },
+    {
+      "complexity": 1,
+      "filePath": "contracts/contracts_src_ascend_summarizer_interface/interface.py",
+      "id": "code-sym-ascend-154decdd72d5",
+      "languageNotes": {
+        "kindexType": "concept",
+        "language": "Python",
+        "toolTier": ""
+      },
+      "name": "AscendConfig",
+      "summary": "class AscendConfig (contracts/contracts_src_ascend_summarizer_interface/interface.py:32)",
+      "tags": [
+        "code",
+        "python"
+      ],
+      "type": "class"
+    },
+    {
+      "complexity": 1,
+      "filePath": "contracts/contracts_src_ascend_summarizer_interface/interface.py",
+      "id": "code-sym-ascend-c75295eb43a5",
+      "languageNotes": {
+        "kindexType": "concept",
+        "language": "Python",
+        "toolTier": ""
+      },
+      "name": "MeetingItemExtract",
+      "summary": "class MeetingItemExtract (contracts/contracts_src_ascend_summarizer_interface/interface.py:26)",
+      "tags": [
+        "code",
+        "python"
+      ],
+      "type": "class"
+    },
+    {
+      "complexity": 11,
+      "filePath": "contracts/contracts_src_ascend_summarizer_interface/interface.py",
+      "id": "code-mod-ascend-df6380ff17e8",
+      "languageNotes": {
+        "kindexType": "artifact",
+        "language": "Python",
+        "toolTier": "C"
+      },
+      "name": "contracts/contracts_src_ascend_summarizer_interface/interface.py",
+      "summary": "Language: Python | Path: contracts/contracts_src_ascend_summarizer_interface/interface.py | ~190 lines ## Classes - AscendConfig",
+      "tags": [
+        "code",
+        "python"
+      ],
+      "type": "file"
+    },
+    {
+      "complexity": 3,
+      "filePath": "contracts/src_ascend_audit/interface.py",
+      "id": "code-mod-ascend-cebca0b666e6",
+      "languageNotes": {
+        "kindexType": "artifact",
+        "language": "Python",
+        "toolTier": "C"
+      },
+      "name": "contracts/src_ascend_audit/interface.py",
+      "summary": "Language: Python | Path: contracts/src_ascend_audit/interface.py | ~59 lines ## Functions - log_operation( command: str, args: Optional[dict] = None, result: Optional[str] = None, error: Optional[str] = None, ) -> None",
+      "tags": [
+        "code",
+        "python"
+      ],
+      "type": "file"
+    },
+    {
+      "complexity": 3,
+      "filePath": "contracts/src_ascend_cli/interface.py",
+      "id": "code-mod-ascend-6f11be332804",
+      "languageNotes": {
+        "kindexType": "artifact",
+        "language": "Python",
+        "toolTier": "C"
+      },
+      "name": "contracts/src_ascend_cli/interface.py",
+      "summary": "Language: Python | Path: contracts/src_ascend_cli/interface.py | ~48 lines ## Functions - main( argv: list[str] | None = None, ) -> None",
+      "tags": [
+        "code",
+        "python"
+      ],
+      "type": "file"
+    },
+    {
+      "complexity": 1,
+      "filePath": "contracts/src_ascend_config/interface.py",
+      "id": "code-sym-ascend-1a2d04a3411a",
+      "languageNotes": {
+        "kindexType": "concept",
+        "language": "Python",
+        "toolTier": ""
+      },
+      "name": "Path",
+      "summary": "class Path (contracts/src_ascend_config/interface.py:33)",
+      "tags": [
+        "code",
+        "python"
+      ],
+      "type": "class"
+    },
+    {
+      "complexity": 1,
+      "filePath": "contracts/src_ascend_config/interface.py",
+      "id": "code-sym-ascend-439350c3ab43",
+      "languageNotes": {
+        "kindexType": "concept",
+        "language": "Python",
+        "toolTier": ""
+      },
+      "name": "AscendConfig",
+      "summary": "class AscendConfig (contracts/src_ascend_config/interface.py:17)",
+      "tags": [
+        "code",
+        "python"
+      ],
+      "type": "class"
+    },
+    {
+      "complexity": 6,
+      "filePath": "contracts/src_ascend_config/interface.py",
+      "id": "code-mod-ascend-9f3b8aafa993",
+      "languageNotes": {
+        "kindexType": "artifact",
+        "language": "Python",
+        "toolTier": "C"
+      },
+      "name": "contracts/src_ascend_config/interface.py",
+      "summary": "Language: Python | Path: contracts/src_ascend_config/interface.py | ~106 lines ## Classes - AscendConfig",
+      "tags": [
+        "code",
+        "python"
+      ],
+      "type": "file"
+    },
+    {
+      "complexity": 1,
+      "filePath": "contracts/src_ascend_db/interface.py",
+      "id": "code-sym-ascend-d807fae4241e",
+      "languageNotes": {
+        "kindexType": "concept",
+        "language": "Python",
+        "toolTier": ""
+      },
+      "name": "HealthCheckResult",
+      "summary": "class HealthCheckResult (contracts/src_ascend_db/interface.py:16)",
+      "tags": [
+        "code",
+        "python"
+      ],
+      "type": "class"
+    },
+    {
+      "complexity": 4,
+      "filePath": "contracts/src_ascend_db/interface.py",
+      "id": "code-mod-ascend-a80692c41e02",
+      "languageNotes": {
+        "kindexType": "artifact",
+        "language": "Python",
+        "toolTier": "C"
+      },
+      "name": "contracts/src_ascend_db/interface.py",
+      "summary": "Language: Python | Path: contracts/src_ascend_db/interface.py | ~75 lines ## Classes - HealthCheckResult",
+      "tags": [
+        "code",
+        "python"
+      ],
+      "type": "file"
+    },
+    {
+      "complexity": 7,
+      "filePath": "contracts/src_ascend_output/interface.py",
+      "id": "code-mod-ascend-7d4db8eba8d0",
+      "languageNotes": {
+        "kindexType": "artifact",
+        "language": "Python",
+        "toolTier": "C"
+      },
+      "name": "contracts/src_ascend_output/interface.py",
+      "summary": "Language: Python | Path: contracts/src_ascend_output/interface.py | ~126 lines ## Functions - copy_to_clipboard( text: str, ) -> bool",
+      "tags": [
+        "code",
+        "python"
+      ],
+      "type": "file"
+    },
+    {
+      "complexity": 1,
+      "filePath": "contracts/src_ascend_scheduler/interface.py",
+      "id": "code-sym-ascend-1e56b5218000",
+      "languageNotes": {
+        "kindexType": "concept",
+        "language": "Python",
+        "toolTier": ""
+      },
+      "name": "CronFields",
+      "summary": "class CronFields (contracts/src_ascend_scheduler/interface.py:44)",
+      "tags": [
+        "code",
+        "python"
+      ],
+      "type": "class"
+    },
+    {
+      "complexity": 15,
+      "filePath": "contracts/src_ascend_scheduler/interface.py",
+      "id": "code-mod-ascend-4af453c987e3",
+      "languageNotes": {
+        "kindexType": "artifact",
+        "language": "Python",
+        "toolTier": "C"
+      },
+      "name": "contracts/src_ascend_scheduler/interface.py",
+      "summary": "Language: Python | Path: contracts/src_ascend_scheduler/interface.py | ~287 lines ## Classes - CronFields",
+      "tags": [
+        "code",
+        "python"
+      ],
+      "type": "file"
+    },
+    {
+      "complexity": 1,
+      "filePath": "contracts/src_ascend_summarizer/interface.py",
+      "id": "code-sym-ascend-76bf6706daf9",
+      "languageNotes": {
+        "kindexType": "concept",
+        "language": "Python",
+        "toolTier": ""
+      },
+      "name": "MeetingItemKind",
+      "summary": "class MeetingItemKind(Enum) (contracts/src_ascend_summarizer/interface.py:13)",
+      "tags": [
+        "code",
+        "python"
+      ],
+      "type": "class"
+    },
+    {
+      "complexity": 1,
+      "filePath": "contracts/src_ascend_summarizer/interface.py",
+      "id": "code-sym-ascend-989ad60b640d",
+      "languageNotes": {
+        "kindexType": "concept",
+        "language": "Python",
+        "toolTier": ""
+      },
+      "name": "MeetingItemExtract",
+      "summary": "class MeetingItemExtract (contracts/src_ascend_summarizer/interface.py:21)",
+      "tags": [
+        "code",
+        "python"
+      ],
+      "type": "class"
+    },
+    {
+      "complexity": 10,
+      "filePath": "contracts/src_ascend_summarizer/interface.py",
+      "id": "code-mod-ascend-c5ae00cf9251",
+      "languageNotes": {
+        "kindexType": "artifact",
+        "language": "Python",
+        "toolTier": "C"
+      },
+      "name": "contracts/src_ascend_summarizer/interface.py",
+      "summary": "Language: Python | Path: contracts/src_ascend_summarizer/interface.py | ~209 lines ## Classes - MeetingItemExtract",
+      "tags": [
+        "code",
+        "python"
+      ],
+      "type": "file"
+    },
+    {
+      "complexity": 1,
+      "filePath": "contracts/src_ascend_transcript/interface.py",
+      "id": "code-sym-ascend-55f232e0787e",
+      "languageNotes": {
+        "kindexType": "concept",
+        "language": "Python",
+        "toolTier": ""
+      },
+      "name": "TranscriptTurn",
+      "summary": "class TranscriptTurn (contracts/src_ascend_transcript/interface.py:22)",
+      "tags": [
+        "code",
+        "python"
+      ],
+      "type": "class"
+    },
+    {
+      "complexity": 1,
+      "filePath": "contracts/src_ascend_transcript/interface.py",
+      "id": "code-sym-ascend-73f75d0cc6bd",
+      "languageNotes": {
+        "kindexType": "concept",
+        "language": "Python",
+        "toolTier": ""
+      },
+      "name": "TranscriptError",
+      "summary": "class TranscriptError (contracts/src_ascend_transcript/interface.py:17)",
+      "tags": [
+        "code",
+        "python"
+      ],
+      "type": "class"
+    },
+    {
+      "complexity": 1,
+      "filePath": "contracts/src_ascend_transcript/interface.py",
+      "id": "code-sym-ascend-e73d8ac3f5e6",
+      "languageNotes": {
+        "kindexType": "concept",
+        "language": "Python",
+        "toolTier": ""
+      },
+      "name": "ParsedTranscript",
+      "summary": "class ParsedTranscript (contracts/src_ascend_transcript/interface.py:27)",
+      "tags": [
+        "code",
+        "python"
+      ],
+      "type": "class"
+    },
+    {
+      "complexity": 10,
+      "filePath": "contracts/src_ascend_transcript/interface.py",
+      "id": "code-mod-ascend-99872290f376",
+      "languageNotes": {
+        "kindexType": "artifact",
+        "language": "Python",
+        "toolTier": "C"
+      },
+      "name": "contracts/src_ascend_transcript/interface.py",
+      "summary": "Language: Python | Path: contracts/src_ascend_transcript/interface.py | ~185 lines ## Classes - ParsedTranscript",
+      "tags": [
+        "code",
+        "python"
+      ],
+      "type": "file"
+    },
+    {
+      "complexity": 1,
+      "filePath": "src/ascend/__init__.py",
+      "id": "code-mod-ascend-725f66c774d4",
+      "languageNotes": {
+        "kindexType": "artifact",
+        "language": "Python",
+        "toolTier": "C"
+      },
+      "name": "src/ascend/__init__.py",
+      "summary": "Language: Python | Path: src/ascend/__init__.py | ~3 lines",
+      "tags": [
+        "code",
+        "python"
+      ],
+      "type": "file"
+    },
+    {
+      "complexity": 3,
+      "filePath": "src/ascend/audit.py",
+      "id": "code-mod-ascend-845582807cc8",
+      "languageNotes": {
+        "kindexType": "artifact",
+        "language": "Python",
+        "toolTier": "C"
+      },
+      "name": "src/ascend/audit.py",
+      "summary": "Language: Python | Path: src/ascend/audit.py | ~43 lines ## Functions - log_operation( command: str, *, args: Optional[dict] = None, result: Optional[str] = None, error: Optional[str] = None, ) -> None",
+      "tags": [
+        "code",
+        "python"
+      ],
+      "type": "file"
+    },
+    {
+      "complexity": 3,
+      "filePath": "src/ascend/cli.py",
+      "id": "code-mod-ascend-1c86b2708494",
+      "languageNotes": {
+        "kindexType": "artifact",
+        "language": "Python",
+        "toolTier": "C"
+      },
+      "name": "src/ascend/cli.py",
+      "summary": "Language: Python | Path: src/ascend/cli.py | ~425 lines ## Functions - main(argv: list[str] | None = None) -> None",
+      "tags": [
+        "code",
+        "python"
+      ],
+      "type": "file"
+    },
+    {
+      "complexity": 8,
+      "filePath": "src/ascend/commands/coach.py",
+      "id": "code-mod-ascend-1ac9d1f2e41c",
+      "languageNotes": {
+        "kindexType": "artifact",
+        "language": "Python",
+        "toolTier": "C"
+      },
+      "name": "src/ascend/commands/coach.py",
+      "summary": "Language: Python | Path: src/ascend/commands/coach.py | ~425 lines ## Functions - cmd_coach_analyze(args: argparse.Namespace) -> None",
+      "tags": [
+        "code",
+        "python"
+      ],
+      "type": "file"
+    },
+    {
+      "complexity": 4,
+      "filePath": "src/ascend/commands/init.py",
+      "id": "code-mod-ascend-188ac4fb563a",
+      "languageNotes": {
+        "kindexType": "artifact",
+        "language": "Python",
+        "toolTier": "C"
+      },
+      "name": "src/ascend/commands/init.py",
+      "summary": "Language: Python | Path: src/ascend/commands/init.py | ~124 lines ## Functions - cmd_config_set(args: argparse.Namespace) -> None",
+      "tags": [
+        "code",
+        "python"
+      ],
+      "type": "file"
+    },
+    {
+      "complexity": 9,
+      "filePath": "src/ascend/commands/meeting.py",
+      "id": "code-mod-ascend-e51bef8eaafb",
+      "languageNotes": {
+        "kindexType": "artifact",
+        "language": "Python",
+        "toolTier": "C"
+      },
+      "name": "src/ascend/commands/meeting.py",
+      "summary": "Language: Python | Path: src/ascend/commands/meeting.py | ~348 lines ## Functions - cmd_meeting_ingest(args: argparse.Namespace) -> None",
+      "tags": [
+        "code",
+        "python"
+      ],
+      "type": "file"
+    },
+    {
+      "complexity": 12,
+      "filePath": "src/ascend/commands/plan.py",
+      "id": "code-mod-ascend-8b9ab9e91f82",
+      "languageNotes": {
+        "kindexType": "artifact",
+        "language": "Python",
+        "toolTier": "C"
+      },
+      "name": "src/ascend/commands/plan.py",
+      "summary": "Language: Python | Path: src/ascend/commands/plan.py | ~556 lines ## Functions - cmd_plan_career(args: argparse.Namespace) -> None",
+      "tags": [
+        "code",
+        "python"
+      ],
+      "type": "file"
+    },
+    {
+      "complexity": 19,
+      "filePath": "src/ascend/commands/report.py",
+      "id": "code-mod-ascend-7fe7ce3e6f7b",
+      "languageNotes": {
+        "kindexType": "artifact",
+        "language": "Python",
+        "toolTier": "C"
+      },
+      "name": "src/ascend/commands/report.py",
+      "summary": "Language: Python | Path: src/ascend/commands/report.py | ~762 lines ## Functions - cmd_report_custom(args: argparse.Namespace) -> None",
+      "tags": [
+        "code",
+        "python"
+      ],
+      "type": "file"
+    },
+    {
+      "complexity": 16,
+      "filePath": "src/ascend/commands/roster.py",
+      "id": "code-mod-ascend-da7eac8b507e",
+      "languageNotes": {
+        "kindexType": "artifact",
+        "language": "Python",
+        "toolTier": "C"
+      },
+      "name": "src/ascend/commands/roster.py",
+      "summary": "Language: Python | Path: src/ascend/commands/roster.py | ~507 lines ## Functions - cmd_roster_add(args: argparse.Namespace) -> None",
+      "tags": [
+        "code",
+        "python"
+      ],
+      "type": "file"
+    },
+    {
+      "complexity": 7,
+      "filePath": "src/ascend/commands/schedule.py",
+      "id": "code-mod-ascend-8fe207d1853c",
+      "languageNotes": {
+        "kindexType": "artifact",
+        "language": "Python",
+        "toolTier": "C"
+      },
+      "name": "src/ascend/commands/schedule.py",
+      "summary": "Language: Python | Path: src/ascend/commands/schedule.py | ~266 lines ## Functions - cmd_schedule_add(args: argparse.Namespace) -> None",
+      "tags": [
+        "code",
+        "python"
+      ],
+      "type": "file"
+    },
+    {
+      "complexity": 17,
+      "filePath": "src/ascend/commands/sync.py",
+      "id": "code-mod-ascend-17336787c33a",
+      "languageNotes": {
+        "kindexType": "artifact",
+        "language": "Python",
+        "toolTier": "C"
+      },
+      "name": "src/ascend/commands/sync.py",
+      "summary": "Language: Python | Path: src/ascend/commands/sync.py | ~347 lines ## Functions - cmd_sync(args: argparse.Namespace) -> None",
+      "tags": [
+        "code",
+        "python"
+      ],
+      "type": "file"
+    },
+    {
+      "complexity": 5,
+      "filePath": "src/ascend/commands/team.py",
+      "id": "code-mod-ascend-85b659c0b2d3",
+      "languageNotes": {
+        "kindexType": "artifact",
+        "language": "Python",
+        "toolTier": "C"
+      },
+      "name": "src/ascend/commands/team.py",
+      "summary": "Language: Python | Path: src/ascend/commands/team.py | ~156 lines ## Functions - cmd_team_add(args: argparse.Namespace) -> None",
+      "tags": [
+        "code",
+        "python"
+      ],
+      "type": "file"
+    },
+    {
+      "complexity": 1,
+      "filePath": "src/ascend/config.py",
+      "id": "code-sym-ascend-a699173579e4",
+      "languageNotes": {
+        "kindexType": "concept",
+        "language": "Python",
+        "toolTier": ""
+      },
+      "name": "AscendConfig",
+      "summary": "class AscendConfig(BaseModel) (src/ascend/config.py:35)",
+      "tags": [
+        "code",
+        "python"
+      ],
+      "type": "class"
+    },
+    {
+      "complexity": 5,
+      "filePath": "src/ascend/config.py",
+      "id": "code-mod-ascend-8852bd533b73",
+      "languageNotes": {
+        "kindexType": "artifact",
+        "language": "Python",
+        "toolTier": "C"
+      },
+      "name": "src/ascend/config.py",
+      "summary": "Language: Python | Path: src/ascend/config.py | ~79 lines ## Classes - AscendConfig(BaseModel)",
+      "tags": [
+        "code",
+        "python"
+      ],
+      "type": "file"
+    },
+    {
+      "complexity": 3,
+      "filePath": "src/ascend/db.py",
+      "id": "code-mod-ascend-0742dfec6f67",
+      "languageNotes": {
+        "kindexType": "artifact",
+        "language": "Python",
+        "toolTier": "C"
+      },
+      "name": "src/ascend/db.py",
+      "summary": "Language: Python | Path: src/ascend/db.py | ~196 lines ## Functions - check_db(db_path: Path) -> dict",
+      "tags": [
+        "code",
+        "python"
+      ],
+      "type": "file"
+    },
+    {
+      "complexity": 9,
+      "filePath": "src/ascend/integrations/github.py",
+      "id": "code-mod-ascend-4d3db4ca2522",
+      "languageNotes": {
+        "kindexType": "artifact",
+        "language": "Python",
+        "toolTier": "C"
+      },
+      "name": "src/ascend/integrations/github.py",
+      "summary": "Language: Python | Path: src/ascend/integrations/github.py | ~306 lines ## Functions - clear_pr_cache() -> None",
+      "tags": [
+        "code",
+        "python"
+      ],
+      "type": "file"
+    },
+    {
+      "complexity": 8,
+      "filePath": "src/ascend/integrations/linear.py",
+      "id": "code-mod-ascend-a2ce0a13a2af",
+      "languageNotes": {
+        "kindexType": "artifact",
+        "language": "Python",
+        "toolTier": "C"
+      },
+      "name": "src/ascend/integrations/linear.py",
+      "summary": "Language: Python | Path: src/ascend/integrations/linear.py | ~343 lines ## Functions - fetch_all_issues(api_key: str, team_id: str) -> list[dict[str,Any]]",
+      "tags": [
+        "code",
+        "python"
+      ],
+      "type": "file"
+    },
+    {
+      "complexity": 5,
+      "filePath": "src/ascend/integrations/slack.py",
+      "id": "code-mod-ascend-1680ae19e7e8",
+      "languageNotes": {
+        "kindexType": "artifact",
+        "language": "Python",
+        "toolTier": "C"
+      },
+      "name": "src/ascend/integrations/slack.py",
+      "summary": "Language: Python | Path: src/ascend/integrations/slack.py | ~167 lines ## Functions - detect_signals(text: str) -> list[str]",
+      "tags": [
+        "code",
+        "python"
+      ],
+      "type": "file"
+    },
+    {
+      "complexity": 2,
+      "filePath": "src/ascend/integrations/snapshot.py",
+      "id": "code-mod-ascend-44a4e7716903",
+      "languageNotes": {
+        "kindexType": "artifact",
+        "language": "Python",
+        "toolTier": "C"
+      },
+      "name": "src/ascend/integrations/snapshot.py",
+      "summary": "Language: Python | Path: src/ascend/integrations/snapshot.py | ~127 lines ## Functions - take_all_snapshots( conn: sqlite3.Connection, config: AscendConfig, *, hours: int = 24, since: Optional[datetime] = None, until: Optional[datetime] = None, date_str: Optional[str] = None, skip_linear: bool = False, skip_fetch: bool = False, ) -> list[dict[str,Any]]",
+      "tags": [
+        "code",
+        "python"
+      ],
+      "type": "file"
+    },
+    {
+      "complexity": 1,
+      "filePath": "src/ascend/models/member.py",
+      "id": "code-sym-ascend-0a04bf88c945",
+      "languageNotes": {
+        "kindexType": "concept",
+        "language": "Python",
+        "toolTier": ""
+      },
+      "name": "Goal",
+      "summary": "class Goal(BaseModel) (src/ascend/models/member.py:59)",
+      "tags": [
+        "code",
+        "python"
+      ],
+      "type": "class"
+    },
+    {
+      "complexity": 1,
+      "filePath": "src/ascend/models/member.py",
+      "id": "code-sym-ascend-3869fe7094ec",
+      "languageNotes": {
+        "kindexType": "concept",
+        "language": "Python",
+        "toolTier": ""
+      },
+      "name": "CoachingEntry",
+      "summary": "class CoachingEntry(BaseModel) (src/ascend/models/member.py:84)",
+      "tags": [
+        "code",
+        "python"
+      ],
+      "type": "class"
+    },
+    {
+      "complexity": 1,
+      "filePath": "src/ascend/models/member.py",
+      "id": "code-sym-ascend-3b596f63055b",
+      "languageNotes": {
+        "kindexType": "concept",
+        "language": "Python",
+        "toolTier": ""
+      },
+      "name": "PerformanceSnapshot",
+      "summary": "class PerformanceSnapshot(BaseModel) (src/ascend/models/member.py:74)",
+      "tags": [
+        "code",
+        "python"
+      ],
+      "type": "class"
+    },
+    {
+      "complexity": 1,
+      "filePath": "src/ascend/models/member.py",
+      "id": "code-sym-ascend-477f8cf8c177",
+      "languageNotes": {
+        "kindexType": "concept",
+        "language": "Python",
+        "toolTier": ""
+      },
+      "name": "Meeting",
+      "summary": "class Meeting(BaseModel) (src/ascend/models/member.py:47)",
+      "tags": [
+        "code",
+        "python"
+      ],
+      "type": "class"
+    },
+    {
+      "complexity": 1,
+      "filePath": "src/ascend/models/member.py",
+      "id": "code-sym-ascend-4cfbb3385900",
+      "languageNotes": {
+        "kindexType": "concept",
+        "language": "Python",
+        "toolTier": ""
+      },
+      "name": "MeetingItem",
+      "summary": "class MeetingItem(BaseModel) (src/ascend/models/member.py:38)",
+      "tags": [
+        "code",
+        "python"
+      ],
+      "type": "class"
+    },
+    {
+      "complexity": 1,
+      "filePath": "src/ascend/models/member.py",
+      "id": "code-sym-ascend-6466e5fccead",
+      "languageNotes": {
+        "kindexType": "concept",
+        "language": "Python",
+        "toolTier": ""
+      },
+      "name": "Team",
+      "summary": "class Team(BaseModel) (src/ascend/models/member.py:27)",
+      "tags": [
+        "code",
+        "python"
+      ],
+      "type": "class"
+    },
+    {
+      "complexity": 1,
+      "filePath": "src/ascend/models/member.py",
+      "id": "code-sym-ascend-aeb7957f8620",
+      "languageNotes": {
+        "kindexType": "concept",
+        "language": "Python",
+        "toolTier": ""
+      },
+      "name": "Member",
+      "summary": "class Member(BaseModel) (src/ascend/models/member.py:11)",
+      "tags": [
+        "code",
+        "python"
+      ],
+      "type": "class"
+    },
+    {
+      "complexity": 1,
+      "filePath": "src/ascend/models/member.py",
+      "id": "code-sym-ascend-ec924f1cc443",
+      "languageNotes": {
+        "kindexType": "concept",
+        "language": "Python",
+        "toolTier": ""
+      },
+      "name": "Schedule",
+      "summary": "class Schedule(BaseModel) (src/ascend/models/member.py:92)",
+      "tags": [
+        "code",
+        "python"
+      ],
+      "type": "class"
+    },
+    {
+      "complexity": 8,
+      "filePath": "src/ascend/models/member.py",
+      "id": "code-mod-ascend-fa1d2c8dea8f",
+      "languageNotes": {
+        "kindexType": "artifact",
+        "language": "Python",
+        "toolTier": "C"
+      },
+      "name": "src/ascend/models/member.py",
+      "summary": "Language: Python | Path: src/ascend/models/member.py | ~100 lines ## Classes - CoachingEntry(BaseModel)",
+      "tags": [
+        "code",
+        "python"
+      ],
+      "type": "file"
+    },
+    {
+      "complexity": 7,
+      "filePath": "src/ascend/output.py",
+      "id": "code-mod-ascend-acdea81e5d6f",
+      "languageNotes": {
+        "kindexType": "artifact",
+        "language": "Python",
+        "toolTier": "C"
+      },
+      "name": "src/ascend/output.py",
+      "summary": "Language: Python | Path: src/ascend/output.py | ~101 lines ## Functions - copy_to_clipboard(text: str) -> bool",
+      "tags": [
+        "code",
+        "python"
+      ],
+      "type": "file"
+    },
+    {
+      "complexity": 12,
+      "filePath": "src/ascend/scheduler.py",
+      "id": "code-mod-ascend-adc83c8d24d9",
+      "languageNotes": {
+        "kindexType": "artifact",
+        "language": "Python",
+        "toolTier": "C"
+      },
+      "name": "src/ascend/scheduler.py",
+      "summary": "Language: Python | Path: src/ascend/scheduler.py | ~342 lines ## Functions - compute_next_run(cron_expr: str, after: Optional[datetime] = None) -> str",
+      "tags": [
+        "code",
+        "python"
+      ],
+      "type": "file"
+    },
+    {
+      "complexity": 1,
+      "filePath": "src/ascend/summarizer.py",
+      "id": "code-sym-ascend-7de3970d8724",
+      "languageNotes": {
+        "kindexType": "concept",
+        "language": "Python",
+        "toolTier": ""
+      },
+      "name": "MeetingItemKind",
+      "summary": "class MeetingItemKind(str, Enum) (src/ascend/summarizer.py:50)",
+      "tags": [
+        "code",
+        "python"
+      ],
+      "type": "class"
+    },
+    {
+      "complexity": 1,
+      "filePath": "src/ascend/summarizer.py",
+      "id": "code-sym-ascend-e66b5b4aa247",
+      "languageNotes": {
+        "kindexType": "concept",
+        "language": "Python",
+        "toolTier": ""
+      },
+      "name": "MeetingItemExtract",
+      "summary": "class MeetingItemExtract(BaseModel) (src/ascend/summarizer.py:58) ## Methods - content_must_be_nonempty(cls, v: str) -> str",
+      "tags": [
+        "code",
+        "python"
+      ],
+      "type": "class"
+    },
+    {
+      "complexity": 9,
+      "filePath": "src/ascend/summarizer.py",
+      "id": "code-mod-ascend-9be03e50c869",
+      "languageNotes": {
+        "kindexType": "artifact",
+        "language": "Python",
+        "toolTier": "C"
+      },
+      "name": "src/ascend/summarizer.py",
+      "summary": "Language: Python | Path: src/ascend/summarizer.py | ~221 lines ## Classes - MeetingItemExtract(BaseModel)",
+      "tags": [
+        "code",
+        "python"
+      ],
+      "type": "file"
+    },
+    {
+      "complexity": 1,
+      "filePath": "src/ascend/transcript.py",
+      "id": "code-sym-ascend-83e47b3c2f63",
+      "languageNotes": {
+        "kindexType": "concept",
+        "language": "Python",
+        "toolTier": ""
+      },
+      "name": "ParsedTranscript",
+      "summary": "class ParsedTranscript(BaseModel) (src/ascend/transcript.py:53)",
+      "tags": [
+        "code",
+        "python"
+      ],
+      "type": "class"
+    },
+    {
+      "complexity": 1,
+      "filePath": "src/ascend/transcript.py",
+      "id": "code-sym-ascend-8920aba6ff22",
+      "languageNotes": {
+        "kindexType": "concept",
+        "language": "Python",
+        "toolTier": ""
+      },
+      "name": "TranscriptError",
+      "summary": "class TranscriptError(ValueError) (src/ascend/transcript.py:33)",
+      "tags": [
+        "code",
+        "python"
+      ],
+      "type": "class"
+    },
+    {
+      "complexity": 1,
+      "filePath": "src/ascend/transcript.py",
+      "id": "code-sym-ascend-d2aada0f8c22",
+      "languageNotes": {
+        "kindexType": "concept",
+        "language": "Python",
+        "toolTier": ""
+      },
+      "name": "TranscriptTurn",
+      "summary": "class TranscriptTurn(BaseModel) (src/ascend/transcript.py:46)",
+      "tags": [
+        "code",
+        "python"
+      ],
+      "type": "class"
+    },
+    {
+      "complexity": 9,
+      "filePath": "src/ascend/transcript.py",
+      "id": "code-mod-ascend-dffef2702eff",
+      "languageNotes": {
+        "kindexType": "artifact",
+        "language": "Python",
+        "toolTier": "C"
+      },
+      "name": "src/ascend/transcript.py",
+      "summary": "Language: Python | Path: src/ascend/transcript.py | ~217 lines ## Classes - ParsedTranscript(BaseModel)",
+      "tags": [
+        "code",
+        "python"
+      ],
+      "type": "file"
+    },
+    {
+      "complexity": 1,
+      "filePath": "src/ascend/tui/app.py",
+      "id": "code-sym-ascend-122b776800c9",
+      "languageNotes": {
+        "kindexType": "concept",
+        "language": "Python",
+        "toolTier": ""
+      },
+      "name": "Sidebar",
+      "summary": "class Sidebar(Vertical) (src/ascend/tui/app.py:103) ## Methods - compose(self) -> ComposeResult",
+      "tags": [
+        "code",
+        "python"
+      ],
+      "type": "class"
+    },
+    {
+      "complexity": 1,
+      "filePath": "src/ascend/tui/app.py",
+      "id": "code-sym-ascend-c201a7482519",
+      "languageNotes": {
+        "kindexType": "concept",
+        "language": "Python",
+        "toolTier": ""
+      },
+      "name": "AscendCommands",
+      "summary": "class AscendCommands(Provider) (src/ascend/tui/app.py:56) ## Methods - search(self, query: str) -> Hits",
+      "tags": [
+        "code",
+        "python"
+      ],
+      "type": "class"
+    },
+    {
+      "complexity": 7,
+      "filePath": "src/ascend/tui/app.py",
+      "id": "code-sym-ascend-e8e54e479a20",
+      "languageNotes": {
+        "kindexType": "concept",
+        "language": "Python",
+        "toolTier": ""
+      },
+      "name": "AscendApp",
+      "summary": "class AscendApp(App) (src/ascend/tui/app.py:112) ## Methods - action_help_overlay(self) -> None",
+      "tags": [
+        "code",
+        "python"
+      ],
+      "type": "class"
+    },
+    {
+      "complexity": 1,
+      "filePath": "src/ascend/tui/app.py",
+      "id": "code-sym-ascend-e915a78ceb8f",
+      "languageNotes": {
+        "kindexType": "concept",
+        "language": "Python",
+        "toolTier": ""
+      },
+      "name": "HelpScreen",
+      "summary": "class HelpScreen(ModalScreen) (src/ascend/tui/app.py:92) ## Methods - compose(self) -> ComposeResult",
+      "tags": [
+        "code",
+        "python"
+      ],
+      "type": "class"
+    },
+    {
+      "complexity": 4,
+      "filePath": "src/ascend/tui/app.py",
+      "id": "code-mod-ascend-5e60ab6a1224",
+      "languageNotes": {
+        "kindexType": "artifact",
+        "language": "Python",
+        "toolTier": "C"
+      },
+      "name": "src/ascend/tui/app.py",
+      "summary": "Language: Python | Path: src/ascend/tui/app.py | ~184 lines ## Classes - AscendApp(App)",
+      "tags": [
+        "code",
+        "python"
+      ],
+      "type": "file"
+    },
+    {
+      "complexity": 4,
+      "filePath": "src/ascend/tui/screens/coaching.py",
+      "id": "code-sym-ascend-557fe71a29ba",
+      "languageNotes": {
+        "kindexType": "concept",
+        "language": "Python",
+        "toolTier": ""
+      },
+      "name": "CoachingPanel",
+      "summary": "class CoachingPanel(Vertical) (src/ascend/tui/screens/coaching.py:10) ## Methods - compose(self) -> ComposeResult",
+      "tags": [
+        "code",
+        "python"
+      ],
+      "type": "class"
+    },
+    {
+      "complexity": 1,
+      "filePath": "src/ascend/tui/screens/coaching.py",
+      "id": "code-mod-ascend-13927e0d513a",
+      "languageNotes": {
+        "kindexType": "artifact",
+        "language": "Python",
+        "toolTier": "C"
+      },
+      "name": "src/ascend/tui/screens/coaching.py",
+      "summary": "Language: Python | Path: src/ascend/tui/screens/coaching.py | ~94 lines ## Classes - CoachingPanel(Vertical)",
+      "tags": [
+        "code",
+        "python"
+      ],
+      "type": "file"
+    },
+    {
+      "complexity": 3,
+      "filePath": "src/ascend/tui/screens/dashboard.py",
+      "id": "code-sym-ascend-f707de54f9f9",
+      "languageNotes": {
+        "kindexType": "concept",
+        "language": "Python",
+        "toolTier": ""
+      },
+      "name": "DashboardPanel",
+      "summary": "class DashboardPanel(ScrollableContainer) (src/ascend/tui/screens/dashboard.py:10) ## Methods - compose(self) -> ComposeResult",
+      "tags": [
+        "code",
+        "python"
+      ],
+      "type": "class"
+    },
+    {
+      "complexity": 1,
+      "filePath": "src/ascend/tui/screens/dashboard.py",
+      "id": "code-mod-ascend-ed4ee3dc8020",
+      "languageNotes": {
+        "kindexType": "artifact",
+        "language": "Python",
+        "toolTier": "C"
+      },
+      "name": "src/ascend/tui/screens/dashboard.py",
+      "summary": "Language: Python | Path: src/ascend/tui/screens/dashboard.py | ~127 lines ## Classes - DashboardPanel(ScrollableContainer)",
+      "tags": [
+        "code",
+        "python"
+      ],
+      "type": "file"
+    },
+    {
+      "complexity": 6,
+      "filePath": "src/ascend/tui/screens/meetings.py",
+      "id": "code-sym-ascend-47be48307072",
+      "languageNotes": {
+        "kindexType": "concept",
+        "language": "Python",
+        "toolTier": ""
+      },
+      "name": "MeetingsPanel",
+      "summary": "class MeetingsPanel(Vertical) (src/ascend/tui/screens/meetings.py:11) ## Methods - action_focus_search(self) -> None",
+      "tags": [
+        "code",
+        "python"
+      ],
+      "type": "class"
+    },
+    {
+      "complexity": 1,
+      "filePath": "src/ascend/tui/screens/meetings.py",
+      "id": "code-mod-ascend-af3c631454c7",
+      "languageNotes": {
+        "kindexType": "artifact",
+        "language": "Python",
+        "toolTier": "C"
+      },
+      "name": "src/ascend/tui/screens/meetings.py",
+      "summary": "Language: Python | Path: src/ascend/tui/screens/meetings.py | ~156 lines ## Classes - MeetingsPanel(Vertical)",
+      "tags": [
+        "code",
+        "python"
+      ],
+      "type": "file"
+    },
+    {
+      "complexity": 4,
+      "filePath": "src/ascend/tui/screens/reports.py",
+      "id": "code-sym-ascend-84032c4f20f7",
+      "languageNotes": {
+        "kindexType": "concept",
+        "language": "Python",
+        "toolTier": ""
+      },
+      "name": "ReportsPanel",
+      "summary": "class ReportsPanel(Vertical) (src/ascend/tui/screens/reports.py:15) ## Methods - action_regenerate(self) -> None",
+      "tags": [
+        "code",
+        "python"
+      ],
+      "type": "class"
+    },
+    {
+      "complexity": 1,
+      "filePath": "src/ascend/tui/screens/reports.py",
+      "id": "code-mod-ascend-ccb3adeab190",
+      "languageNotes": {
+        "kindexType": "artifact",
+        "language": "Python",
+        "toolTier": "C"
+      },
+      "name": "src/ascend/tui/screens/reports.py",
+      "summary": "Language: Python | Path: src/ascend/tui/screens/reports.py | ~209 lines ## Classes - ReportsPanel(Vertical)",
+      "tags": [
+        "code",
+        "python"
+      ],
+      "type": "file"
+    },
+    {
+      "complexity": 8,
+      "filePath": "src/ascend/tui/screens/roster.py",
+      "id": "code-sym-ascend-98aa298c838c",
+      "languageNotes": {
+        "kindexType": "concept",
+        "language": "Python",
+        "toolTier": ""
+      },
+      "name": "RosterPanel",
+      "summary": "class RosterPanel(Vertical) (src/ascend/tui/screens/roster.py:13) ## Methods - action_flag_member(self) -> None",
+      "tags": [
+        "code",
+        "python"
+      ],
+      "type": "class"
+    },
+    {
+      "complexity": 1,
+      "filePath": "src/ascend/tui/screens/roster.py",
+      "id": "code-mod-ascend-f91401ba2498",
+      "languageNotes": {
+        "kindexType": "artifact",
+        "language": "Python",
+        "toolTier": "C"
+      },
+      "name": "src/ascend/tui/screens/roster.py",
+      "summary": "Language: Python | Path: src/ascend/tui/screens/roster.py | ~121 lines ## Classes - RosterPanel(Vertical)",
+      "tags": [
+        "code",
+        "python"
+      ],
+      "type": "file"
+    },
+    {
+      "complexity": 7,
+      "filePath": "src/ascend/tui/screens/schedules.py",
+      "id": "code-sym-ascend-a8a050fad2e6",
+      "languageNotes": {
+        "kindexType": "concept",
+        "language": "Python",
+        "toolTier": ""
+      },
+      "name": "SchedulesPanel",
+      "summary": "class SchedulesPanel(Vertical) (src/ascend/tui/screens/schedules.py:11) ## Methods - action_disable_schedule(self) -> None",
+      "tags": [
+        "code",
+        "python"
+      ],
+      "type": "class"
+    },
+    {
+      "complexity": 1,
+      "filePath": "src/ascend/tui/screens/schedules.py",
+      "id": "code-mod-ascend-471fa8d5c833",
+      "languageNotes": {
+        "kindexType": "artifact",
+        "language": "Python",
+        "toolTier": "C"
+      },
+      "name": "src/ascend/tui/screens/schedules.py",
+      "summary": "Language: Python | Path: src/ascend/tui/screens/schedules.py | ~177 lines ## Classes - SchedulesPanel(Vertical)",
+      "tags": [
+        "code",
+        "python"
+      ],
+      "type": "file"
+    },
+    {
+      "complexity": 4,
+      "filePath": "src/ascend/tui/widgets/member_card.py",
+      "id": "code-sym-ascend-f0a1ce47ba06",
+      "languageNotes": {
+        "kindexType": "concept",
+        "language": "Python",
+        "toolTier": ""
+      },
+      "name": "MemberCard",
+      "summary": "class MemberCard(Widget) (src/ascend/tui/widgets/member_card.py:13) ## Methods - clear_card(self) -> None",
+      "tags": [
+        "code",
+        "python"
+      ],
+      "type": "class"
+    },
+    {
+      "complexity": 1,
+      "filePath": "src/ascend/tui/widgets/member_card.py",
+      "id": "code-mod-ascend-9125b127dc83",
+      "languageNotes": {
+        "kindexType": "artifact",
+        "language": "Python",
+        "toolTier": "C"
+      },
+      "name": "src/ascend/tui/widgets/member_card.py",
+      "summary": "Language: Python | Path: src/ascend/tui/widgets/member_card.py | ~131 lines ## Classes - MemberCard(Widget)",
+      "tags": [
+        "code",
+        "python"
+      ],
+      "type": "file"
+    },
+    {
+      "complexity": 3,
+      "filePath": "src/ascend/tui/widgets/metric_bar.py",
+      "id": "code-sym-ascend-624b1dd7e336",
+      "languageNotes": {
+        "kindexType": "concept",
+        "language": "Python",
+        "toolTier": ""
+      },
+      "name": "MetricBar",
+      "summary": "class MetricBar(Widget) (src/ascend/tui/widgets/metric_bar.py:11) ## Methods - render(self) -> str",
+      "tags": [
+        "code",
+        "python"
+      ],
+      "type": "class"
+    },
+    {
+      "complexity": 1,
+      "filePath": "src/ascend/tui/widgets/metric_bar.py",
+      "id": "code-mod-ascend-ea9fb3a03d98",
+      "languageNotes": {
+        "kindexType": "artifact",
+        "language": "Python",
+        "toolTier": "C"
+      },
+      "name": "src/ascend/tui/widgets/metric_bar.py",
+      "summary": "Language: Python | Path: src/ascend/tui/widgets/metric_bar.py | ~44 lines ## Classes - MetricBar(Widget)",
+      "tags": [
+        "code",
+        "python"
+      ],
+      "type": "file"
+    }
+  ],
+  "project": {
+    "analyzedAt": "2026-05-24T17:34:36-05:00",
+    "description": "Code map exported from Kindex for Ascend.",
+    "frameworks": [],
+    "gitCommitHash": "ace3a6f3a20e394c86b9cca1137a6f4476c587f3",
+    "languages": [
+      "Python"
+    ],
+    "name": "Ascend"
+  },
   "tour": [
     {
-      "order": 1,
-      "title": "Core",
-      "description": "Review 49 node(s) in the Core layer.",
+      "description": "Review 39 node(s) in the Core layer.",
       "nodeIds": [
         "code-mod-ascend-1680ae19e7e8",
         "code-mod-ascend-17336787c33a",
@@ -2693,12 +2269,12 @@
         "code-mod-ascend-8fe207d1853c",
         "code-mod-ascend-99872290f376",
         "code-mod-ascend-9be03e50c869"
-      ]
+      ],
+      "order": 1,
+      "title": "Core"
     },
     {
-      "order": 2,
-      "title": "Data",
-      "description": "Review 9 node(s) in the Data layer.",
+      "description": "Review 7 node(s) in the Data layer.",
       "nodeIds": [
         "code-mod-ascend-0742dfec6f67",
         "code-mod-ascend-62abf3f28ee3",
@@ -2706,17 +2282,16 @@
         "code-mod-ascend-a216eb390608",
         "code-mod-ascend-a80692c41e02",
         "code-mod-ascend-ccb3adeab190",
-        "code-mod-ascend-fa1d2c8dea8f",
-        "code-sym-ascend-4cdbf5cade0a",
-        "code-sym-ascend-6f10937f8ae4"
-      ]
+        "code-mod-ascend-fa1d2c8dea8f"
+      ],
+      "order": 2,
+      "title": "Data"
     },
     {
-      "order": 3,
-      "title": "Domain",
-      "description": "Review 37 node(s) in the Domain layer.",
+      "description": "Review 49 node(s) in the Domain layer.",
       "nodeIds": [
         "code-sym-ascend-0a04bf88c945",
+        "code-sym-ascend-10e7104890da",
         "code-sym-ascend-122b776800c9",
         "code-sym-ascend-154decdd72d5",
         "code-sym-ascend-1a2d04a3411a",
@@ -2726,26 +2301,25 @@
         "code-sym-ascend-439350c3ab43",
         "code-sym-ascend-477f8cf8c177",
         "code-sym-ascend-47be48307072",
+        "code-sym-ascend-4cdbf5cade0a",
         "code-sym-ascend-4cfbb3385900",
         "code-sym-ascend-557fe71a29ba",
         "code-sym-ascend-55f232e0787e",
         "code-sym-ascend-624b1dd7e336",
+        "code-sym-ascend-6305ee2a797b",
         "code-sym-ascend-6466e5fccead",
+        "code-sym-ascend-6f10937f8ae4",
         "code-sym-ascend-73f75d0cc6bd",
         "code-sym-ascend-76bf6706daf9",
         "code-sym-ascend-7de3970d8724",
+        "code-sym-ascend-808c418deefc",
         "code-sym-ascend-83e47b3c2f63",
-        "code-sym-ascend-84032c4f20f7",
-        "code-sym-ascend-85228f87fa7b",
-        "code-sym-ascend-8920aba6ff22",
-        "code-sym-ascend-989ad60b640d",
-        "code-sym-ascend-98aa298c838c",
-        "code-sym-ascend-a699173579e4"
-      ]
+        "code-sym-ascend-84032c4f20f7"
+      ],
+      "order": 3,
+      "title": "Domain"
     },
     {
-      "order": 4,
-      "title": "Ui",
       "description": "Review 8 node(s) in the Ui layer.",
       "nodeIds": [
         "code-mod-ascend-13927e0d513a",
@@ -2756,7 +2330,10 @@
         "code-mod-ascend-ea9fb3a03d98",
         "code-mod-ascend-ed4ee3dc8020",
         "code-mod-ascend-f91401ba2498"
-      ]
+      ],
+      "order": 4,
+      "title": "Ui"
     }
-  ]
+  ],
+  "version": "1.0.0"
 }
