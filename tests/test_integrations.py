@@ -158,6 +158,40 @@ class TestGitHubFetcher:
         assert result["alice"]["reviews_given"] == 2
         assert result["bob"]["reviews_given"] == 1
 
+    def test_parse_coauthors(self):
+        from ascend.integrations.github import _parse_coauthors
+        body = (
+            "Implement feature\n\n"
+            "Co-authored-by: Bob Jones <bob@example.com>\n"
+            "co-authored-by: Carol <carol@example.com>\n"
+        )
+        assert _parse_coauthors(body) == [
+            ("Bob Jones", "bob@example.com"),
+            ("Carol", "carol@example.com"),
+        ]
+        assert _parse_coauthors("") == []
+        assert _parse_coauthors("no trailers here") == []
+
+    def test_parse_commit_records(self):
+        from ascend.integrations.github import _parse_commit_records
+        rec = (
+            "abc123\x1fAlice\x1falice@example.com\x1fFix bug\x1f2025-01-15T10:00:00Z\x1f"
+            "body line\nCo-authored-by: Bob <bob@example.com>\x1e"
+        )
+        records = _parse_commit_records(rec)
+        assert len(records) == 1
+        assert records[0]["hash"] == "abc123"
+        assert records[0]["author_email"] == "alice@example.com"
+        assert "Co-authored-by: Bob" in records[0]["body"]
+
+    def test_match_handle(self):
+        from ascend.integrations.github import _match_handle
+        handles = {"alice", "bob"}
+        email_map = {"alice@corp.com": "alice"}
+        assert _match_handle("Alice A", "alice@corp.com", handles, email_map) == "alice"
+        assert _match_handle("bob", "bob@somewhere.com", handles, email_map) == "bob"
+        assert _match_handle("Nobody", "x@y.com", handles, email_map) is None
+
 
 class TestLinearFetcher:
     """Unit tests for Linear fetcher with mocked urllib."""
@@ -316,6 +350,26 @@ class TestSnapshot:
         assert result["metrics"]["reviews_given"] == 4
         # reviews_given weight is 2 → 4 * 2 = 8
         assert result["score"] == 8.0
+        conn.close()
+
+    def test_snapshot_credits_coauthored_commits(self, isolated_home):
+        from ascend.config import AscendConfig
+        from ascend.integrations.snapshot import take_snapshot
+        conn = init_db(isolated_home / "ascend.db")
+        conn.execute("INSERT INTO members (name, github, status) VALUES ('Alice', 'alice', 'active')")
+        conn.commit()
+        config = AscendConfig()
+
+        # Helping land others' commits (co-authorship) is multiplication too.
+        mock_gh = {
+            "error": None, "commits": [], "prs": {"open": [], "merged": []},
+            "reviews_given": 0, "coauthored_commits": 3,
+        }
+        with patch("ascend.integrations.github.fetch_member_github", return_value=mock_gh):
+            result = take_snapshot(1, "Alice", "alice", conn, config)
+        assert result["metrics"]["coauthored_commits"] == 3
+        # coauthored_commits weight is 1 → 3 * 1 = 3
+        assert result["score"] == 3.0
         conn.close()
 
     def test_snapshot_stored_in_db(self, isolated_home):

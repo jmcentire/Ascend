@@ -546,6 +546,30 @@ class TestRiskAlgorithm:
         assert "low visible output" not in sig
         assert risks["details"]["reviews_given_30d"] == 12
 
+    def test_coauthorship_counts_as_multiplication(self, isolated_home):
+        # Co-authorship (helping land others' commits) should count toward
+        # multiplication and explain a low direct-output index.
+        from ascend.commands.coach import _compute_risks
+        from ascend.db import get_connection
+        _init_with_member()
+        for i in range(4):
+            date = (datetime.now() - timedelta(days=i * 5)).strftime("%Y-%m-%d")
+            _add_snapshot(isolated_home, 1, date, {
+                "commits_count": 0, "prs_opened": 0, "prs_merged": 0,
+                "issues_completed": 0, "issues_in_progress": 0,
+                "reviews_given": 0, "coauthored_commits": 2,
+            }, 1.0)
+        conn = get_connection(isolated_home / "ascend.db")
+        m = dict(conn.execute("SELECT * FROM members WHERE id = 1").fetchone())
+        risks = _compute_risks(m, conn)
+        conn.close()
+        sig = " ".join(risks["signals"])
+        assert "multiplication" in sig
+        assert "co-authored" in sig
+        assert "low visible output" not in sig
+        assert risks["details"]["coauthored_commits_30d"] == 8
+        assert risks["details"]["multiplication_30d"] == 8
+
     def test_compute_risks_burnout(self, isolated_home):
         from ascend.commands.coach import _compute_risks
         from ascend.db import get_connection

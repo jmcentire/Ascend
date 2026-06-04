@@ -108,7 +108,7 @@ def _aggregate_metrics(snapshots: list[dict]) -> dict[str, int]:
     double-counting items that persist across multiple daily snapshots.
     """
     # Metrics that represent cumulative events — sum them
-    _SUM_KEYS = {"commits_count", "prs_merged", "issues_completed", "reviews_given"}
+    _SUM_KEYS = {"commits_count", "prs_merged", "issues_completed", "reviews_given", "coauthored_commits"}
     # Metrics that represent current state — take max
     _MAX_KEYS = {"prs_opened", "issues_in_progress"}
 
@@ -119,6 +119,7 @@ def _aggregate_metrics(snapshots: list[dict]) -> dict[str, int]:
         "issues_completed": 0,
         "issues_in_progress": 0,
         "reviews_given": 0,
+        "coauthored_commits": 0,
     }
     for s in snapshots:
         m = s.get("metrics", {})
@@ -280,6 +281,7 @@ def cmd_report_performance(args: argparse.Namespace) -> None:
             parts.append(f"- Issues completed: {r['metrics']['issues_completed']}")
             parts.append(f"- Issues in progress: {r['metrics']['issues_in_progress']}")
             parts.append(f"- Reviews given on others' PRs (multiplication): {r['metrics'].get('reviews_given', 0)}")
+            parts.append(f"- Co-authored commits on others' work (multiplication): {r['metrics'].get('coauthored_commits', 0)}")
             parts.append("")
             parts.append("### Visible Activity")
             parts.append("_Activity index = weighted sum of commits/PRs/issues. An indicator of visible output, not a performance verdict; prevention, multiplication, and craft do not register here._")

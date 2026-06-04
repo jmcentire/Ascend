@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import concurrent.futures
 import json
+import re
 import subprocess
 import sys
 from datetime import datetime
@@ -155,10 +156,12 @@ def fetch_all_github(
 
     handles = {m["github"] for m in members if m.get("github")}
     result: dict[str, dict[str, Any]] = {
-        h: {"error": None, "commits": [], "prs": {"open": [], "merged": []}, "reviews_given": 0}
+        h: {"error": None, "commits": [], "prs": {"open": [], "merged": []},
+            "reviews_given": 0, "coauthored_commits": 0}
         for h in handles
     }
     seen_hashes: dict[str, set[str]] = {h: set() for h in handles}
+    seen_coauthor: set[tuple[str, str]] = set()
 
     # Build email-to-handle lookup so commits authored with personal/work
     # emails are attributed correctly even when the email doesn't contain
@@ -187,9 +190,12 @@ def fetch_all_github(
             pool.map(_fetch_repo, repo_dirs)
 
     for entry in repo_dirs:
-        # Fetch ALL commits for the time window (not per-author)
+        # Fetch ALL commits for the time window (not per-author). Body (%b) is
+        # included so Co-authored-by trailers can be credited as multiplication.
+        # Fields are separated by \x1f and commits by \x1e so multi-line bodies
+        # parse cleanly.
         since_str = since.strftime("%Y-%m-%dT%H:%M:%S")
-        fmt = "%H|%an|%ae|%s|%aI"
+        fmt = "%H%x1f%an%x1f%ae%x1f%s%x1f%aI%x1f%b%x1e"
         log_cmd = [
             "git", "-C", str(entry), "log", "--all",
             f"--since={since_str}", f"--format={fmt}",
@@ -198,29 +204,28 @@ def fetch_all_github(
             log_cmd.insert(-1, f"--until={until.strftime('%Y-%m-%dT%H:%M:%S')}")
         stdout, _, rc = _run_cmd(log_cmd)
         if rc == 0:
-            for line in stdout.strip().splitlines():
-                if not line:
-                    continue
-                parts = line.split("|", 4)
-                if len(parts) != 5:
-                    continue
-                commit_hash, author_name, author_email, message, date = parts
-                h = commit_hash[:8]
+            for c in _parse_commit_records(stdout):
+                h = c["hash"][:8]
                 # Match by github handle in author name/email, or by
                 # known email addresses (work + personal) from roster.
-                matched_handle = email_to_handle.get(author_email.lower())
-                if not matched_handle:
-                    for handle in handles:
-                        if handle.lower() in author_name.lower() or handle.lower() in author_email.lower():
-                            matched_handle = handle
-                            break
+                matched_handle = _match_handle(
+                    c["author_name"], c["author_email"], handles, email_to_handle
+                )
                 if matched_handle and h not in seen_hashes[matched_handle]:
                     seen_hashes[matched_handle].add(h)
                     result[matched_handle]["commits"].append({
-                        "hash": h, "author": author_name,
-                        "message": message, "date": date,
+                        "hash": h, "author": c["author_name"],
+                        "message": c["message"], "date": c["date"],
                         "repo": entry.name,
                     })
+                # Multiplication: credit co-authors (helped land someone else's
+                # commit) — counted once per (co-author, commit), never the
+                # primary author crediting themselves.
+                for co_name, co_email in _parse_coauthors(c["body"]):
+                    co_handle = _match_handle(co_name, co_email, handles, email_to_handle)
+                    if co_handle and co_handle != matched_handle and (co_handle, h) not in seen_coauthor:
+                        seen_coauthor.add((co_handle, h))
+                        result[co_handle]["coauthored_commits"] += 1
 
         # Fetch PRs once per repo (cached)
         repo_slug = f"{github_org}/{entry.name}"
@@ -264,7 +269,8 @@ def fetch_member_github(
         [member], repos_dir, github_org, since, until=until, skip_fetch=skip_fetch,
     )
     return results.get(github_handle, {
-        "error": None, "commits": [], "prs": {"open": [], "merged": []}, "reviews_given": 0,
+        "error": None, "commits": [], "prs": {"open": [], "merged": []},
+        "reviews_given": 0, "coauthored_commits": 0,
     })
 
 
@@ -320,6 +326,54 @@ def _tally_reviews_given(
         for reviewer in pr.get("reviewers", []) or []:
             if reviewer in handles and reviewer != author:
                 result[reviewer]["reviews_given"] = result[reviewer].get("reviews_given", 0) + 1
+
+
+def _match_handle(
+    name: str, email: str, handles: set[str], email_to_handle: dict[str, str]
+) -> str | None:
+    """Resolve a commit (name, email) to a roster GitHub handle, or None."""
+    handle = email_to_handle.get((email or "").lower())
+    if handle:
+        return handle
+    for h in handles:
+        if h.lower() in (name or "").lower() or h.lower() in (email or "").lower():
+            return h
+    return None
+
+
+def _parse_commit_records(stdout: str) -> list[dict[str, str]]:
+    """Parse \\x1e-delimited git log records (fields split by \\x1f).
+
+    Format: hash, author_name, author_email, subject, date, body.
+    Body may span multiple lines; the separators keep records unambiguous.
+    """
+    records = []
+    for rec in stdout.split("\x1e"):
+        rec = rec.strip("\n")
+        if not rec.strip():
+            continue
+        parts = rec.split("\x1f")
+        if len(parts) < 5:
+            continue
+        records.append({
+            "hash": parts[0],
+            "author_name": parts[1],
+            "author_email": parts[2],
+            "message": parts[3],
+            "date": parts[4],
+            "body": parts[5] if len(parts) > 5 else "",
+        })
+    return records
+
+
+_COAUTHOR_RE = re.compile(
+    r"^\s*co-authored-by:\s*(.*?)\s*<([^>]+)>\s*$", re.IGNORECASE | re.MULTILINE
+)
+
+
+def _parse_coauthors(body: str) -> list[tuple[str, str]]:
+    """Extract (name, email) pairs from Co-authored-by trailers in a commit body."""
+    return [(m.group(1).strip(), m.group(2).strip()) for m in _COAUTHOR_RE.finditer(body or "")]
 
 
 def _is_within_window(

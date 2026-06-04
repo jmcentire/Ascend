@@ -322,24 +322,31 @@ def _compute_risks(member: dict, conn: sqlite3.Connection) -> dict[str, Any]:
         avg_score = sum(scores) / len(scores)
         details["avg_activity_30d"] = round(avg_score, 1)
 
-        # Multiplication: reviews given on others' PRs. Activity metrics tend to
-        # miss this kind of work — its value lands in someone else's output, not
-        # in this member's own commit/PR counts — so we surface it explicitly and
-        # let it explain a low activity index rather than reading as underperformance.
-        total_reviews = sum(
-            (json.loads(s["metrics"]).get("reviews_given", 0) if s["metrics"] else 0)
-            for s in snapshots
-        )
+        # Multiplication: reviewing others' PRs and helping land others' commits
+        # (co-authorship). Activity metrics tend to miss this kind of work — its
+        # value lands in someone else's output, not in this member's own
+        # commit/PR counts — so we surface it explicitly and let it explain a low
+        # activity index rather than reading as underperformance.
+        total_reviews = 0
+        total_coauthored = 0
+        for s in snapshots:
+            m = json.loads(s["metrics"]) if s["metrics"] else {}
+            total_reviews += m.get("reviews_given", 0)
+            total_coauthored += m.get("coauthored_commits", 0)
+        total_multiplication = total_reviews + total_coauthored
         details["reviews_given_30d"] = total_reviews
+        details["coauthored_commits_30d"] = total_coauthored
+        details["multiplication_30d"] = total_multiplication
 
         # Low visible output — an indicator, not a verdict. If the person is doing
-        # heavy multiplication (reviewing others' PRs), that explains the low index;
-        # surface it as multiplication instead of flagging it as a risk.
+        # heavy multiplication, that explains the low index; surface it as
+        # multiplication instead of flagging it as a risk.
         if avg_score < 3 and len(snapshots) >= 3:
-            if total_reviews >= 5:
+            if total_multiplication >= 5:
                 signals.append(
-                    f"multiplication: {total_reviews} reviews on others' PRs in 30d — "
-                    "value lands in others' output, not this member's activity index"
+                    f"multiplication: {total_reviews} reviews + {total_coauthored} co-authored "
+                    "commits on others' work in 30d — value lands in others' output, not this "
+                    "member's activity index"
                 )
             else:
                 signals.append(
