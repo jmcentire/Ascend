@@ -108,7 +108,7 @@ def _aggregate_metrics(snapshots: list[dict]) -> dict[str, int]:
     double-counting items that persist across multiple daily snapshots.
     """
     # Metrics that represent cumulative events — sum them
-    _SUM_KEYS = {"commits_count", "prs_merged", "issues_completed"}
+    _SUM_KEYS = {"commits_count", "prs_merged", "issues_completed", "reviews_given"}
     # Metrics that represent current state — take max
     _MAX_KEYS = {"prs_opened", "issues_in_progress"}
 
@@ -118,6 +118,7 @@ def _aggregate_metrics(snapshots: list[dict]) -> dict[str, int]:
         "prs_merged": 0,
         "issues_completed": 0,
         "issues_in_progress": 0,
+        "reviews_given": 0,
     }
     for s in snapshots:
         m = s.get("metrics", {})
@@ -278,9 +279,11 @@ def cmd_report_performance(args: argparse.Namespace) -> None:
             parts.append(f"- PRs merged: {r['metrics']['prs_merged']}")
             parts.append(f"- Issues completed: {r['metrics']['issues_completed']}")
             parts.append(f"- Issues in progress: {r['metrics']['issues_in_progress']}")
+            parts.append(f"- Reviews given on others' PRs (multiplication): {r['metrics'].get('reviews_given', 0)}")
             parts.append("")
-            parts.append("### Performance")
-            parts.append(f"- Avg score: {r['avg_score']}")
+            parts.append("### Visible Activity")
+            parts.append("_Activity index = weighted sum of commits/PRs/issues. An indicator of visible output, not a performance verdict; prevention, multiplication, and craft do not register here._")
+            parts.append(f"- Avg activity index: {r['avg_score']}")
             parts.append(f"- Velocity (weekly): {r['velocity']}")
             parts.append(f"- Momentum (4w delta): {r['momentum']}")
             parts.append(f"- Snapshots: {r['snapshots_count']}")
@@ -375,9 +378,9 @@ def cmd_report_team(args: argparse.Namespace) -> None:
         parts.append(f"**Total commits:** {result['total_commits']}")
         parts.append(f"**Total PRs merged:** {result['total_prs_merged']}")
         parts.append(f"**Total issues completed:** {result['total_issues_completed']}")
-        parts.append(f"**Avg score:** {result['avg_score']}")
+        parts.append(f"**Avg activity index:** {result['avg_score']}")
         parts.append("")
-        headers = ["Member", "Status", "Commits", "PRs Merged", "Issues", "Velocity", "Avg Score"]
+        headers = ["Member", "Status", "Commits", "PRs Merged", "Issues", "Velocity", "Avg Activity"]
         rows = [
             [r["member"], r["status"], str(r["commits"]), str(r["prs_merged"]),
              str(r["issues_completed"]), str(r["velocity"]), str(r["avg_score"])]
@@ -452,7 +455,7 @@ def cmd_report_progress(args: argparse.Namespace) -> None:
         parts.append(f"**Days with data:** {result['days_with_data']}")
         parts.append("")
         if trend:
-            headers = ["Date", "Avg Score", "Total Score", "Snapshots"]
+            headers = ["Date", "Avg Activity", "Total Activity", "Snapshots"]
             rows = [
                 [t["date"], str(t["avg_score"]), str(t["total_score"]), str(t["snapshots"])]
                 for t in trend
@@ -605,7 +608,7 @@ def cmd_report_dashboard(args: argparse.Namespace) -> None:
         parts.append("")
         if member_summaries:
             parts.append("## Member Rankings")
-            headers = ["Member", "Avg Score", "Snapshots"]
+            headers = ["Member", "Avg Activity", "Snapshots"]
             rows = [
                 [m["member"], str(m["avg_score"]), str(m["snapshots"])]
                 for m in member_summaries
@@ -801,7 +804,7 @@ def cmd_report_custom(args: argparse.Namespace) -> None:
         )
         if snapshots:
             avg_score = round(sum(s["score"] for s in snapshots) / len(snapshots), 1)
-            context_parts.append(f"Avg score: {avg_score} ({len(snapshots)} snapshots)")
+            context_parts.append(f"Avg activity index: {avg_score} ({len(snapshots)} snapshots) — visible-output indicator, not a performance verdict")
         context_parts.append(f"Meetings: {len(meetings)}")
         if meetings:
             for mtg in meetings[-3:]:

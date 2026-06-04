@@ -326,20 +326,25 @@ class TestCoachRisks:
         assert any("flight_risk" in s for s in alice_risk["signals"])
         assert alice_risk["risk_score"] > 0
 
-    def test_stale_meeting(self, isolated_home):
+    def test_stale_meeting_is_not_risk(self, isolated_home):
+        # Meeting freshness is informational only: at scale, ~monthly cadence is
+        # the baseline, gaps are often deliberate, and uploaded != occurred.
+        # A stale/absent 1:1 must NOT manufacture a risk signal.
         _init_with_member()
         old_date = (datetime.now() - timedelta(days=45)).strftime("%Y-%m-%d")
         _add_meeting(isolated_home, 1, old_date)
         data = _capture_json(["coach", "risks"])
         alice_risk = next(r for r in data if r["member"] == "Alice")
-        assert any("stale" in s for s in alice_risk["signals"])
+        assert not any("stale" in s for s in alice_risk["signals"])
 
     def test_no_data_risk(self, isolated_home):
         _init_with_member()
         data = _capture_json(["coach", "risks"])
         alice_risk = next(r for r in data if r["member"] == "Alice")
-        assert any("no performance data" in s for s in alice_risk["signals"])
-        assert any("no 1:1" in s for s in alice_risk["signals"])
+        # Absence of countable activity is an indicator to investigate, not a verdict.
+        assert any("no visible activity" in s for s in alice_risk["signals"])
+        # No 1:1 on record is NOT a risk signal (uploaded != occurred).
+        assert not any("1:1" in s and "risk" in s.lower() for s in alice_risk["signals"])
 
     def test_pip_risk(self, isolated_home):
         _init_with_member()
@@ -359,7 +364,7 @@ class TestCoachRisks:
             }, 1.0)
         data = _capture_json(["coach", "risks"])
         alice_risk = next(r for r in data if r["member"] == "Alice")
-        assert any("underperformance" in s for s in alice_risk["signals"])
+        assert any("low visible output" in s for s in alice_risk["signals"])
 
     def test_text_output_no_risks(self, isolated_home):
         _capture(["init"])
@@ -501,7 +506,7 @@ class TestRiskAlgorithm:
         risks = _compute_risks(m, conn)
         conn.close()
         assert risks["member"] == "Alice"
-        assert "no performance data" in " ".join(risks["signals"])
+        assert "no visible activity" in " ".join(risks["signals"])
 
     def test_compute_risks_with_data(self, isolated_home):
         from ascend.commands.coach import _compute_risks
@@ -519,6 +524,27 @@ class TestRiskAlgorithm:
         conn.close()
         # With good data, should have few/no signals
         assert risks["risk_score"] < 30
+
+    def test_multiplication_explains_low_output(self, isolated_home):
+        # A heavy reviewer with low direct output is a multiplier, NOT a low
+        # performer — the index should recognize the reviews, not flag risk.
+        from ascend.commands.coach import _compute_risks
+        from ascend.db import get_connection
+        _init_with_member()
+        for i in range(4):
+            date = (datetime.now() - timedelta(days=i * 5)).strftime("%Y-%m-%d")
+            _add_snapshot(isolated_home, 1, date, {
+                "commits_count": 0, "prs_opened": 0, "prs_merged": 0,
+                "issues_completed": 0, "issues_in_progress": 0, "reviews_given": 3,
+            }, 1.0)
+        conn = get_connection(isolated_home / "ascend.db")
+        m = dict(conn.execute("SELECT * FROM members WHERE id = 1").fetchone())
+        risks = _compute_risks(m, conn)
+        conn.close()
+        sig = " ".join(risks["signals"])
+        assert "multiplication" in sig
+        assert "low visible output" not in sig
+        assert risks["details"]["reviews_given_30d"] == 12
 
     def test_compute_risks_burnout(self, isolated_home):
         from ascend.commands.coach import _compute_risks

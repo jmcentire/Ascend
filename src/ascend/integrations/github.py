@@ -106,7 +106,7 @@ def fetch_prs(
                   if _is_within_window(pr, since, until=until)]
         return {"error": cached.get("error"), "open": cached.get("open", []), "merged": merged}
 
-    fields = "number,title,author,state,createdAt,updatedAt,mergedAt,closedAt,reviewDecision,url"
+    fields = "number,title,author,state,createdAt,updatedAt,mergedAt,closedAt,reviewDecision,latestReviews,url"
 
     stdout_open, stderr_open, rc_open = _run_cmd([
         "gh", "pr", "list", "--repo", repo_slug,
@@ -155,7 +155,7 @@ def fetch_all_github(
 
     handles = {m["github"] for m in members if m.get("github")}
     result: dict[str, dict[str, Any]] = {
-        h: {"error": None, "commits": [], "prs": {"open": [], "merged": []}}
+        h: {"error": None, "commits": [], "prs": {"open": [], "merged": []}, "reviews_given": 0}
         for h in handles
     }
     seen_hashes: dict[str, set[str]] = {h: set() for h in handles}
@@ -240,6 +240,12 @@ def fetch_all_github(
                 pr_copy = {**pr, "repo": entry.name}
                 result[author]["prs"]["merged"].append(pr_copy)
 
+        # Multiplication: credit reviews given on others' PRs in this repo.
+        _tally_reviews_given(
+            list(pr_result.get("open", [])) + list(pr_result.get("merged", [])),
+            handles, result,
+        )
+
     return result
 
 
@@ -258,7 +264,7 @@ def fetch_member_github(
         [member], repos_dir, github_org, since, until=until, skip_fetch=skip_fetch,
     )
     return results.get(github_handle, {
-        "error": None, "commits": [], "prs": {"open": [], "merged": []},
+        "error": None, "commits": [], "prs": {"open": [], "merged": []}, "reviews_given": 0,
     })
 
 
@@ -280,11 +286,40 @@ def _parse_pr_list(stdout: str) -> list[dict[str, Any]]:
             "author": author_login,
             "state": pr.get("state", ""),
             "review_status": _review_label(review),
+            "reviewers": _extract_reviewers(pr),
             "created_at": pr.get("createdAt", ""),
             "merged_at": pr.get("mergedAt", ""),
             "url": pr.get("url", ""),
         })
     return result
+
+
+def _extract_reviewers(pr: dict[str, Any]) -> list[str]:
+    """Reviewer logins who left an actual review on a PR (from latestReviews)."""
+    reviewers = []
+    for r in pr.get("latestReviews") or []:
+        author = r.get("author") or {}
+        login = author.get("login", "") if isinstance(author, dict) else ""
+        state = (r.get("state") or "").upper()
+        if login and state in ("APPROVED", "CHANGES_REQUESTED", "COMMENTED"):
+            reviewers.append(login)
+    return reviewers
+
+
+def _tally_reviews_given(
+    prs: list[dict[str, Any]], handles: set[str], result: dict[str, dict[str, Any]]
+) -> None:
+    """Count reviews each in-roster member gave on OTHERS' PRs.
+
+    This is a multiplication signal: reviewing someone else's PR is work whose
+    value lands in the author's output, not the reviewer's own commit/PR counts.
+    Self-reviews and reviews by people outside the roster are not counted.
+    """
+    for pr in prs:
+        author = pr.get("author", "")
+        for reviewer in pr.get("reviewers", []) or []:
+            if reviewer in handles and reviewer != author:
+                result[reviewer]["reviews_given"] = result[reviewer].get("reviews_given", 0) + 1
 
 
 def _is_within_window(

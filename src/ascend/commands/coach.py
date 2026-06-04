@@ -312,28 +312,58 @@ def _compute_risks(member: dict, conn: sqlite3.Connection) -> dict[str, Any]:
         (member_id, thirty_days_ago),
     ).fetchall()
 
+    # The snapshot "score" is a visible-activity index (a weighted sum of
+    # commits/PRs/issues), NOT a performance verdict. Prevention, multiplication,
+    # and craft leave no countable artifact, so they register as LOW here. Every
+    # signal derived from it is therefore an indicator that should route attention
+    # ("investigate why"), never a conclusion. Risk weights are deliberately small.
     if snapshots:
         scores = [s["score"] or 0 for s in snapshots]
         avg_score = sum(scores) / len(scores)
-        details["avg_score_30d"] = round(avg_score, 1)
+        details["avg_activity_30d"] = round(avg_score, 1)
 
-        # Underperformance: low average score
+        # Multiplication: reviews given on others' PRs. Activity metrics tend to
+        # miss this kind of work — its value lands in someone else's output, not
+        # in this member's own commit/PR counts — so we surface it explicitly and
+        # let it explain a low activity index rather than reading as underperformance.
+        total_reviews = sum(
+            (json.loads(s["metrics"]).get("reviews_given", 0) if s["metrics"] else 0)
+            for s in snapshots
+        )
+        details["reviews_given_30d"] = total_reviews
+
+        # Low visible output — an indicator, not a verdict. If the person is doing
+        # heavy multiplication (reviewing others' PRs), that explains the low index;
+        # surface it as multiplication instead of flagging it as a risk.
         if avg_score < 3 and len(snapshots) >= 3:
-            signals.append("underperformance: avg score < 3 over 30d")
-            risk_score += 25
+            if total_reviews >= 5:
+                signals.append(
+                    f"multiplication: {total_reviews} reviews on others' PRs in 30d — "
+                    "value lands in others' output, not this member's activity index"
+                )
+            else:
+                signals.append(
+                    "low visible output: activity index avg < 3 over 30d — "
+                    "investigate why (may be prevention/multiplication/illegible work)"
+                )
+                risk_score += 15
 
         # Declining trend
         if len(scores) >= 3:
             first_half = sum(scores[:len(scores) // 2]) / max(1, len(scores) // 2)
             second_half = sum(scores[len(scores) // 2:]) / max(1, len(scores) - len(scores) // 2)
             if first_half > 0 and second_half < first_half * 0.5:
-                signals.append("declining performance: second half < 50% of first half")
-                risk_score += 15
+                signals.append("declining visible activity: second half < 50% of first half — investigate why")
+                risk_score += 10
 
-        # Potential burnout: very high output
+        # Sustained high output — high activity is not burnout by itself; the real
+        # signal is load vs. recharge, which lives in the 1:1, not the commit count.
         if avg_score > 40:
-            signals.append("potential burnout: sustained high output (avg > 40)")
-            risk_score += 10
+            signals.append(
+                "sustained high visible output (avg > 40) — check load vs. recharge in 1:1; "
+                "high output is not burnout by itself"
+            )
+            risk_score += 5
 
         # Overwork: high issues_in_progress
         total_in_progress = 0
@@ -346,24 +376,25 @@ def _compute_risks(member: dict, conn: sqlite3.Connection) -> dict[str, Any]:
             risk_score += 10
             details["avg_wip"] = round(avg_wip, 1)
     else:
-        # No snapshot data is itself a concern
-        signals.append("no performance data in last 30 days")
-        risk_score += 10
+        # No countable activity. This is an indicator to look closer, not a
+        # deficit — it is exactly what illegible/prevention work, or a data gap,
+        # produces. Small weight; the answer is "investigate," not "underperformer."
+        signals.append("no visible activity data in last 30 days — investigate why (illegible/prevention work, or a data gap)")
+        risk_score += 5
 
-    # Meeting freshness
+    # Meeting freshness — INFORMATIONAL ONLY, never risk. At any real team size
+    # the baseline 1:1 cadence may be monthly or longer, gaps are often
+    # deliberate, and not every 1:1 is recorded here (recorded != occurred).
+    # Treating a gap as risk manufactures false signal, so it lives in details
+    # and adds zero risk_score.
     last_meeting = conn.execute(
         "SELECT date FROM meetings WHERE member_id = ? ORDER BY date DESC LIMIT 1",
         (member_id,),
     ).fetchone()
     if last_meeting:
-        last_date = last_meeting["date"]
-        details["last_meeting"] = last_date
-        if last_date < thirty_days_ago:
-            signals.append(f"stale 1:1: last meeting was {last_date}")
-            risk_score += 15
+        details["last_recorded_1on1"] = last_meeting["date"]
     else:
-        signals.append("no 1:1 meetings on record")
-        risk_score += 10
+        details["last_recorded_1on1"] = "none on record (note: not all 1:1s are uploaded)"
 
     # Sentiment trend
     recent_meetings = conn.execute(

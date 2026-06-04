@@ -119,6 +119,45 @@ class TestGitHubFetcher:
         assert _review_label(None) == "needs review"
         assert _review_label("") == "needs review"
 
+    def test_extract_reviewers(self):
+        from ascend.integrations.github import _extract_reviewers
+        pr = {"latestReviews": [
+            {"author": {"login": "bob"}, "state": "APPROVED"},
+            {"author": {"login": "carol"}, "state": "COMMENTED"},
+            {"author": {"login": "dave"}, "state": "DISMISSED"},  # not an active review
+            {"author": None, "state": "APPROVED"},                 # malformed, skipped
+        ]}
+        assert _extract_reviewers(pr) == ["bob", "carol"]
+
+    def test_extract_reviewers_empty(self):
+        from ascend.integrations.github import _extract_reviewers
+        assert _extract_reviewers({}) == []
+        assert _extract_reviewers({"latestReviews": None}) == []
+
+    def test_parse_pr_list_includes_reviewers(self):
+        from ascend.integrations.github import _parse_pr_list
+        pr_json = json.dumps([
+            {"number": 7, "title": "x", "author": {"login": "alice"}, "state": "OPEN",
+             "reviewDecision": "APPROVED",
+             "latestReviews": [{"author": {"login": "bob"}, "state": "APPROVED"}],
+             "createdAt": "", "mergedAt": None, "url": ""}
+        ])
+        prs = _parse_pr_list(pr_json)
+        assert prs[0]["reviewers"] == ["bob"]
+
+    def test_tally_reviews_given(self):
+        from ascend.integrations.github import _tally_reviews_given
+        handles = {"alice", "bob"}
+        result = {"alice": {"reviews_given": 0}, "bob": {"reviews_given": 0}}
+        prs = [
+            {"author": "carol", "reviewers": ["alice", "bob"]},  # both credited
+            {"author": "alice", "reviewers": ["alice"]},          # self-review, not counted
+            {"author": "dave", "reviewers": ["alice", "eve"]},    # eve outside roster
+        ]
+        _tally_reviews_given(prs, handles, result)
+        assert result["alice"]["reviews_given"] == 2
+        assert result["bob"]["reviews_given"] == 1
+
 
 class TestLinearFetcher:
     """Unit tests for Linear fetcher with mocked urllib."""
@@ -257,6 +296,26 @@ class TestSnapshot:
         assert result["metrics"]["prs_merged"] == 1
         # Score: 2*1 + 1*3 + 1*5 = 10
         assert result["score"] == 10.0
+        conn.close()
+
+    def test_snapshot_credits_reviews_given(self, isolated_home):
+        from ascend.config import AscendConfig
+        from ascend.integrations.snapshot import take_snapshot
+        conn = init_db(isolated_home / "ascend.db")
+        conn.execute("INSERT INTO members (name, github, status) VALUES ('Alice', 'alice', 'active')")
+        conn.commit()
+        config = AscendConfig()
+
+        # Reviews on others' PRs (multiplication) must register in the index.
+        mock_gh = {
+            "error": None, "commits": [], "prs": {"open": [], "merged": []},
+            "reviews_given": 4,
+        }
+        with patch("ascend.integrations.github.fetch_member_github", return_value=mock_gh):
+            result = take_snapshot(1, "Alice", "alice", conn, config)
+        assert result["metrics"]["reviews_given"] == 4
+        # reviews_given weight is 2 → 4 * 2 = 8
+        assert result["score"] == 8.0
         conn.close()
 
     def test_snapshot_stored_in_db(self, isolated_home):

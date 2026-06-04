@@ -24,7 +24,7 @@ class MemberCard(Widget):
             yield Static("", id="card-status")
             yield Static("", id="card-flags")
             yield Static("", id="card-team")
-            yield MetricBar(label="Score", id="card-score-bar")
+            yield MetricBar(label="Activity", id="card-score-bar")
             yield Static("", id="card-meetings")
             yield Static("", id="card-items")
 

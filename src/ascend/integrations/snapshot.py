@@ -11,13 +11,21 @@ from typing import Any, Optional
 from ascend.config import AscendConfig
 
 
-# Score weights
+# Visible-activity index weights.
+# NOTE: this is an ACTIVITY index, not a performance verdict. It is a weighted
+# sum of countable artifacts (commits/PRs/issues/reviews). Prevention leaves no
+# event and craft produces states rather than artifacts — neither registers here.
+# `reviews_given` is included so that *multiplication* (reviewing others' PRs,
+# work whose value lands in someone else's output) earns at least partial credit
+# instead of being invisible. Read the index as an indicator that points to
+# "look closer," never as an answer about how good someone is.
 _WEIGHTS = {
     "commits_count": 1,
     "prs_opened": 3,
     "prs_merged": 5,
     "issues_completed": 5,
     "issues_in_progress": 2,
+    "reviews_given": 2,
 }
 _MAX_SCORE = 100.0
 
@@ -52,6 +60,7 @@ def take_snapshot(
         "prs_merged": 0,
         "issues_completed": 0,
         "issues_in_progress": 0,
+        "reviews_given": 0,
     }
     errors: list[str] = []
 
@@ -68,6 +77,7 @@ def take_snapshot(
                 metrics["commits_count"] = len(gh_data.get("commits", []))
                 metrics["prs_opened"] = len(gh_data.get("prs", {}).get("open", []))
                 metrics["prs_merged"] = len(gh_data.get("prs", {}).get("merged", []))
+                metrics["reviews_given"] = gh_data.get("reviews_given", 0)
             else:
                 errors.append(f"github: {gh_data['error']}")
         except Exception as e:

@@ -429,7 +429,10 @@ class TestReportHelpers:
         ]
         totals = _aggregate_metrics(snapshots)
         assert totals["commits_count"] == 8
-        assert totals["prs_opened"] == 3
+        # prs_opened and issues_in_progress are point-in-time metrics → max,
+        # not sum, to avoid double-counting items that persist across snapshots.
+        assert totals["prs_opened"] == 2
+        assert totals["issues_in_progress"] == 1
         assert totals["prs_merged"] == 1
         assert totals["issues_completed"] == 3
 

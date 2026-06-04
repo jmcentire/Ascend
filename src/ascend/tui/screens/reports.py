@@ -109,7 +109,7 @@ class ReportsPanel(Vertical):
             return
 
         parts = [f"# Team Report — {from_date} to {to_date}\n"]
-        parts.append("| Member | Commits | PRs Merged | Issues | Avg Score |")
+        parts.append("| Member | Commits | PRs Merged | Issues | Avg Activity |")
         parts.append("|--------|---------|------------|--------|-----------|")
 
         for m in members:
@@ -196,7 +196,7 @@ class ReportsPanel(Vertical):
 
         parts = [f"# Progress — {from_date} to {to_date}\n"]
         parts.append(f"**Days with data:** {len(daily)}\n")
-        parts.append("| Date | Avg Score | Snapshots |")
+        parts.append("| Date | Avg Activity | Snapshots |")
         parts.append("|------|-----------|-----------|")
 
         for date in sorted(daily.keys()):
