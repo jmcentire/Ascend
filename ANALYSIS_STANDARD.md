@@ -5,11 +5,17 @@
 **Applies to:** every deeper-analysis run — `coach-analyze`, `coach-risks`, `coach-suggest`,
 and any cohort / outlier analysis built on Ascend data.
 
-**Changelog:** v2.1 incorporates the Jeremy-simulacrum strategy critique (2026-06-12): the
-*output shape* — not the metric weighting — is what makes a tool a Mirror or a Frame. A
-ranked "bottom-N to manage out" list is a Frame regardless of how the inputs are weighted.
-This version rewrites the output contract (§0.5) and adds the failure-mode controls (§1.D)
-and the investigation + misfire-audit protocols (§8–9) the critique demanded.
+**Changelog:**
+- v2.2 (2026-06-12): corrected scope per Jeremy — the goal is **comprehensive analysis for
+  every engineer**, and the tool is **agnostic about how the reader uses it**. Rewrote §0.5
+  away from usage-governance (no "the tool must never rank / investigation-before-action /
+  process-violation" enforcement) toward analysis-for-all + the analytical-correctness
+  controls. Investigation logging (§8) and the misfire audit (§9) are now *optional* tooling
+  (note-taking + tracking the tool's own accuracy), not gates on the manager. The genuine
+  Sim insight is retained where it belongs: keep the analysis honest, don't fake signals,
+  don't penalize illegible work — but don't police usage.
+- v2.1 (2026-06-12): incorporated the Jeremy-simulacrum critique on metric-correctness
+  failure modes (§1.D controls: novelty, system-criticality, cohort-validity).
 
 This is the single source of truth for *what we measure and how we reason about it*. The
 `coach-analyze` system prompt encodes this document; if the two disagree, this document wins
@@ -34,29 +40,32 @@ and the prompt is the bug.
 
 ---
 
-## 0.5 Output contract — Mirror, not Frame  *(load-bearing; from the Sim critique)*
+## 0.5 Output contract — analysis for all, honestly
 
-The **shape** of the output, not the sophistication of the weighting, is what makes Ascend a
-Mirror or a Frame. Get this wrong and every metric below becomes a weapon.
+The product is **comprehensive, multi-dimensional analysis for every engineer.** The tool's
+job is to make that analysis *true and complete*; it is **agnostic about how the reader uses
+it**. The tool does not decide, gate, or police usage — that is the manager's call. What the
+tool owes is correctness, not governance.
 
-- **A Mirror outputs anomalies-to-investigate.** "These engineers are >2 SD above their
-  level/tenure cohort on catchable-error rate — investigate why." The output is a *question*;
-  the required next action is *investigation*.
-- **A Frame outputs verdicts.** "These are the bottom 10 — raise the bar / manage out." The
-  output is a *judgment*; the next action is *execution*. **Ascend must never emit this.**
+What that means in practice:
+1. **Analysis for all, not a hunt for the bad ones.** The primary surface (`report-analysis`)
+   covers *every* engineer across every dimension — output, multiplication, flow, quality,
+   and the industry frameworks — shown both absolute and cohort-relative. Anomaly/outlier
+   views (`coach-outliers`) are *one optional lens*, not the product.
+2. **Don't collapse to a single verdict score.** A one-number ranking hides exactly the
+   illegible / multiplication / prevention work the controls below exist to surface. Present
+   the dimensions; let the reader sort, weigh, and decide. The tool will happily sort by any
+   dimension — sorting is a reader convenience and carries no judgment.
+3. **The analytical-correctness controls are mandatory** — they keep the analysis honest, and
+   that is the one thing the tool is opinionated about:
+   - cohort normalization by level / tenure / criticality (§3–4),
+   - crediting multiplication / review-load, not penalizing it (§1.B),
+   - novelty / criticality / cohort-validity context on every comparison (§1.D),
+   - data-gap honesty — name what isn't measured, never proxy it silently (§0.4),
+   - CFR/reverts demoted as a dead discriminator on a fix-forward team (§1.D).
 
-Hard rules that follow:
-1. **No ranked manage-out lists.** Ascend surfaces outliers against an absolute,
-   cohort-relative threshold (e.g. >2 SD, or rate >Nx cohort median) — never a positional
-   "bottom N." Positional ranking is forced-ranking (Vitality Curve); it guarantees a bottom
-   segment exists even when everyone is strong, and it misclassifies globally-strong
-   engineers who sit on exceptional teams. (A one-off manual ranking a human explicitly
-   requests and interprets is their call; the *tool* does not generate or persist one.)
-2. **Every flag ships with its candidate explanations**, including the ones that exonerate
-   (see §1.D controls). The flag is the start of an investigation, not its conclusion.
-3. **Investigation precedes action** (§8). If a manager moves to PIP/manage-out on an Ascend
-   flag with no logged investigation, Ascend records that as a *process violation*, not a
-   validated decision.
+(The activity-index-is-an-indicator-not-a-verdict principle, §0.1, still holds: a number is a
+starting point for understanding a person's work, never the whole of it.)
 
 ---
 
@@ -190,24 +199,16 @@ tenure-unknown, and criticality-unknown.
 
 ---
 
-## 8. Investigation protocol  *(the Mirror's teeth)*
-A flag is a hypothesis. Before any consequential action (PIP, manage-out, formal rating) on
-an Ascend signal, the manager records an investigation answering, at minimum:
-1. **Why** is the rate/anomaly high — what does digging in actually show?
-2. **Is the comparison valid** — same level, tenure, work-novelty, system-criticality?
-3. **What would change it** — a context/tooling fix (inadequate tests, greenfield) vs. a
-   genuine performance gap?
-4. **Verdict** — performance issue, context issue, or metric misfire.
+## 8. Investigation log  *(optional)*
+When someone *does* dig into a finding, they can record what they found — why the anomaly is
+there, whether the comparison was valid, what would change it, and a verdict
+(performance / context / misfire). This is **optional note-taking**, not a gate: the tool
+does not require it and does not police whether anyone acts before logging. Its one real
+payoff is §9 — recorded verdicts are what let the tool measure its own accuracy.
 
-Ascend stores the investigation against the flag. A consequential action with **no logged
-investigation** is recorded as a process violation. Skipping investigation is the exact
-failure mode the Mirror exists to prevent (the tool becoming the justification rather than
-the trigger).
-
-## 9. Misfire audit  *(keeps the metric honest)*
-Quarterly, re-examine the prior period's flags. For each: was the signal valid, or a misfire
-(novel work, invalid cohort, inadequate tooling, illegible/prevention work)? If the misfire
-rate exceeds **~30%**, the metric is not fit to inform consequential action — demote it to
-investigation-only and fix the controls before it is trusted again. Track misfire rate per
-dimension over time; a dimension that cannot get below the threshold does not belong in the
-weighting.
+## 9. Misfire audit  *(keeps the analysis honest about itself)*
+Periodically, re-examine prior flags that were investigated: was the signal valid, or a
+misfire (novel work, invalid cohort, inadequate tooling, illegible/prevention work)? If a
+dimension misfires more than **~30%** of the time, that's the *tool* telling you the
+dimension isn't earning its keep — fix the controls or stop foregrounding it. This audits the
+analysis, not the analyst.

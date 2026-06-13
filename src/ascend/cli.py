@@ -251,6 +251,18 @@ def _build_parser() -> argparse.ArgumentParser:
     p.add_argument("--copy", action="store_true", help="Copy to clipboard")
     p.add_argument("--save", action="store_true", help="Save to reports directory")
 
+    # -- report analysis --
+    p = sub.add_parser(
+        "report-analysis",
+        help="Comprehensive analysis for every engineer (absolute + cohort-relative)",
+    )
+    p.add_argument("--member", help="Filter to one member")
+    p.add_argument("--team", help="Filter by team")
+    p.add_argument("--days", type=int, default=90, help="Lookback days (default: 90)")
+    p.add_argument("--sort", help="Sort by metric key (e.g. reopened, stale_hours) or 'name'")
+    p.add_argument("--json", action="store_true", help="JSON output")
+    p.add_argument("--copy", action="store_true", help="Copy to clipboard")
+
     # -- report custom --
     p = sub.add_parser("report-custom", help="Free-form AI report")
     p.add_argument("prompt", help="Report prompt/question")
@@ -446,6 +458,7 @@ def _rewrite_args(argv: list[str]) -> list[str]:
             "sync-github", "sync-linear", "sync-slack", "sync-snapshot", "sync-backfill",
             "report-performance", "report-team", "report-progress",
             "report-git", "report-dashboard", "report-stale", "report-custom",
+            "report-analysis",
             "plan-cycle", "plan-career",
             "coach-analyze", "coach-risks", "coach-star", "coach-suggest",
             "coach-outliers", "coach-investigate", "coach-audit",
@@ -608,6 +621,10 @@ def main(argv: list[str] | None = None) -> None:
     elif args.command == "report-stale":
         from ascend.commands.report import cmd_report_stale
         cmd_report_stale(args)
+
+    elif args.command == "report-analysis":
+        from ascend.commands.coach import cmd_report_analysis
+        cmd_report_analysis(args)
 
     elif args.command == "report-custom":
         from ascend.commands.report import cmd_report_custom

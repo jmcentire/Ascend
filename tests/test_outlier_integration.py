@@ -155,3 +155,38 @@ def test_outlier_flag_investigate_audit_flow(conn):
     assert iid
     audit = inv.misfire_audit(conn)
     assert isinstance(audit, dict)
+
+
+def test_report_analysis_runs_for_all(conn, monkeypatch, capsys):
+    """Analysis-for-all surface renders every engineer without network/git access."""
+    import types
+    from ascend.commands import coach as coach_mod
+    import ascend.integrations.github as gh
+
+    for name in ("Erin", "Frank", "Gina"):
+        mid = _add_member(conn, name, "Product Engineer II", github=name)
+        _add_snapshot(conn, mid, "2099-01-01", {
+            "prs_merged": 3, "commits_count": 20, "reviews_given": 5,
+            "reopened": 1, "pr_cycle_p85_hours": 80.0, "stale_hours": 40.0,
+            "bug_share": 0.25, "issues_completed": 4, "coauthored_commits": 1,
+        })
+
+    monkeypatch.setattr(coach_mod, "_get_conn", lambda: conn)
+    monkeypatch.setattr(
+        coach_mod, "load_config",
+        lambda: types.SimpleNamespace(repos_dir="/tmp/nope"),
+    )
+    # No git/network: pin tenure deterministically.
+    monkeypatch.setattr(gh, "first_commit_date", lambda *a, **k: "2024-01-01")
+
+    args = types.SimpleNamespace(
+        json=False, copy=False, days=90, sort="reopened", member=None, team=None,
+    )
+    coach_mod.cmd_report_analysis(args)
+    out = capsys.readouterr().out
+    # Every engineer present; it's analysis-for-all, not an outlier subset.
+    assert "Erin" in out and "Frank" in out and "Gina" in out
+    assert "every engineer" in out.lower()
+    # No usage-policing language.
+    assert "manage out" not in out.lower()
+    assert "process violation" not in out.lower()
