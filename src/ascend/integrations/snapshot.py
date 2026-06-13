@@ -64,6 +64,15 @@ def take_snapshot(
         "issues_in_progress": 0,
         "reviews_given": 0,
         "coauthored_commits": 0,
+        # Flow & quality signals (ANALYSIS_STANDARD.md §1.C/§1.D). These are NOT folded
+        # into the activity-index score below — they are quality/latency indicators, and
+        # the index stays an activity-only sum per the indicator-not-verdict doctrine.
+        "stale_hours": 0.0,
+        "rotting_prs": 0,
+        "pr_cycle_p85_hours": 0.0,
+        "open_prs": 0,
+        "bug_share": 0.0,
+        "reopened": 0,
     }
     errors: list[str] = []
 
@@ -78,10 +87,22 @@ def take_snapshot(
             )
             if not gh_data.get("error"):
                 metrics["commits_count"] = len(gh_data.get("commits", []))
-                metrics["prs_opened"] = len(gh_data.get("prs", {}).get("open", []))
-                metrics["prs_merged"] = len(gh_data.get("prs", {}).get("merged", []))
+                prs = gh_data.get("prs", {}) or {}
+                metrics["prs_opened"] = len(prs.get("open", []))
+                metrics["prs_merged"] = len(prs.get("merged", []))
                 metrics["reviews_given"] = gh_data.get("reviews_given", 0)
                 metrics["coauthored_commits"] = gh_data.get("coauthored_commits", 0)
+                # Flow & latency metrics (§1.C) — derived from the PR data already fetched,
+                # so no extra network cost.
+                try:
+                    from ascend.integrations.github import compute_flow_metrics
+                    flow = compute_flow_metrics(prs)
+                    metrics["stale_hours"] = flow.get("stale_hours", 0.0)
+                    metrics["rotting_prs"] = flow.get("rotting_prs", 0)
+                    metrics["pr_cycle_p85_hours"] = flow.get("pr_cycle_p85_hours", 0.0)
+                    metrics["open_prs"] = flow.get("open_prs", 0)
+                except Exception as e:
+                    errors.append(f"github flow: {e}")
             else:
                 errors.append(f"github: {gh_data['error']}")
         except Exception as e:
@@ -91,16 +112,29 @@ def take_snapshot(
     linear_api_key = os.environ.get(config.linear_api_key_env, "") if not skip_linear else ""
     if linear_api_key:
         try:
-            from ascend.integrations.linear import fetch_member_issues, get_effective_team_ids
+            from ascend.integrations.linear import (
+                fetch_member_issues, get_effective_team_ids, bug_share, count_reopened,
+            )
             team_ids = get_effective_team_ids(config)
+            all_issues: list[dict] = []
             for team_id in team_ids:
                 issues = fetch_member_issues(linear_api_key, team_id, member_name, since)
+                all_issues.extend(issues)
                 for issue in issues:
                     state = (issue.get("state", {}).get("name", "") or "").lower()
                     if "done" in state or "complete" in state:
                         metrics["issues_completed"] += 1
                     elif "progress" in state or "started" in state:
                         metrics["issues_in_progress"] += 1
+                # Repeated failures (§1.D, heaviest-weighted) — reopened transitions.
+                try:
+                    metrics["reopened"] += count_reopened(
+                        linear_api_key, team_id, member_name, since
+                    )
+                except Exception as e:
+                    errors.append(f"linear reopened: {e}")
+            # Bug-fix share (§1.D) across all issues touched this window.
+            metrics["bug_share"] = bug_share(all_issues)
         except Exception as e:
             errors.append(f"linear: {e}")
     else:

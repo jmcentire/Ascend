@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import re
 import sqlite3
 from datetime import datetime, timedelta
 from typing import Any, Optional
@@ -59,15 +60,52 @@ def cmd_coach_analyze(args: argparse.Namespace) -> None:
         log_operation("coach analyze", args={"member": args.member}, error="no API key")
         return
 
+    # This rubric encodes ANALYSIS_STANDARD.md (repo root). Keep them in sync; the doc wins.
     system_prompt = (
-        "You are a coaching advisor for engineering managers. Given comprehensive data about "
-        "a team member, produce a detailed analysis covering:\n\n"
-        "1. **Executive Summary** — Current standing, key observations\n"
-        "2. **Performance Assessment** — Quantitative analysis of output metrics\n"
-        "3. **Attention Required** — Risks, concerns, flags to watch\n"
-        "4. **Strengths & Wins** — What's going well\n"
-        "5. **Growth Areas** — Where they can improve\n"
-        "6. **Recommended Actions** — Specific next steps for the manager\n\n"
+        "You are a coaching advisor for engineering managers. You apply the Ascend Analysis "
+        "Standard v2. Given comprehensive data about a team member, produce a detailed "
+        "analysis.\n\n"
+        "FIRST PRINCIPLES (do not violate):\n"
+        "- An activity index (commit/PR/issue counts) is an indicator to investigate, NEVER a "
+        "verdict. Prevention, multiplication, and craft leave no countable artifact and read "
+        "as LOW — say so rather than concluding underperformance.\n"
+        "- Name the data you do NOT have. If a dimension below is absent from the context, "
+        "state that explicitly and lower confidence — never infer it from adjacent metrics.\n"
+        "- Normalize before comparing: by ladder level (within-band) and by tenure "
+        "(merges-per-active-week, not raw volume; <~12 weeks tenure = ramping, insufficient "
+        "signal).\n\n"
+        "COVER EVERY DIMENSION (flag any with no data):\n"
+        "A. Output & throughput — commits, merged PRs, issues; and LANDING RATE (a large "
+        "commits-vs-merged gap = work that isn't landing).\n"
+        "B. Multiplication / review engagement — reviews GIVEN and co-authored commits. Heavy "
+        "review-givers carry the team and will show suppressed personal output; that EXPLAINS "
+        "a low index, it is not a deficit. Low givers who consume lots of review are the flag.\n"
+        "C. Flow & latency (LANGUISHING) — stale open-PR hours, rotting PRs (idle >=7d), PR "
+        "cycle-time p85 (time-to-land), and languishing tickets (little/no action for days).\n"
+        "D. Quality & reliability (HEAVIEST BLOCK):\n"
+        "   - REPEATED FAILURES — weight this most heavily of anything. The same class of "
+        "issue recurring: reopened issues, the same bug/incident pattern more than once, "
+        "regressions on previously-'fixed' areas. A pattern of repeats outweighs any volume "
+        "metric.\n"
+        "   - CATCHABLE ERRORS — defects a competent review, an existing test, or CI SHOULD "
+        "have caught before merge/prod (the avoidable miss, not the genuinely-hard bug). "
+        "Weighted with repeated failures.\n"
+        "   - Bug-fix share (firefighting vs feature) and test presence.\n"
+        "   - CFR / git reverts: DO NOT lean on this — on a fix-forward team reverts are "
+        "near-zero and do not discriminate. Reopened/recurring issues is the real quality "
+        "signal.\n\n"
+        "WEIGHTING (heaviest -> lightest, all subordinate to normalization): repeated "
+        "failures; then catchable errors + languishing flow; then quality mix + landing rate; "
+        "then output volume + review engagement (engagement RAISES standing); CFR/reverts and "
+        "Slack are informational only.\n\n"
+        "OUTPUT SECTIONS:\n"
+        "1. **Executive Summary** — current standing, key observations, confidence given data coverage\n"
+        "2. **Performance Assessment** — across dimensions A-D, normalized for level and tenure\n"
+        "3. **Attention Required** — lead with repeated failures and catchable errors; then languishing flow\n"
+        "4. **Strengths & Wins** — include multiplication/review load explicitly\n"
+        "5. **Growth Areas**\n"
+        "6. **Recommended Actions** — specific next steps for the manager\n"
+        "7. **Data Gaps** — dimensions not present in the provided context\n\n"
         "Be data-driven but empathetic. Use markdown formatting."
     )
 
@@ -487,11 +525,24 @@ def _gather_full_context(member: dict, conn: sqlite3.Connection) -> str:
         parts.append("\nPerformance snapshots:")
         for s in snapshots:
             metrics = json.loads(s["metrics"]) if s["metrics"] else {}
+            # Surface multiplication (reviews given / co-authored) — it is collected but was
+            # previously dropped here, so the analysis never saw the work that lands in
+            # others' output. Per ANALYSIS_STANDARD.md §1.B this is a decisive dimension.
             parts.append(
                 f"  {s['date']}: score={s['score']}, "
                 f"commits={metrics.get('commits_count', 0)}, "
-                f"prs={metrics.get('prs_merged', 0)}, "
-                f"issues={metrics.get('issues_completed', 0)}"
+                f"prs_merged={metrics.get('prs_merged', 0)}, "
+                f"prs_opened={metrics.get('prs_opened', 0)}, "
+                f"reviews_given={metrics.get('reviews_given', 0)}, "
+                f"coauthored={metrics.get('coauthored_commits', 0)}, "
+                f"issues_done={metrics.get('issues_completed', 0)}, "
+                f"issues_wip={metrics.get('issues_in_progress', 0)}, "
+                # Flow & quality (§1.C/§1.D). reopened = REPEATED FAILURES (heaviest).
+                f"reopened={metrics.get('reopened', 0)}, "
+                f"bug_share={metrics.get('bug_share', 0)}, "
+                f"stale_hours={metrics.get('stale_hours', 0)}, "
+                f"rotting_prs={metrics.get('rotting_prs', 0)}, "
+                f"pr_cycle_p85h={metrics.get('pr_cycle_p85_hours', 0)}"
             )
 
     # Meetings
@@ -544,3 +595,491 @@ def _gather_full_context(member: dict, conn: sqlite3.Connection) -> str:
             parts.append(f"  [{e['kind']}] {e['created_at']}: {e['content'][:200]}")
 
     return "\n".join(parts)
+
+
+# ---- Coach: Outliers (ANALYSIS_STANDARD.md §0.5 — Mirror, not Frame) ----
+#
+# This command surfaces cohort-relative ANOMALIES-TO-INVESTIGATE. It deliberately does
+# NOT produce a ranked / positional "bottom-N" list (forbidden by §0.5). Every flag ships
+# with candidate explanations — including the exonerating §1.D controls — and a pointer to
+# the investigation that must precede any consequential action (§8).
+
+# Compiled once at import (not per call). Roman-numeral product-engineer levels (PE II).
+_ROMAN_RE = re.compile(r"\b([ivx]{1,4})\b", re.IGNORECASE)
+_LADDER_BANDS = ("principal", "staff", "senior", "junior", "intern", "lead")
+
+
+def _parse_level(title: Optional[str]) -> str:
+    """Best-effort ladder-band extraction from a free-text title.
+
+    Returns a normalized band string for cohorting, or 'unknown'. Unknown level means
+    the member is compared only within tenure/criticality — never silently mis-banded.
+    """
+    if not title:
+        return "unknown"
+    t = title.lower()
+    band = []
+    for kw in _LADDER_BANDS:
+        if kw in t:
+            band.append(kw)
+            break
+    m = _ROMAN_RE.search(t)
+    if m and ("engineer" in t or "pe" in t):
+        band.append(m.group(1))
+    return "-".join(band) if band else "unknown"
+
+
+def _member_criticality(conn: sqlite3.Connection, member_id: int) -> Optional[str]:
+    """Read an explicit 'criticality:<class>' member flag if present.
+
+    Returns the class (critical/high/standard/low) or None. None is honest 'unknown'
+    per §0.4 — the §1.D blast-radius control then degrades to a caveat rather than a
+    fabricated value.
+    """
+    rows = conn.execute(
+        "SELECT flag FROM member_flags WHERE member_id = ?", (member_id,)
+    ).fetchall()
+    for r in rows:
+        flag = (r["flag"] or "").lower()
+        if flag.startswith("criticality:"):
+            return flag.split(":", 1)[1].strip() or None
+    return None
+
+
+def _aggregate_member_metrics(conn: sqlite3.Connection, member_id: int, days: int) -> dict:
+    """Aggregate a member's snapshots over the window into one metrics dict.
+
+    Sums event-style signals (reopened, merges, commits, reviews); averages rate/latency
+    signals (stale_hours, cycle p85, bug_share) over snapshots that carry them.
+    """
+    from datetime import datetime, timedelta
+
+    since = (datetime.now() - timedelta(days=days)).strftime("%Y-%m-%d")
+    rows = conn.execute(
+        """SELECT metrics FROM performance_snapshots
+           WHERE member_id = ? AND date >= ?""",
+        (member_id, since),
+    ).fetchall()
+
+    agg = {
+        "reopened": 0, "prs_merged": 0, "commits": 0, "reviews_given": 0,
+        "coauthored_commits": 0, "issues_completed": 0,
+    }
+    cycle_vals: list[float] = []
+    stale_vals: list[float] = []
+    bug_vals: list[float] = []
+    for row in rows:
+        m = json.loads(row["metrics"]) if row["metrics"] else {}
+        agg["reopened"] += m.get("reopened", 0) or 0
+        agg["prs_merged"] += m.get("prs_merged", 0) or 0
+        agg["commits"] += m.get("commits_count", 0) or 0
+        agg["reviews_given"] += m.get("reviews_given", 0) or 0
+        agg["coauthored_commits"] += m.get("coauthored_commits", 0) or 0
+        agg["issues_completed"] += m.get("issues_completed", 0) or 0
+        if m.get("pr_cycle_p85_hours"):
+            cycle_vals.append(float(m["pr_cycle_p85_hours"]))
+        if m.get("stale_hours"):
+            stale_vals.append(float(m["stale_hours"]))
+        if m.get("bug_share"):
+            bug_vals.append(float(m["bug_share"]))
+
+    weeks = max(days / 7.0, 1e-9)
+    agg["merges_per_week"] = agg["prs_merged"] / weeks
+    agg["pr_cycle_p85_hours"] = (sum(cycle_vals) / len(cycle_vals)) if cycle_vals else 0.0
+    agg["stale_hours"] = (sum(stale_vals) / len(stale_vals)) if stale_vals else 0.0
+    agg["bug_share"] = (sum(bug_vals) / len(bug_vals)) if bug_vals else 0.0
+    agg["snapshots"] = len(rows)
+    return agg
+
+
+# Dimension specs per ANALYSIS_STANDARD §1/§2. repeated_failures is the heaviest-weighted
+# signal; catchable_errors is intentionally ABSENT (not yet collected) and is reported as a
+# data gap by the command rather than proxied (§0.4).
+def _dimension_specs():
+    from ascend.analysis.outliers import DimensionSpec
+    return [
+        DimensionSpec("repeated_failures", "reopened", "high_bad", threshold_sd=2.0),
+        DimensionSpec("languishing_prs", "stale_hours", "high_bad", threshold_sd=2.0),
+        DimensionSpec("slow_cycle", "pr_cycle_p85_hours", "high_bad", threshold_sd=2.0),
+        DimensionSpec("low_output", "merges_per_week", "low_bad", threshold_sd=2.0),
+        DimensionSpec("bug_heavy", "bug_share", "high_bad", threshold_sd=2.0),
+    ]
+
+
+def cmd_coach_outliers(args: argparse.Namespace) -> None:
+    """Surface cohort-relative anomalies-to-investigate (§0.5). NOT a ranking."""
+    from ascend.analysis.cohorts import criticality_class  # noqa: F401 (future use)
+    from ascend.analysis.outliers import detect_outliers
+    from ascend.analysis import investigation as inv
+    from ascend.integrations.github import first_commit_date, tenure_weeks
+
+    conn = _get_conn()
+    json_mode = getattr(args, "json", False)
+    copy = getattr(args, "copy", False)
+    days = getattr(args, "days", None) or 90
+    config = load_config()
+
+    inv.ensure_tables(conn)
+
+    members = [dict(r) for r in conn.execute(
+        "SELECT * FROM members WHERE status = 'active'"
+    ).fetchall()]
+
+    member_metrics: list[dict] = []
+    data_gaps = {"tenure_unknown": 0, "criticality_unknown": 0}
+    for m in members:
+        agg = _aggregate_member_metrics(conn, m["id"], days)
+        if agg["snapshots"] == 0:
+            continue  # no data — cannot compare; excluded, not flagged (§0.4)
+        tw = None
+        try:
+            fcd = first_commit_date(
+                m.get("github") or "", str(config.repos_dir),
+                email=m.get("email"), personal_email=m.get("personal_email"),
+            )
+            tw = tenure_weeks(fcd)
+        except Exception:
+            tw = None
+        if tw is None:
+            data_gaps["tenure_unknown"] += 1
+        crit = _member_criticality(conn, m["id"])
+        if crit is None:
+            data_gaps["criticality_unknown"] += 1
+        member_metrics.append({
+            "member_id": m["id"],
+            "name": m["name"],
+            "level": _parse_level(m.get("title")),
+            "tenure_weeks": tw,
+            "criticality": crit,
+            "novelty": 0.0,  # not yet collected — §1.D novelty control reads as inactive
+            **{k: agg[k] for k in (
+                "reopened", "stale_hours", "pr_cycle_p85_hours",
+                "merges_per_week", "bug_share",
+            )},
+        })
+
+    specs = _dimension_specs()
+    flags = detect_outliers(member_metrics, specs)
+
+    # Persist each flag as an open hypothesis (§8) so it can be investigated.
+    period = f"last_{days}d"
+    name_to_id = {mm["name"]: mm["member_id"] for mm in member_metrics}
+    for f in flags:
+        try:
+            fid = inv.record_flag(
+                conn,
+                member_id=name_to_id.get(f["member"]),
+                dimension=f["dimension"], period=period, cohort_key=f.get("cohort_key"),
+                value=f.get("value"), cohort_median=f.get("cohort_median"),
+                cohort_sd=f.get("cohort_sd"), z_score=f.get("z_score"),
+                explanations=f.get("explanations"),
+            )
+            f["flag_id"] = fid
+        except Exception:
+            f["flag_id"] = None
+
+    conn.close()
+    log_operation("coach outliers", args={"days": days, "flags": len(flags)})
+
+    result = {
+        "period": period,
+        "members_analyzed": len(member_metrics),
+        "anomalies": flags,
+        "data_gaps": data_gaps,
+        "catchable_errors": "not collected — data gap per §0.4/§7; not proxied.",
+        "note": "One optional lens: engineers >2 SD from their cohort norm, with context "
+                "(incl. reasons the gap may be benign). Full picture: `report-analysis`.",
+    }
+
+    if json_mode:
+        render_output(result, json_mode=True, copy=copy)
+        return
+
+    if not flags:
+        render_output(
+            f"# Cohort outliers — {period}\n\nNo engineers cross the 2 SD bar "
+            f"({len(member_metrics)} analyzed) — not that everyone is 'fine'; this is just "
+            f"one lens. For the full per-engineer picture, use `report-analysis`.", copy=copy
+        )
+        return
+
+    parts = [f"# Cohort outliers — {period}"]
+    parts.append(
+        "An optional lens: engineers >2 SD from their level/tenure/criticality cohort on a "
+        "dimension, each with context (including reasons the gap may be benign). For the full "
+        "per-engineer picture, use `report-analysis`.\n"
+    )
+    parts.append(f"Members analyzed: {len(member_metrics)}  |  Flags: {len(flags)}")
+    parts.append(
+        f"Data gaps: tenure unknown for {data_gaps['tenure_unknown']}, "
+        f"criticality unknown for {data_gaps['criticality_unknown']}. "
+        "Catchable-errors dimension: NOT collected (not proxied, per §0.4).\n"
+    )
+    # Group by dimension; within, order is incidental (no positional meaning).
+    by_dim: dict[str, list] = {}
+    for f in flags:
+        by_dim.setdefault(f["dimension"], []).append(f)
+    # repeated_failures first only because it is the heaviest-weighted DIMENSION, not a rank.
+    dim_order = ["repeated_failures", "bug_heavy", "languishing_prs", "slow_cycle", "low_output"]
+    for dim in sorted(by_dim, key=lambda d: dim_order.index(d) if d in dim_order else 99):
+        parts.append(f"\n## {dim} ({len(by_dim[dim])})")
+        for f in by_dim[dim]:
+            fid = f.get("flag_id")
+            parts.append(
+                f"\n**{f['member']}** — value {f['value']:.2f} vs cohort median "
+                f"{f.get('cohort_median', 0):.2f} (z={f.get('z_score', 0):+.1f}, "
+                f"{f.get('severity', 'watch')}; cohort `{f.get('cohort_key')}`, "
+                f"n={f.get('cohort_n')}){f' — flag #{fid}' if fid else ''}"
+            )
+            for ex in f.get("explanations", []):
+                tag = "EXONERATES" if ex.get("exonerating") else "concern"
+                parts.append(f"  - [{tag}] {ex.get('label')}: {ex.get('rationale')}")
+            if fid:
+                parts.append(
+                    f"  (optional — log what you find: "
+                    f"`ascend coach-investigate {fid} --why ... --verdict ...`)"
+                )
+    render_output("\n".join(parts), copy=copy)
+
+
+def cmd_coach_investigate(args: argparse.Namespace) -> None:
+    """Record an investigation against a flag (§8 — the Mirror's teeth)."""
+    from ascend.analysis import investigation as inv
+
+    conn = _get_conn()
+    json_mode = getattr(args, "json", False)
+    inv.ensure_tables(conn)
+
+    valid = (getattr(args, "valid", "yes") or "yes").lower() in ("yes", "y", "true", "1")
+    try:
+        iid = inv.record_investigation(
+            conn,
+            flag_id=args.flag_id,
+            why=args.why,
+            comparison_valid=valid,
+            what_would_change=getattr(args, "what_would_change", None),
+            verdict=args.verdict,
+            investigated_by=getattr(args, "by", None) or "manager",
+        )
+    except ValueError as e:
+        conn.close()
+        render_output({"error": str(e)}, json_mode=True)
+        return
+
+    conn.close()
+    log_operation("coach investigate", args={"flag_id": args.flag_id, "verdict": args.verdict})
+    result = {"investigation_id": iid, "flag_id": args.flag_id, "verdict": args.verdict}
+    if json_mode:
+        render_output(result, json_mode=True)
+    else:
+        render_output(
+            f"Investigation #{iid} recorded for flag #{args.flag_id} "
+            f"(verdict: {args.verdict}). Flag status -> investigated."
+        )
+
+
+def cmd_coach_audit(args: argparse.Namespace) -> None:
+    """Misfire audit (§9) — keep the metric honest; demote dimensions >30% misfire."""
+    from ascend.analysis import investigation as inv
+
+    conn = _get_conn()
+    json_mode = getattr(args, "json", False)
+    copy = getattr(args, "copy", False)
+    inv.ensure_tables(conn)
+
+    audit = inv.misfire_audit(conn, since=getattr(args, "since", None))
+    conn.close()
+    log_operation("coach audit")
+
+    result = {"misfire_audit": audit}
+    if json_mode:
+        render_output(result, json_mode=True, copy=copy)
+        return
+
+    parts = ["# Analysis self-accuracy audit (§9)"]
+    parts.append(
+        "How often did flagged anomalies turn out to be noise (per logged investigations)? "
+        "This audits the analysis itself — a dimension that misfires too often isn't earning "
+        f"its keep. Threshold: misfire rate > {audit.get('threshold', 0.30)}.\n"
+    )
+    per_dim = audit.get("dimensions", audit) if isinstance(audit, dict) else {}
+    if isinstance(per_dim, dict) and per_dim:
+        for dim, stats in per_dim.items():
+            if not isinstance(stats, dict):
+                continue
+            rec = stats.get("recommendation", "")
+            parts.append(
+                f"- **{dim}**: {stats.get('misfires', 0)}/{stats.get('investigated', 0)} "
+                f"misfires (rate {stats.get('misfire_rate', 0):.0%}) {('-> ' + rec) if rec else ''}"
+            )
+    else:
+        parts.append("_No investigated flags yet — nothing to audit._")
+    render_output("\n".join(parts), copy=copy)
+
+
+# ---- Analysis for all (ANALYSIS_STANDARD.md §0.5) ----
+#
+# The primary surface: comprehensive, honest analysis for EVERY engineer — output,
+# multiplication, flow, quality, and the industry frameworks — each shown both in absolute
+# terms and relative to the member's level/tenure/criticality cohort. It presents the full
+# multi-dimensional picture and is agnostic about how the reader uses it. The analytical
+# controls (cohort normalization, surfacing illegible/multiplication work, data-gap honesty,
+# CFR-demotion) are here to keep the analysis TRUE, not to police usage.
+
+# Dimensions shown per engineer with cohort-relative standing. (name, metric_key, lower_is_better)
+_ANALYSIS_DIMENSIONS = [
+    ("merges_per_week", "merges_per_week", False),
+    ("reviews_given", "reviews_given", False),
+    ("reopened", "reopened", True),
+    ("bug_share", "bug_share", True),
+    ("stale_hours", "stale_hours", True),
+    ("pr_cycle_p85_hours", "pr_cycle_p85_hours", True),
+]
+
+
+def _fw_metrics(agg: dict, days: int) -> dict:
+    """Map an aggregate into the metrics dict the frameworks module expects."""
+    return {
+        "commits_count": agg.get("commits", 0),
+        "prs_merged": agg.get("prs_merged", 0),
+        "issues_completed": agg.get("issues_completed", 0),
+        "reviews_given": agg.get("reviews_given", 0),
+        "coauthored_commits": agg.get("coauthored_commits", 0),
+        "reopened": agg.get("reopened", 0),
+        "bug_share": agg.get("bug_share", 0.0),
+        "stale_hours": agg.get("stale_hours", 0.0),
+        "pr_cycle_p85_hours": agg.get("pr_cycle_p85_hours", 0.0),
+        "period_days": days,
+    }
+
+
+def cmd_report_analysis(args: argparse.Namespace) -> None:
+    """Comprehensive analysis for every engineer, with cohort-relative standing (§0.5)."""
+    from ascend.integrations.frameworks import frameworks_report
+    from ascend.integrations.github import first_commit_date, tenure_weeks
+    from ascend.analysis.normalization import cohort_stats, zscore
+    from ascend.analysis.cohorts import cohort_key
+
+    conn = _get_conn()
+    json_mode = getattr(args, "json", False)
+    copy = getattr(args, "copy", False)
+    days = getattr(args, "days", None) or 90
+    sort_key = getattr(args, "sort", None) or "name"
+    only_member = getattr(args, "member", None)
+    only_team = getattr(args, "team", None)
+    config = load_config()
+
+    query = "SELECT * FROM members WHERE status = 'active'"
+    members = [dict(r) for r in conn.execute(query).fetchall()]
+    if only_member:
+        ml = only_member.lower()
+        members = [m for m in members if ml in (m.get("name", "") or "").lower()
+                   or ml == str(m.get("id")) or ml == (m.get("github") or "").lower()]
+    if only_team and "team_id" in (members[0] if members else {}):
+        members = [m for m in members if str(m.get("team_id")) == str(only_team)]
+
+    profiles = []
+    for m in members:
+        agg = _aggregate_member_metrics(conn, m["id"], days)
+        tw = None
+        try:
+            fcd = first_commit_date(
+                m.get("github") or "", str(config.repos_dir),
+                email=m.get("email"), personal_email=m.get("personal_email"),
+            )
+            tw = tenure_weeks(fcd)
+        except Exception:
+            tw = None
+        crit = _member_criticality(conn, m["id"])
+        level = _parse_level(m.get("title"))
+        profiles.append({
+            "member": m["name"],
+            "level": level,
+            "title": m.get("title"),
+            "tenure_weeks": tw,
+            "criticality": crit,
+            "has_data": agg["snapshots"] > 0,
+            "cohort": cohort_key(level, tw, crit),
+            "metrics": {
+                "merges_per_week": agg.get("merges_per_week", 0.0),
+                "reviews_given": agg.get("reviews_given", 0),
+                "reopened": agg.get("reopened", 0),
+                "bug_share": agg.get("bug_share", 0.0),
+                "stale_hours": agg.get("stale_hours", 0.0),
+                "pr_cycle_p85_hours": agg.get("pr_cycle_p85_hours", 0.0),
+                "commits": agg.get("commits", 0),
+                "prs_merged": agg.get("prs_merged", 0),
+            },
+            "frameworks": frameworks_report(_fw_metrics(agg, days), period_days=days),
+        })
+
+    # Cohort-relative standing: for each dimension, z-score within the member's cohort.
+    with_data = [p for p in profiles if p["has_data"]]
+    by_cohort: dict[str, list] = {}
+    for p in with_data:
+        by_cohort.setdefault(p["cohort"], []).append(p)
+    for _, group in by_cohort.items():
+        for dim, key, lower_bad in _ANALYSIS_DIMENSIONS:
+            stats = cohort_stats([g["metrics"].get(key, 0.0) for g in group])
+            for g in group:
+                z = zscore(g["metrics"].get(key, 0.0), stats)
+                g.setdefault("standing", {})[dim] = round(z, 2)
+
+    # Sorting is a convenience for the reader; it carries no verdict.
+    def _sort_val(p):
+        if sort_key in ("name",):
+            return (p["member"] or "").lower()
+        if sort_key in p["metrics"]:
+            return -float(p["metrics"][sort_key])
+        return (p["member"] or "").lower()
+    profiles.sort(key=_sort_val)
+
+    conn.close()
+    log_operation("report analysis", args={"days": days, "members": len(profiles)})
+
+    result = {
+        "period": f"last_{days}d",
+        "engineers": profiles,
+        "note": "Comprehensive analysis for every engineer. Metrics shown absolute and "
+                "cohort-relative (z within level/tenure/criticality). catchable-errors is "
+                "not collected (data gap, not proxied).",
+    }
+    if json_mode:
+        render_output(result, json_mode=True, copy=copy)
+        return
+
+    parts = [f"# Engineering analysis — every engineer · last {days}d (sorted by {sort_key})"]
+    parts.append(
+        "Per-engineer, all dimensions, absolute + cohort-relative (z within "
+        "level/tenure/criticality). `*`=|z|>2 vs cohort. catchable-errors: not collected.\n"
+    )
+    header = (f"{'Engineer':<22}{'Level':<10}{'Ten':>4}{'Mrg/wk':>7}{'Rev':>5}"
+              f"{'Reopen':>7}{'Bug%':>6}{'Stale':>7}{'Cyc85':>7}")
+    parts.append(header)
+    parts.append("-" * len(header))
+    for p in profiles:
+        if not p["has_data"]:
+            parts.append(f"{p['member'][:21]:<22}{p['level'][:9]:<10}  — no snapshot data in window")
+            continue
+        mk = p["metrics"]
+        st = p.get("standing", {})
+
+        def mark(dim, val, fmt):
+            s = "*" if abs(st.get(dim, 0)) > 2 else " "
+            return f"{fmt.format(val)}{s}"
+        tw = f"{p['tenure_weeks']:.0f}" if p["tenure_weeks"] is not None else "?"
+        parts.append(
+            f"{p['member'][:21]:<22}{p['level'][:9]:<10}{tw:>4}"
+            f"{mark('merges_per_week', mk['merges_per_week'], '{:.1f}'):>7}"
+            f"{mark('reviews_given', mk['reviews_given'], '{:.0f}'):>5}"
+            f"{mark('reopened', mk['reopened'], '{:.0f}'):>7}"
+            f"{mark('bug_share', mk['bug_share']*100, '{:.0f}'):>6}"
+            f"{mark('stale_hours', mk['stale_hours'], '{:.0f}'):>7}"
+            f"{mark('pr_cycle_p85_hours', mk['pr_cycle_p85_hours'], '{:.0f}'):>7}"
+        )
+    parts.append(
+        f"\n{len(with_data)}/{len(profiles)} engineers with data. "
+        "DORA/SPACE/DX Core 4 per engineer available via --json. "
+        "Read it however you like — this is analysis, not a verdict."
+    )
+    render_output("\n".join(parts), copy=copy)

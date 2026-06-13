@@ -14,7 +14,7 @@ import json
 import re
 import subprocess
 import sys
-from datetime import datetime
+from datetime import datetime, timezone, timedelta
 from pathlib import Path
 from typing import Any
 
@@ -399,3 +399,187 @@ def _review_label(decision: str) -> str:
         "CHANGES_REQUESTED": "changes requested",
         "REVIEW_REQUIRED": "needs review",
     }.get(decision or "", "needs review")
+
+
+# ---------------------------------------------------------------------------
+# Flow & latency collectors (ANALYSIS_STANDARD §1.C)
+# ---------------------------------------------------------------------------
+
+
+def _parse_iso(ts: Any) -> datetime | None:
+    """Parse an ISO8601 timestamp (with optional trailing 'Z') to an aware UTC
+    datetime. Returns None on missing/unparseable input. Never raises."""
+    if not isinstance(ts, str) or not ts.strip():
+        return None
+    try:
+        dt = datetime.fromisoformat(ts.strip().replace("Z", "+00:00"))
+    except (ValueError, TypeError):
+        return None
+    if dt.tzinfo is None:
+        dt = dt.replace(tzinfo=timezone.utc)
+    return dt
+
+
+def _percentile(values: list[float], pct: float) -> float:
+    """Linear-interpolation percentile (pct in [0, 100]). 0.0 for empty input."""
+    if not values:
+        return 0.0
+    ordered = sorted(values)
+    if len(ordered) == 1:
+        return float(ordered[0])
+    rank = (pct / 100.0) * (len(ordered) - 1)
+    lo = int(rank)
+    hi = min(lo + 1, len(ordered) - 1)
+    frac = rank - lo
+    return float(ordered[lo] + (ordered[hi] - ordered[lo]) * frac)
+
+
+def compute_flow_metrics(
+    prs: dict[str, Any], *, now: datetime | None = None
+) -> dict[str, Any]:
+    """Flow & latency metrics (ANALYSIS_STANDARD §1.C) over a member's PRs.
+
+    ``prs`` is shaped ``{"open": [...], "merged": [...]}`` where each PR is a
+    raw dict with camelCase keys (createdAt, updatedAt, mergedAt). Timestamps
+    are ISO8601 strings that may end in 'Z'. PRs with missing/unparseable
+    timestamps are skipped gracefully (never raise).
+
+    Returns:
+        stale_hours: sum over OPEN prs of hours since updatedAt.
+        rotting_prs: count of OPEN prs idle >= 7 days by updatedAt.
+        pr_cycle_p85_hours: 85th percentile of (mergedAt - createdAt) in hours
+            over MERGED prs; 0.0 if none parseable.
+        open_prs: count of OPEN prs supplied.
+    """
+    if now is None:
+        now = datetime.now(timezone.utc)
+    elif now.tzinfo is None:
+        now = now.replace(tzinfo=timezone.utc)
+
+    open_prs = list((prs or {}).get("open") or [])
+    merged_prs = list((prs or {}).get("merged") or [])
+
+    rotting_cutoff = timedelta(days=7)
+    stale_hours = 0.0
+    rotting = 0
+    for pr in open_prs:
+        if not isinstance(pr, dict):
+            continue
+        updated = _parse_iso(pr.get("updatedAt"))
+        if updated is None:
+            continue
+        idle = now - updated
+        idle_hours = idle.total_seconds() / 3600.0
+        if idle_hours > 0:
+            stale_hours += idle_hours
+        if idle >= rotting_cutoff:
+            rotting += 1
+
+    cycle_hours: list[float] = []
+    for pr in merged_prs:
+        if not isinstance(pr, dict):
+            continue
+        created = _parse_iso(pr.get("createdAt"))
+        merged = _parse_iso(pr.get("mergedAt"))
+        if created is None or merged is None:
+            continue
+        delta_hours = (merged - created).total_seconds() / 3600.0
+        if delta_hours >= 0:
+            cycle_hours.append(delta_hours)
+
+    return {
+        "stale_hours": stale_hours,
+        "rotting_prs": rotting,
+        "pr_cycle_p85_hours": _percentile(cycle_hours, 85.0),
+        "open_prs": len(open_prs),
+    }
+
+
+# ---------------------------------------------------------------------------
+# Tenure / ramp collectors (ANALYSIS_STANDARD §3)
+# ---------------------------------------------------------------------------
+
+
+def first_commit_date(
+    github_handle: str,
+    repos_dir: str,
+    *,
+    email: str | None = None,
+    personal_email: str | None = None,
+) -> str | None:
+    """Earliest commit date (ISO 'YYYY-MM-DD') authored by this person across
+    all git repos under ``repos_dir``.
+
+    Matches by author email(s) and by the GitHub handle (substring of author
+    name/email). Returns None if no matching commit is found anywhere.
+    """
+    repos_path = Path(repos_dir)
+    if not repos_path.exists():
+        return None
+
+    patterns: list[str] = []
+    for addr in (email, personal_email):
+        if addr and addr.strip():
+            patterns.append(addr.strip())
+    if github_handle and github_handle.strip():
+        patterns.append(github_handle.strip())
+    if not patterns:
+        return None
+
+    try:
+        repo_dirs = sorted(
+            e for e in repos_path.iterdir()
+            if e.is_dir() and (e / ".git").exists()
+        )
+    except OSError:
+        return None
+
+    earliest: datetime | None = None
+    for entry in repo_dirs:
+        for pat in patterns:
+            stdout, _, rc = _run_cmd([
+                "git", "-C", str(entry), "log", "--all", "--reverse",
+                "--format=%aI", f"--author={pat}", "-i",
+            ])
+            if rc != 0 or not stdout.strip():
+                continue
+            first_line = stdout.strip().splitlines()[0].strip()
+            dt = _parse_iso(first_line)
+            if dt is None:
+                continue
+            if earliest is None or dt < earliest:
+                earliest = dt
+            # First match per repo is the earliest for that pattern; keep
+            # scanning other patterns in case a different email is older.
+
+    if earliest is None:
+        return None
+    return earliest.date().isoformat()
+
+
+def tenure_weeks(
+    first_commit_iso: str | None, *, now: datetime | None = None
+) -> float | None:
+    """Weeks elapsed since the first commit date. None if input is None.
+
+    Accepts an ISO date ('YYYY-MM-DD') or full ISO8601 timestamp.
+    """
+    if first_commit_iso is None:
+        return None
+    first = _parse_iso(first_commit_iso)
+    if first is None:
+        # Bare date won't parse via fromisoformat on all versions if it has a
+        # trailing space etc.; try a plain date parse as a fallback.
+        try:
+            first = datetime.fromisoformat(first_commit_iso.strip())
+            if first.tzinfo is None:
+                first = first.replace(tzinfo=timezone.utc)
+        except (ValueError, TypeError, AttributeError):
+            return None
+
+    if now is None:
+        now = datetime.now(timezone.utc)
+    elif now.tzinfo is None:
+        now = now.replace(tzinfo=timezone.utc)
+
+    return (now - first).total_seconds() / (7 * 24 * 3600.0)
