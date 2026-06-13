@@ -346,3 +346,143 @@ def _assignee_matches(issue: dict[str, Any], name_lower: str) -> bool:
     display = (assignee.get("displayName") or "").lower()
     name = (assignee.get("name") or "").lower()
     return name_lower in (display, name) or name_lower in display or name_lower in name
+
+
+# ---------------------------------------------------------------------------
+# Quality & reliability collectors (ANALYSIS_STANDARD §1.D)
+# ---------------------------------------------------------------------------
+
+# Issue history with from/to state types, used to detect reopen transitions.
+_ISSUE_HISTORY_QUERY = """
+query($teamId: ID!, $first: Int!, $cursor: String) {
+  issues(
+    filter: {
+      team: { id: { eq: $teamId } }
+      assignee: { name: { containsIgnoreCase: $assignee } }
+    }
+    first: $first
+    after: $cursor
+    orderBy: updatedAt
+  ) {
+    nodes {
+      identifier
+      assignee { name displayName }
+      history {
+        nodes {
+          createdAt
+          fromState { name type }
+          toState { name type }
+        }
+      }
+    }
+    pageInfo { hasNextPage endCursor }
+  }
+}
+"""
+
+
+def _parse_iso(ts: Any) -> datetime | None:
+    """Parse an ISO8601 timestamp (optional trailing 'Z') to aware UTC datetime.
+    Returns None on missing/unparseable input. Never raises."""
+    if not isinstance(ts, str) or not ts.strip():
+        return None
+    try:
+        dt = datetime.fromisoformat(ts.strip().replace("Z", "+00:00"))
+    except (ValueError, TypeError):
+        return None
+    if dt.tzinfo is None:
+        from datetime import timezone as _tz
+        dt = dt.replace(tzinfo=_tz.utc)
+    return dt
+
+
+def _is_reopen(history_nodes: list[dict[str, Any]], since: datetime) -> bool:
+    """True if any history transition went FROM a completed state BACK TO a
+    non-completed state with createdAt >= since.
+
+    A "completed" state is one whose ``type`` is ``"completed"``. The reopen is
+    a transition out of completed into anything not completed (e.g. started,
+    unstarted, backlog, triage).
+    """
+    if not history_nodes:
+        return False
+    if since.tzinfo is None:
+        from datetime import timezone as _tz
+        since = since.replace(tzinfo=_tz.utc)
+
+    for node in history_nodes:
+        if not isinstance(node, dict):
+            continue
+        from_state = node.get("fromState") or {}
+        to_state = node.get("toState") or {}
+        from_type = (from_state.get("type") or "").lower()
+        to_type = (to_state.get("type") or "").lower()
+        if from_type != "completed" or to_type == "completed":
+            continue
+        # toState must exist (an actual destination state) to count as a reopen.
+        if not to_state:
+            continue
+        created = _parse_iso(node.get("createdAt"))
+        if created is None or created < since:
+            continue
+        return True
+    return False
+
+
+def count_reopened(
+    api_key: str, team_id: str, member_name: str, since: datetime
+) -> int:
+    """Count issues assigned to ``member_name`` that were reopened (transitioned
+    out of a completed state back to non-completed) at or after ``since``.
+
+    Reopened/recurring issues are the heaviest quality signal (§1.D). On any API
+    error this returns 0 and never raises.
+    """
+    member_lower = member_name.lower()
+    count = 0
+    cursor = None
+
+    while True:
+        variables: dict[str, Any] = {
+            "teamId": team_id,
+            "assignee": member_name,
+            "first": 50,
+        }
+        if cursor:
+            variables["cursor"] = cursor
+        result = _graphql(api_key, _ISSUE_HISTORY_QUERY, variables)
+        if result is None:
+            break
+        issues_data = result.get("issues", {}) or {}
+        for issue in issues_data.get("nodes", []) or []:
+            if not _assignee_matches(issue, member_lower):
+                continue
+            history = (issue.get("history") or {}).get("nodes", []) or []
+            if _is_reopen(history, since):
+                count += 1
+        page_info = issues_data.get("pageInfo", {}) or {}
+        if page_info.get("hasNextPage") and page_info.get("endCursor"):
+            cursor = page_info["endCursor"]
+        else:
+            break
+
+    return count
+
+
+def bug_share(issues: list[dict[str, Any]]) -> float:
+    """Fraction (0..1) of issues with a label whose name contains 'bug'
+    (case-insensitive). 0.0 if the list is empty.
+    """
+    if not issues:
+        return 0.0
+    bug_count = 0
+    for issue in issues:
+        if not isinstance(issue, dict):
+            continue
+        labels = (issue.get("labels") or {}).get("nodes", []) or []
+        for label in labels:
+            name = (label.get("name") or "") if isinstance(label, dict) else ""
+            if "bug" in name.lower():
+                bug_count += 1
+                break
+    return bug_count / len(issues)

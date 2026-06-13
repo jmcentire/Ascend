@@ -5,7 +5,7 @@ from __future__ import annotations
 import sqlite3
 from pathlib import Path
 
-SCHEMA_VERSION = 2
+SCHEMA_VERSION = 3
 
 _SCHEMA_SQL = """\
 -- Schema version tracking
@@ -156,6 +156,47 @@ CREATE TABLE IF NOT EXISTS schedules (
     enabled INTEGER NOT NULL DEFAULT 1,
     created_at TEXT NOT NULL DEFAULT (datetime('now'))
 );
+
+-- Outlier flags (ANALYSIS_STANDARD.md §0.5) — anomalies-to-investigate, NOT verdicts.
+-- A flag is a hypothesis; it is resolved by an investigation (§8), never by ranking.
+CREATE TABLE IF NOT EXISTS flags (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    member_id INTEGER NOT NULL REFERENCES members(id),
+    dimension TEXT NOT NULL,
+    period TEXT,
+    cohort_key TEXT,
+    value REAL,
+    cohort_median REAL,
+    cohort_sd REAL,
+    z_score REAL,
+    explanations TEXT,  -- JSON: candidate explanations incl. exonerating §1.D controls
+    status TEXT NOT NULL DEFAULT 'open',
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+-- Investigations (§8) — the Mirror's teeth. A flag must be investigated before action.
+CREATE TABLE IF NOT EXISTS investigations (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    flag_id INTEGER NOT NULL REFERENCES flags(id),
+    why TEXT,
+    comparison_valid INTEGER,
+    what_would_change TEXT,
+    verdict TEXT NOT NULL,  -- performance | context | misfire
+    investigated_by TEXT,
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
+
+-- Consequential actions (§8) — PIP/manage-out/rating. A consequential action with no
+-- logged investigation is recorded as a process violation, not a validated decision.
+CREATE TABLE IF NOT EXISTS consequential_actions (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    member_id INTEGER NOT NULL REFERENCES members(id),
+    action TEXT NOT NULL,  -- pip | manage_out | rating
+    flag_id INTEGER REFERENCES flags(id),
+    investigation_id INTEGER REFERENCES investigations(id),
+    is_process_violation INTEGER NOT NULL DEFAULT 0,
+    created_at TEXT NOT NULL DEFAULT (datetime('now'))
+);
 """
 
 
@@ -211,15 +252,32 @@ def check_db(db_path: Path) -> dict:
         "members", "member_flags", "teams", "team_members",
         "meetings", "meeting_items", "goals",
         "performance_snapshots", "coaching_entries", "schedules",
+        "flags", "investigations", "consequential_actions",
     ]
     counts = {}
+    missing = []
     for table in tables:
-        row = conn.execute(f"SELECT COUNT(*) FROM {table}").fetchone()
-        counts[table] = row[0]
+        try:
+            row = conn.execute(f"SELECT COUNT(*) FROM {table}").fetchone()
+            counts[table] = row[0]
+        except sqlite3.OperationalError:
+            # Table absent — DB predates a schema bump and has not been re-initialized.
+            # Report it instead of crashing; `ascend init` applies the pending migration.
+            counts[table] = None
+            missing.append(table)
 
     conn.close()
-    return {
+    result = {
         "ok": True,
         "version": version,
         "tables": counts,
     }
+    if missing:
+        result["schema_drift"] = {
+            "expected_version": SCHEMA_VERSION,
+            "missing_tables": missing,
+            "fix": "run `ascend init` to apply pending migrations",
+        }
+        if version < SCHEMA_VERSION:
+            result["ok"] = True  # not fatal; surfaced as drift, not an error
+    return result

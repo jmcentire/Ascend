@@ -337,6 +337,39 @@ def _build_parser() -> argparse.ArgumentParser:
     p.add_argument("--json", action="store_true", help="JSON output")
     p.add_argument("--copy", action="store_true", help="Copy to clipboard")
 
+    # -- coach outliers --
+    p = sub.add_parser(
+        "coach-outliers",
+        help="Cohort-relative anomalies-to-investigate (Mirror, not a ranking)",
+    )
+    p.add_argument("--days", type=int, default=90, help="Lookback days (default: 90)")
+    p.add_argument("--json", action="store_true", help="JSON output")
+    p.add_argument("--copy", action="store_true", help="Copy to clipboard")
+
+    # -- coach investigate --
+    p = sub.add_parser(
+        "coach-investigate",
+        help="Record an investigation against a flag (required before action, §8)",
+    )
+    p.add_argument("flag_id", type=int, help="Flag ID from coach-outliers")
+    p.add_argument("--why", required=True, help="Why is the anomaly present (the dig-in)")
+    p.add_argument("--valid", choices=["yes", "no"], default="yes",
+                   help="Is the cohort comparison valid?")
+    p.add_argument("--what-would-change", dest="what_would_change",
+                   help="What context/tooling/behavior change would move it")
+    p.add_argument("--verdict", required=True,
+                   choices=["performance", "context", "misfire"], help="Investigation verdict")
+    p.add_argument("--by", help="Investigator name")
+    p.add_argument("--json", action="store_true", help="JSON output")
+
+    # -- coach audit --
+    p = sub.add_parser(
+        "coach-audit", help="Misfire audit (§9) + process-violation report",
+    )
+    p.add_argument("--since", help="Only audit flags created since (YYYY-MM-DD)")
+    p.add_argument("--json", action="store_true", help="JSON output")
+    p.add_argument("--copy", action="store_true", help="Copy to clipboard")
+
     # -- schedule list --
     p = sub.add_parser("schedule-list", help="List all schedules")
     p.add_argument("--json", action="store_true", help="JSON output")
@@ -415,6 +448,7 @@ def _rewrite_args(argv: list[str]) -> list[str]:
             "report-git", "report-dashboard", "report-stale", "report-custom",
             "plan-cycle", "plan-career",
             "coach-analyze", "coach-risks", "coach-star", "coach-suggest",
+            "coach-outliers", "coach-investigate", "coach-audit",
             "schedule-list", "schedule-add", "schedule-remove",
             "schedule-run", "schedule-enable", "schedule-disable",
         ):
@@ -622,6 +656,18 @@ def main(argv: list[str] | None = None) -> None:
     elif args.command == "coach-suggest":
         from ascend.commands.coach import cmd_coach_suggest
         cmd_coach_suggest(args)
+
+    elif args.command == "coach-outliers":
+        from ascend.commands.coach import cmd_coach_outliers
+        cmd_coach_outliers(args)
+
+    elif args.command == "coach-investigate":
+        from ascend.commands.coach import cmd_coach_investigate
+        cmd_coach_investigate(args)
+
+    elif args.command == "coach-audit":
+        from ascend.commands.coach import cmd_coach_audit
+        cmd_coach_audit(args)
 
     elif args.command == "schedule-list":
         from ascend.commands.schedule import cmd_schedule_list
