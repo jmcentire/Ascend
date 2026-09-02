@@ -13,7 +13,7 @@ def config_path(tmp_path):
 
 def test_default_config():
     cfg = AscendConfig()
-    assert cfg.model == "claude-sonnet-4-20250514"
+    assert cfg.model == "claude-sonnet-4-6"
     assert cfg.default_lookback_hours == 24
     assert cfg.github_org == ""
 
@@ -30,12 +30,12 @@ def test_save_and_load(config_path):
 
 def test_load_missing_returns_defaults(tmp_path):
     cfg = load_config(tmp_path / "nonexistent.yaml")
-    assert cfg.model == "claude-sonnet-4-20250514"
+    assert cfg.model == "claude-sonnet-4-6"
 
 
 def test_get_config_value():
     cfg = AscendConfig()
-    assert get_config_value("model", cfg) == "claude-sonnet-4-20250514"
+    assert get_config_value("model", cfg) == "claude-sonnet-4-6"
 
 
 def test_get_config_value_unknown():
