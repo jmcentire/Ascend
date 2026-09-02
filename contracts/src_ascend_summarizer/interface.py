@@ -10,6 +10,7 @@
 #   - Sentiment scores are always clamped to [0.0, 1.0] range
 #   - MeetingItemExtract.content is always non-empty (enforced by validator)
 
+from enum import Enum
 class MeetingItemKind(Enum):
     """Enumeration of meeting item types extracted from transcripts"""
     action_item = "action_item"

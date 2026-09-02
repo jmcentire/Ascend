@@ -12,11 +12,15 @@
 #   - All connections use sqlite3.Row as row_factory
 #   - check_db expects tables: members, member_flags, teams, team_members, meetings, meeting_items, goals, performance_snapshots, coaching_entries, schedules
 
-Path = primitive  # pathlib.Path - filesystem path object
+#Path =  # pathlib.Path - filesystem path object
 
-Connection = primitive  # sqlite3.Connection - database connection object
+#Connection =  # sqlite3.Connection - database connection object
 
-Row = primitive  # sqlite3.Row - row factory for dict-like access to query results
+#Row =  # sqlite3.Row - row factory for dict-like access to query results
+
+from pathlib import Path
+from sqlite3 import Connection
+from sqlite3 import Row
 
 class HealthCheckResult:
     """Dictionary returned by check_db with health status"""

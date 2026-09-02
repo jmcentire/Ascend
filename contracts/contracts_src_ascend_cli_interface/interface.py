@@ -9,7 +9,7 @@
 #   - Parser program name is always 'ascend'
 #   - 3-word command matching takes precedence over 2-word matching in _rewrite_args
 
-SystemExit = primitive  # Built-in exception type for exiting the program with a status code
+#SystemExit =  # Built-in exception type for exiting the program with a status code
 
 def _build_parser() -> argparse.ArgumentParser:
     """

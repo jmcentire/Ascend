@@ -33,13 +33,13 @@ class _DAY_MAP:
 
 class _CRON_WEEKDAY_TO_PYTHON:
     """Mapping from cron weekday numbers (0=Sunday) to Python weekday numbers (0=Monday, 6=Sunday)"""
-    0: int                                   # required, Cron Sunday (0) -> Python Sunday (6)
-    1: int                                   # required, Cron Monday (1) -> Python Monday (0)
-    2: int                                   # required, Cron Tuesday (2) -> Python Tuesday (1)
-    3: int                                   # required, Cron Wednesday (3) -> Python Wednesday (2)
-    4: int                                   # required, Cron Thursday (4) -> Python Thursday (3)
-    5: int                                   # required, Cron Friday (5) -> Python Friday (4)
-    6: int                                   # required, Cron Saturday (6) -> Python Saturday (5)
+    # 0: int                                   # required, Cron Sunday (0) -> Python Sunday (6)
+    # 1: int                                   # required, Cron Monday (1) -> Python Monday (0)
+    # 2: int                                   # required, Cron Tuesday (2) -> Python Tuesday (1)
+    # 3: int                                   # required, Cron Wednesday (3) -> Python Wednesday (2)
+    # 4: int                                   # required, Cron Thursday (4) -> Python Thursday (3)
+    # 5: int                                   # required, Cron Friday (5) -> Python Friday (4)
+    # 6: int                                   # required, Cron Saturday (6) -> Python Saturday (5)
 
 class CronFields:
     """Dictionary representing parsed cron expression fields"""
