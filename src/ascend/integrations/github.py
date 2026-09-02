@@ -10,6 +10,7 @@ make ~3,800 gh API calls; the cached approach makes ~132 (2 per repo).
 from __future__ import annotations
 
 import concurrent.futures
+from collections import defaultdict
 import json
 import re
 import subprocess
@@ -17,6 +18,43 @@ import sys
 from datetime import datetime, timezone, timedelta
 from pathlib import Path
 from typing import Any
+
+from ascend.integrations import codestats
+from ascend.analysis.cohorts import DEFAULT_CRITICALITY
+
+# Reviews authored by machines are not multiplication. 93% of inline review threads in
+# this org are bot-authored (Cursor, Adapt, Codex, Copilot), so any review metric that
+# includes them measures CI, not people. ANALYSIS_STANDARD.md §1.5 Gate 4.
+REVIEW_BOTS = {
+    "cursor", "adaptcom", "chatgpt-codex-connector", "copilot-pull-request-reviewer",
+    "claude", "sealabcore", "github-actions", "dependabot", "wander-ci",
+}
+
+# A commit whose subject matches this is repair work. Used for rework direction:
+# a fix by SOMEONE ELSE landing on a file you just touched is the strongest negative
+# discriminator found (§1.5 / §10.2) — it beat every volume metric.
+_FIXY = re.compile(
+    r"\b(fix|bug|hotfix|patch|revert|repair|regression|broken|incident)\b", re.I
+)
+_REWORK_WINDOW_SECONDS = 14 * 86400
+
+
+def _is_review_bot(login: str) -> bool:
+    l = (login or "").lower()
+    return l in REVIEW_BOTS or l.endswith("[bot]")
+
+
+def _criticality_of(repo_name: str) -> str:
+    """Blast-radius class for a repo (§1.D system-criticality control)."""
+    low = (repo_name or "").lower()
+    for frag, cls in DEFAULT_CRITICALITY.items():
+        if frag in low:
+            return cls
+    return "standard"
+
+
+_CRIT_WEIGHT = {"critical": 3.0, "high": 2.5, "standard": 2.0, "low": 1.0}
+
 
 # Module-level PR cache: repo_slug -> {"open": [...], "merged": [...]}
 _pr_cache: dict[str, dict[str, Any]] = {}
@@ -107,7 +145,7 @@ def fetch_prs(
                   if _is_within_window(pr, since, until=until)]
         return {"error": cached.get("error"), "open": cached.get("open", []), "merged": merged}
 
-    fields = "number,title,author,state,createdAt,updatedAt,mergedAt,closedAt,reviewDecision,latestReviews,url"
+    fields = "number,title,author,state,createdAt,updatedAt,mergedAt,closedAt,reviewDecision,latestReviews,mergedBy,url"
 
     stdout_open, stderr_open, rc_open = _run_cmd([
         "gh", "pr", "list", "--repo", repo_slug,
@@ -157,7 +195,12 @@ def fetch_all_github(
     handles = {m["github"] for m in members if m.get("github")}
     result: dict[str, dict[str, Any]] = {
         h: {"error": None, "commits": [], "prs": {"open": [], "merged": []},
-            "reviews_given": 0, "coauthored_commits": 0}
+            "reviews_given": 0, "coauthored_commits": 0,
+            "reviews_cross_repo": 0, "review_criticality_sum": 0.0,
+            "prs_merged_without_human_approval": 0, "prs_merged_total": 0,
+            "lines": codestats.empty_line_stats(),
+            "fixes_others": 0, "fixed_by_others": 0,
+            "foundation_files": 0, "files_touched": 0}
         for h in handles
     }
     seen_hashes: dict[str, set[str]] = {h: set() for h in handles}
@@ -189,15 +232,17 @@ def fetch_all_github(
         with concurrent.futures.ThreadPoolExecutor(max_workers=8) as pool:
             pool.map(_fetch_repo, repo_dirs)
 
+    touch_index: dict[tuple[str, str], list[tuple[int, Any, bool]]] = defaultdict(list)
+
     for entry in repo_dirs:
         # Fetch ALL commits for the time window (not per-author). Body (%b) is
         # included so Co-authored-by trailers can be credited as multiplication.
         # Fields are separated by \x1f and commits by \x1e so multi-line bodies
         # parse cleanly.
         since_str = since.strftime("%Y-%m-%dT%H:%M:%S")
-        fmt = "%H%x1f%an%x1f%ae%x1f%s%x1f%aI%x1f%b%x1e"
+        fmt = "%x1e%H%x1f%an%x1f%ae%x1f%s%x1f%aI%x1f%at%x1f%b"
         log_cmd = [
-            "git", "-C", str(entry), "log", "--all",
+            "git", "-C", str(entry), "log", "--all", "--no-merges", "--numstat",
             f"--since={since_str}", f"--format={fmt}",
         ]
         if until:
@@ -218,6 +263,23 @@ def fetch_all_github(
                         "message": c["message"], "date": c["date"],
                         "repo": entry.name,
                     })
+                    # Classified line accounting (§1.5 Gate 1) — raw insertion
+                    # counts are meaningless without this.
+                    for path, added, deleted in c.get("files", []):
+                        codestats.accumulate(
+                            result[matched_handle]["lines"], path, added, deleted
+                        )
+                # File-touch index feeds rework direction and foundation share
+                # (§10.2, §10.5). Recorded for every commit, matched or not, so
+                # "someone else fixed it" stays detectable when the fixer is
+                # off-roster.
+                if c.get("files"):
+                    _is_fix = bool(_FIXY.search(c.get("message") or ""))
+                    _ts = c.get("ts", 0)
+                    for path, _a, _d in c["files"]:
+                        touch_index[(entry.name, path)].append(
+                            (_ts, matched_handle, _is_fix)
+                        )
                 # Multiplication: credit co-authors (helped land someone else's
                 # commit) — counted once per (co-author, commit), never the
                 # primary author crediting themselves.
@@ -248,9 +310,19 @@ def fetch_all_github(
         # Multiplication: credit reviews given on others' PRs in this repo.
         _tally_reviews_given(
             list(pr_result.get("open", [])) + list(pr_result.get("merged", [])),
-            handles, result,
+            handles, result, repo_name=entry.name,
         )
 
+        # Governance: merged with no human approval (§1.5 Gate 4). Self-merge is
+        # the norm here, so this is reported, never used to penalise an individual.
+        for pr in pr_result.get("merged", []):
+            author = pr.get("author", "")
+            if author in handles:
+                result[author]["prs_merged_total"] += 1
+                if pr.get("human_approvals", 0) == 0:
+                    result[author]["prs_merged_without_human_approval"] += 1
+
+    _tally_rework_and_foundation(touch_index, result)
     return result
 
 
@@ -271,6 +343,11 @@ def fetch_member_github(
     return results.get(github_handle, {
         "error": None, "commits": [], "prs": {"open": [], "merged": []},
         "reviews_given": 0, "coauthored_commits": 0,
+        "reviews_cross_repo": 0, "review_criticality_sum": 0.0,
+        "prs_merged_without_human_approval": 0, "prs_merged_total": 0,
+        "lines": codestats.empty_line_stats(),
+        "fixes_others": 0, "fixed_by_others": 0,
+        "foundation_files": 0, "files_touched": 0,
     })
 
 
@@ -295,6 +372,9 @@ def _parse_pr_list(stdout: str) -> list[dict[str, Any]]:
             "reviewers": _extract_reviewers(pr),
             "created_at": pr.get("createdAt", ""),
             "merged_at": pr.get("mergedAt", ""),
+            "merged_by": (pr.get("mergedBy") or {}).get("login", "") if isinstance(pr.get("mergedBy"), dict) else "",
+            "human_approvals": _count_human_reviews(pr, "APPROVED"),
+            "human_changes_requested": _count_human_reviews(pr, "CHANGES_REQUESTED"),
             "url": pr.get("url", ""),
         })
     return result
@@ -307,13 +387,27 @@ def _extract_reviewers(pr: dict[str, Any]) -> list[str]:
         author = r.get("author") or {}
         login = author.get("login", "") if isinstance(author, dict) else ""
         state = (r.get("state") or "").upper()
-        if login and state in ("APPROVED", "CHANGES_REQUESTED", "COMMENTED"):
+        if login and not _is_review_bot(login) and state in (
+            "APPROVED", "CHANGES_REQUESTED", "COMMENTED"
+        ):
             reviewers.append(login)
     return reviewers
 
 
+def _count_human_reviews(pr: dict[str, Any], want_state: str) -> int:
+    """Count non-bot reviews on a PR in a given state (§1.5 Gate 4)."""
+    n = 0
+    for r in pr.get("latestReviews") or []:
+        author = r.get("author") or {}
+        login = author.get("login", "") if isinstance(author, dict) else ""
+        if login and not _is_review_bot(login) and (r.get("state") or "").upper() == want_state:
+            n += 1
+    return n
+
+
 def _tally_reviews_given(
-    prs: list[dict[str, Any]], handles: set[str], result: dict[str, dict[str, Any]]
+    prs: list[dict[str, Any]], handles: set[str], result: dict[str, dict[str, Any]],
+    *, repo_name: str = "",
 ) -> None:
     """Count reviews each in-roster member gave on OTHERS' PRs.
 
@@ -324,8 +418,61 @@ def _tally_reviews_given(
     for pr in prs:
         author = pr.get("author", "")
         for reviewer in pr.get("reviewers", []) or []:
-            if reviewer in handles and reviewer != author:
+            if reviewer in handles and reviewer != author and not _is_review_bot(reviewer):
                 result[reviewer]["reviews_given"] = result[reviewer].get("reviews_given", 0) + 1
+                # Reach, not just count (§10.4): a reviewer with 956 reviews at 9%
+                # cross-repo and criticality 1.10 is not multiplying at the same
+                # altitude as one at 93% cross-repo and 2.75. Home repo is resolved
+                # after the loop, so record the repo and weight here.
+                result[reviewer].setdefault("review_repos", defaultdict(int))
+                result[reviewer]["review_repos"][repo_name] += 1
+                result[reviewer]["review_criticality_sum"] = (
+                    result[reviewer].get("review_criticality_sum", 0.0)
+                    + _CRIT_WEIGHT.get(_criticality_of(repo_name), 2.0)
+                )
+
+
+def _tally_rework_and_foundation(
+    touch_index: dict[tuple[str, str], list[tuple[int, Any, bool]]],
+    result: dict[str, dict[str, Any]],
+) -> None:
+    """Derive rework direction and foundation share from the file-touch index.
+
+    Rework direction (§10.2) is the strongest negative discriminator available: for
+    each repair-flagged commit, credit the NEAREST PRIOR toucher of that file within
+    14 days. A fix by someone else on your recent work counts against durability;
+    fixing your own counts as neither. Fixing OTHERS' work is a seniority signal and
+    is credited to the fixer.
+
+    Foundation share (§10.5) is the count of files a person touched first in the
+    window that somebody else subsequently built on.
+    """
+    for (_repo, _path), events in touch_index.items():
+        events.sort(key=lambda e: e[0])
+        authors = {h for _t, h, _f in events if h}
+        first_author = next((h for _t, h, _f in events if h), None)
+        if first_author:
+            result.setdefault(first_author, {})
+            if "files_touched" in result[first_author]:
+                result[first_author]["files_touched"] += 1
+                if len(authors) > 1:
+                    result[first_author]["foundation_files"] += 1
+        for i, (ts, handle, is_fix) in enumerate(events):
+            if not is_fix:
+                continue
+            for j in range(i - 1, -1, -1):
+                prev_ts, prev_handle, _ = events[j]
+                if ts - prev_ts > _REWORK_WINDOW_SECONDS:
+                    break
+                if prev_handle is None:
+                    break
+                if prev_handle == handle:
+                    break  # self-repair: neither credited nor penalised
+                if prev_handle in result and "fixed_by_others" in result[prev_handle]:
+                    result[prev_handle]["fixed_by_others"] += 1
+                if handle and handle in result and "fixes_others" in result[handle]:
+                    result[handle]["fixes_others"] += 1
+                break
 
 
 def _match_handle(
@@ -341,10 +488,15 @@ def _match_handle(
     return None
 
 
-def _parse_commit_records(stdout: str) -> list[dict[str, str]]:
+def _parse_commit_records(stdout: str) -> list[dict[str, Any]]:
     """Parse \\x1e-delimited git log records (fields split by \\x1f).
 
-    Format: hash, author_name, author_email, subject, date, body.
+    Format: hash, author_name, author_email, subject, date, unix_ts, body.
+    The record separator LEADS each record (``%x1e`` first in the format string):
+    with --numstat git emits the stat rows after the formatted header, so a
+    trailing separator would attach a commit's files to the following record.
+    The numstat rows ("added\\tdeleted\\tpath") trailing the body are collected
+    into ``files`` so line counts can be classified (§1.5 Gate 1).
     Body may span multiple lines; the separators keep records unambiguous.
     """
     records = []
@@ -353,15 +505,32 @@ def _parse_commit_records(stdout: str) -> list[dict[str, str]]:
         if not rec.strip():
             continue
         parts = rec.split("\x1f")
-        if len(parts) < 5:
+        if len(parts) < 6:
             continue
+        # numstat rows trail the body inside the final field
+        tail = parts[6] if len(parts) > 6 else ""
+        body_lines, files = [], []
+        for line in tail.split("\n"):
+            cols = line.split("\t")
+            if len(cols) == 3 and (cols[0].isdigit() or cols[0] == "-"):
+                added = int(cols[0]) if cols[0].isdigit() else 0
+                deleted = int(cols[1]) if cols[1].isdigit() else 0
+                files.append((cols[2], added, deleted))
+            else:
+                body_lines.append(line)
+        try:
+            ts = int(parts[5])
+        except (TypeError, ValueError):
+            ts = 0
         records.append({
             "hash": parts[0],
             "author_name": parts[1],
             "author_email": parts[2],
             "message": parts[3],
             "date": parts[4],
-            "body": parts[5] if len(parts) > 5 else "",
+            "ts": ts,
+            "body": "\n".join(body_lines),
+            "files": files,
         })
     return records
 

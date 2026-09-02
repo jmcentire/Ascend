@@ -174,15 +174,22 @@ class TestGitHubFetcher:
 
     def test_parse_commit_records(self):
         from ascend.integrations.github import _parse_commit_records
+        # Record separator LEADS the record (see _parse_commit_records): with
+        # --numstat git emits stat rows after the header, so a trailing separator
+        # would attach a commit's files to the following record. Fields are
+        # hash, name, email, subject, date, unix_ts, body(+numstat rows).
         rec = (
-            "abc123\x1fAlice\x1falice@example.com\x1fFix bug\x1f2025-01-15T10:00:00Z\x1f"
-            "body line\nCo-authored-by: Bob <bob@example.com>\x1e"
+            "\x1eabc123\x1fAlice\x1falice@example.com\x1fFix bug\x1f2025-01-15T10:00:00Z"
+            "\x1f1736935200\x1fbody line\nCo-authored-by: Bob <bob@example.com>\n"
+            "10\t2\tsrc/a.ts\n"
         )
         records = _parse_commit_records(rec)
         assert len(records) == 1
         assert records[0]["hash"] == "abc123"
         assert records[0]["author_email"] == "alice@example.com"
         assert "Co-authored-by: Bob" in records[0]["body"]
+        assert records[0]["ts"] == 1736935200
+        assert records[0]["files"] == [("src/a.ts", 10, 2)]
 
     def test_match_handle(self):
         from ascend.integrations.github import _match_handle
@@ -463,3 +470,98 @@ class TestConfigExtension:
         assert "slack_bot_token_env" in data
         assert data["slack_bot_token_env"] == "SLACK_BOT_TOKEN"
         assert "linear_team_ids" in data
+
+
+class TestCodeStats:
+    """ANALYSIS_STANDARD.md §1.5 Gate 1 — raw line counts are meaningless without
+    classification; only ~22% of added lines in this codebase are production code."""
+
+    def test_classify_separates_authored_code_from_noise(self):
+        from ascend.integrations.codestats import classify
+        assert classify("src/logic/refund.ts") == "prod_code"
+        assert classify("src/logic/__tests__/refund.spec.ts") == "test"
+        assert classify("src/api/management-api.d.ts") == "generated"
+        assert classify("pnpm-lock.yaml") == "generated"
+        assert classify("data/prompts/lodging-corpus.json") == "data"
+        assert classify("services/sync/src/testing/escapia/expected/property.json") == "fixture"
+        assert classify("README.md") == "docs"
+
+    def test_accumulate_excludes_generated_and_data_from_authored(self):
+        from ascend.integrations.codestats import empty_line_stats, accumulate, test_ratio
+        s = empty_line_stats()
+        accumulate(s, "src/a.ts", 100, 10)
+        accumulate(s, "src/a.test.ts", 50, 0)
+        accumulate(s, "src/api.d.ts", 9999, 0)      # generated — must not inflate
+        accumulate(s, "data/corpus.json", 500000, 0)  # data — must not inflate
+        assert s["prod_added"] == 100
+        assert s["prod_deleted"] == 10
+        assert s["test_added"] == 50
+        assert s["generated_added"] == 9999
+        assert s["data_added"] == 500000
+        assert test_ratio(s) == 0.333
+
+
+class TestReworkDirection:
+    """§10.2 — a repair by someone else on your recent work is the strongest
+    negative discriminator available; self-repair is credited to neither side."""
+
+    def _blank(self):
+        return {"fixed_by_others": 0, "fixes_others": 0,
+                "foundation_files": 0, "files_touched": 0}
+
+    def test_fix_by_other_credits_both_sides(self):
+        from ascend.integrations.github import _tally_rework_and_foundation
+        result = {"alice": self._blank(), "bob": self._blank()}
+        idx = {("repo", "a.ts"): [(1000, "alice", False), (2000, "bob", True)]}
+        _tally_rework_and_foundation(idx, result)
+        assert result["alice"]["fixed_by_others"] == 1
+        assert result["bob"]["fixes_others"] == 1
+
+    def test_self_repair_penalises_nobody(self):
+        from ascend.integrations.github import _tally_rework_and_foundation
+        result = {"alice": self._blank()}
+        idx = {("repo", "a.ts"): [(1000, "alice", False), (2000, "alice", True)]}
+        _tally_rework_and_foundation(idx, result)
+        assert result["alice"]["fixed_by_others"] == 0
+        assert result["alice"]["fixes_others"] == 0
+
+    def test_repair_outside_window_is_not_rework(self):
+        from ascend.integrations.github import _tally_rework_and_foundation
+        result = {"alice": self._blank(), "bob": self._blank()}
+        idx = {("repo", "a.ts"): [(0, "alice", False), (15 * 86400, "bob", True)]}
+        _tally_rework_and_foundation(idx, result)
+        assert result["alice"]["fixed_by_others"] == 0
+
+    def test_foundation_counts_files_others_built_on(self):
+        from ascend.integrations.github import _tally_rework_and_foundation
+        result = {"alice": self._blank(), "bob": self._blank()}
+        idx = {
+            ("repo", "shared.ts"): [(1000, "alice", False), (2000, "bob", False)],
+            ("repo", "solo.ts"): [(1000, "alice", False)],
+        }
+        _tally_rework_and_foundation(idx, result)
+        assert result["alice"]["files_touched"] == 2
+        assert result["alice"]["foundation_files"] == 1
+
+
+class TestReviewBots:
+    """§1.5 Gate 4 — 93% of inline review threads here are machine-authored, so a
+    review metric that counts them measures CI, not people."""
+
+    def test_bots_are_excluded_from_reviewers(self):
+        from ascend.integrations.github import _extract_reviewers
+        pr = {"latestReviews": [
+            {"author": {"login": "cursor"}, "state": "COMMENTED"},
+            {"author": {"login": "adaptcom"}, "state": "CHANGES_REQUESTED"},
+            {"author": {"login": "renovate[bot]"}, "state": "APPROVED"},
+            {"author": {"login": "alice"}, "state": "APPROVED"},
+        ]}
+        assert _extract_reviewers(pr) == ["alice"]
+
+    def test_human_approval_count_ignores_bots(self):
+        from ascend.integrations.github import _count_human_reviews
+        pr = {"latestReviews": [
+            {"author": {"login": "cursor"}, "state": "APPROVED"},
+            {"author": {"login": "alice"}, "state": "APPROVED"},
+        ]}
+        assert _count_human_reviews(pr, "APPROVED") == 1

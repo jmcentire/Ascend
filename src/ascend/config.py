@@ -24,7 +24,7 @@ _DEFAULTS = {
     "reports_dir": str(Path.home() / "ascend-data" / "reports"),
     "config_dir": str(Path.home() / "ascend-data" / "config"),
     "anthropic_api_key_env": "ASCEND_ANTHROPIC_API_KEY",
-    "model": "claude-sonnet-4-20250514",
+    "model": "claude-sonnet-4-6",
     "default_lookback_hours": 24,
     "linear_team_id": "",
     "slack_channels": [],

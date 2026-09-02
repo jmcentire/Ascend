@@ -47,10 +47,16 @@ def take_snapshot(
     date_str: Optional[str] = None,
     skip_linear: bool = False,
     skip_fetch: bool = False,
+    gh_data_all: Optional[dict[str, dict[str, Any]]] = None,
 ) -> dict[str, Any]:
     """Take a performance snapshot for a single member.
 
     For backfill, pass explicit since/until/date_str to snapshot a specific day.
+
+    ``gh_data_all`` is a pre-fetched ``fetch_all_github`` result. Pass it whenever
+    snapshotting more than one member: cross-person metrics (fixes_others,
+    foundation_files) can only be derived when every roster member is resolved in
+    the same pass, and it turns an O(members x repos) sync into O(repos).
     """
     if since is None:
         since = datetime.now(timezone.utc) - timedelta(hours=hours)
@@ -73,18 +79,43 @@ def take_snapshot(
         "open_prs": 0,
         "bug_share": 0.0,
         "reopened": 0,
+        # Code volume, classified (ANALYSIS_STANDARD.md §1.5 Gate 1). Raw insertion
+        # counts are not reported because they are dominated by data and generated
+        # files — only ~22% of added lines in this codebase are production code.
+        "prod_lines_added": 0,
+        "prod_lines_deleted": 0,
+        "test_lines_added": 0,
+        "generated_lines_added": 0,
+        "test_ratio": 0.0,
+        # Rework direction (§10.2) — the strongest negative discriminator available.
+        "fixed_by_others": 0,
+        "fixes_others": 0,
+        # Foundation share (§10.5) — files you touched first that others built on.
+        "foundation_files": 0,
+        "files_touched": 0,
+        # Review reach (§10.4) — count alone conflates in-silo churn with real
+        # multiplication.
+        "reviews_cross_repo": 0,
+        "review_avg_criticality": 0.0,
+        # Governance (§1.5 Gate 4) — reported, never used to penalise an individual.
+        "prs_merged_without_human_approval": 0,
     }
     errors: list[str] = []
 
     # GitHub data
     if github_handle:
         try:
-            from ascend.integrations.github import fetch_member_github
-            gh_data = fetch_member_github(
-                github_handle, str(config.repos_dir), config.github_org, since,
-                email=email, personal_email=personal_email, until=until,
-                skip_fetch=skip_fetch,
-            )
+            if gh_data_all is not None:
+                gh_data = gh_data_all.get(github_handle) or {
+                    "error": None, "commits": [], "prs": {"open": [], "merged": []},
+                }
+            else:
+                from ascend.integrations.github import fetch_member_github
+                gh_data = fetch_member_github(
+                    github_handle, str(config.repos_dir), config.github_org, since,
+                    email=email, personal_email=personal_email, until=until,
+                    skip_fetch=skip_fetch,
+                )
             if not gh_data.get("error"):
                 metrics["commits_count"] = len(gh_data.get("commits", []))
                 prs = gh_data.get("prs", {}) or {}
@@ -92,6 +123,41 @@ def take_snapshot(
                 metrics["prs_merged"] = len(prs.get("merged", []))
                 metrics["reviews_given"] = gh_data.get("reviews_given", 0)
                 metrics["coauthored_commits"] = gh_data.get("coauthored_commits", 0)
+
+                lines = gh_data.get("lines") or {}
+                metrics["prod_lines_added"] = lines.get("prod_added", 0)
+                metrics["prod_lines_deleted"] = lines.get("prod_deleted", 0)
+                metrics["test_lines_added"] = lines.get("test_added", 0)
+                metrics["generated_lines_added"] = lines.get("generated_added", 0)
+                try:
+                    from ascend.integrations.codestats import test_ratio
+                    metrics["test_ratio"] = test_ratio(
+                        {**{"prod_added": 0, "test_added": 0}, **lines}
+                    )
+                except Exception:
+                    pass
+
+                metrics["fixed_by_others"] = gh_data.get("fixed_by_others", 0)
+                metrics["fixes_others"] = gh_data.get("fixes_others", 0)
+                metrics["foundation_files"] = gh_data.get("foundation_files", 0)
+                metrics["files_touched"] = gh_data.get("files_touched", 0)
+                metrics["prs_merged_without_human_approval"] = gh_data.get(
+                    "prs_merged_without_human_approval", 0
+                )
+
+                # Review reach: cross-repo share and the average criticality of what
+                # was reviewed. Home repo = where the reviewer reviews most.
+                rr = gh_data.get("review_repos") or {}
+                given = gh_data.get("reviews_given", 0) or 0
+                if rr and given:
+                    home = max(rr, key=lambda k: rr[k])
+                    metrics["reviews_cross_repo"] = sum(
+                        n for r, n in rr.items() if r != home
+                    )
+                if given:
+                    metrics["review_avg_criticality"] = round(
+                        gh_data.get("review_criticality_sum", 0.0) / given, 2
+                    )
                 # Flow & latency metrics (§1.C) — derived from the PR data already fetched,
                 # so no extra network cost.
                 try:
@@ -183,6 +249,26 @@ def take_all_snapshots(
         "SELECT id, name, github, email, personal_email FROM members WHERE status = 'active'"
     ).fetchall()
 
+    # One GitHub pass for the whole roster. Required for correctness, not just
+    # speed: fixes_others and foundation_files are cross-person and cannot be
+    # derived when each member is fetched in isolation.
+    gh_data_all = None
+    try:
+        from ascend.integrations.github import fetch_all_github
+        _since = since or (datetime.now(timezone.utc) - timedelta(hours=hours))
+        members_for_gh = [
+            {"github": r["github"], "email": r["email"],
+             "personal_email": r["personal_email"]}
+            for r in rows if r["github"]
+        ]
+        if members_for_gh:
+            gh_data_all = fetch_all_github(
+                members_for_gh, str(config.repos_dir), config.github_org, _since,
+                until=until, skip_fetch=skip_fetch,
+            )
+    except Exception:
+        gh_data_all = None  # fall back to per-member fetches
+
     results = []
     for row in rows:
         mid = row["id"]
@@ -192,7 +278,7 @@ def take_all_snapshots(
             mid, name, github, conn, config, hours=hours,
             email=row["email"], personal_email=row["personal_email"],
             since=since, until=until, date_str=date_str, skip_linear=skip_linear,
-            skip_fetch=skip_fetch,
+            skip_fetch=skip_fetch, gh_data_all=gh_data_all,
         )
         results.append(result)
 

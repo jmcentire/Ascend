@@ -7,7 +7,9 @@
 #   - pbcopy timeout is fixed at 5 seconds
 #   - JSON output always uses 2-space indentation and default=str for serialization
 
-Any = primitive  # Python typing.Any for arbitrary data types
+#Any =  # Python typing.Any for arbitrary data types
+
+from typing import Any
 
 def _colorize(
     text: str,

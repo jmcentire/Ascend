@@ -9,9 +9,12 @@
 #   - Row factory set to sqlite3.Row for all connections
 #   - Schema version tracked in schema_version table
 
-Path = primitive  # pathlib.Path from standard library
+#Path =  # pathlib.Path from standard library
 
-Connection = primitive  # sqlite3.Connection from standard library
+#Connection =  # sqlite3.Connection from standard library
+
+from pathlib import Path
+from sqlite3 import Connection
 
 class HealthCheckResult:
     """Return type for check_db function - dict with status information"""
