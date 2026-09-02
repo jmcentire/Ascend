@@ -15,6 +15,7 @@
 #   - Sentiment scores are always clamped to [0.0, 1.0]
 #   - MeetingItemExtract.content must be non-empty (validated)
 
+_MAX_INPUT_CHARS = 100_000
 from enum import Enum
 class MeetingItemKind(Enum):
     """Enumeration of structured meeting item types"""
