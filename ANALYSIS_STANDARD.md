@@ -123,9 +123,73 @@ starting point for understanding a person's work, never the whole of it.)
   with comprehensive CI and the flagged engineer is on greenfield infra. Invalid comparison
   → no flag; surface the comparison gap instead.
 
+
 ### E. Engagement (Slack)  *(caveated — see §6)*
 
+### F. Leveling band  *(required output of any deeper analysis)*
+
+Every per-person analysis must land on an industry-calibrated band — Junior / Mid / Senior /
+Staff / Principal — and state the evidence for it. Do **not** report the internal ladder as the
+answer: 17 of 29 ICs hold the same title, so "Senior" does not discriminate. Report
+`current title -> recommended band -> delta`.
+
+- **Junior** — one defined task at a time; produces working code by copying nearby shape.
+- **Mid** — a feature end to end inside someone else's design; handles failures they have seen.
+- **Senior** — owns a domain and designs within it; declares failure behavior; leaves a
+  debuggable trail. Ceiling: solves the problem as given.
+- **Staff** — works across systems they do not own; builds abstractions that survive
+  requirement change; can name a decision made *against* the stated requirement.
+- **Principal** — the org's hard problems route here; removes categories of error rather than
+  instances (a type system, protocol, or invariant that makes a class of bug impossible).
+
+**The four discriminators that actually separated this population** — weight these above volume:
+1. **Partial-failure reasoning** — distinguishes failed from half-succeeded; states what is owed after.
+2. **Authority of a fact** — names an owner and a tolerance when two systems disagree, instead of
+   reconciling in code.
+3. **Designing for reversal** — builds for a business change that has not been announced.
+4. **Observability as an output** — someone else can debug it at 3am without them.
+
 ---
+
+## 1.5 MEASUREMENT INTEGRITY — mandatory gates before any ranking is published
+
+These are not advisory. A ranking published without them is invalid.
+
+**Gate 1 — Classify files before counting anything.** Only ~22% of added lines in this codebase
+are production code; 36% is data (prompt corpora, one commit of 948K lines), 15% generated
+(`.d.ts` API clients at 400K lines, lockfiles), 13% test. Unclassified, one engineer showed
+33,023,081 insertions. Classify into prod_code / test / fixture / generated / data / config /
+docs and report prod+test only. Reference implementation: the `classify()` used by the Sep 2026
+leveling run.
+
+**Gate 2 — Correlate the composite against a naive volume index and publish the number.**
+Weighting coefficients do not control influence; *spread* does. A composite nominally weighted
+quality-28% / output-18% measured r=+0.80 against pure volume, because the output block's
+standard deviation was 0.78 against quality's 0.36. If the composite correlates above ~0.5 with
+volume, it is an output ranking — relabel it or rebalance it.
+
+**Gate 3 — Do not screen on code-density metrics alone; they are backend-shaped.** Error-handling,
+logging, validation and `console.log` rates per kloc correlate at r=-0.59 with front-end share of
+work (ops-maturity alone: r=-0.71). Browser code reports errors to the user and Sentry, not
+stdout; mobile has no server log; CLI and experiment repos legitimately invert the console rule.
+**Read the code before assigning a band.** Several engineers whose densities sit low write
+demonstrably sound code.
+
+**Gate 4 — Exclude bots from every review metric, and report the human-review rate separately.**
+93% of inline review threads here are machine-authored (Cursor, Adapt, Codex, Copilot). Across
+3,067 PRs there were 522 approvals and 47 change-requests in total, and self-merge without human
+approval is the norm (top engineers 83-93%). "Contentious vs easily approved" is therefore not a
+usable discriminator; report **review given** (multiplication) and **human-review rate**
+(governance) instead.
+
+**Gate 5 — Never validate a level-blind analysis against current level or against manager
+bar-language.** Both are contaminated: the ladder is compressed, and 1:1 reads are formed partly
+by observing delivery, so agreement with them cannot referee whether an index is output-driven.
+
+**Gate 6 — Check start dates and tenure before treating absence of signal as a finding.** A
+roster can contain people ahead of their start date. Engineers under ~120 days carry a ramp
+caveat and their placement is directional, not settled.
+
 
 ## 2. Weighting
 
@@ -142,7 +206,9 @@ count is only meaningful *after* tenure/level normalization and identity verific
 ---
 
 ## 3. Required normalizations
-- **Per-level band.** Compare within ladder band (PE II vs PE II). Express as z-score within
+- **Per-level band — USE WITH CARE.** The internal ladder is compressed (59% of ICs share one
+  level), so within-band z-scores have little variance to work with and cannot be used to
+  validate an index. Prefer normalizing by *tenure* and *system-criticality class*. Express as z-score within
   band before ranking across bands.
 - **Tenure / ramp.** Use first-commit date; express output as **merges-per-active-week**,
   not raw volume. A new hire reads as "low output" identically to a coaster — the denominator
@@ -212,3 +278,30 @@ misfire (novel work, invalid cohort, inadequate tooling, illegible/prevention wo
 dimension misfires more than **~30%** of the time, that's the *tool* telling you the
 dimension isn't earning its keep — fix the controls or stop foregrounding it. This audits the
 analysis, not the analyst.
+
+
+---
+
+## 10. Metrics still missing from the pipeline  *(added 2026-09-01)*
+
+Collected today: commits, PRs open/merged, issues completed, reviews given, co-authored commits,
+stale hours, rotting PRs, cycle p85, bug share, reopened.
+
+**Required by this standard but not yet collected:**
+
+1. **Classified line counts** (prod / test / fixture / generated / data). `integrations/github.py`
+   collects no line counts at all, so "how much real code" is unmeasurable. Highest-value gap.
+2. **Rework direction** — for each commit, whether a *fix*-flagged commit by someone else lands on
+   the same file within 14 days. This was the strongest negative discriminator in the Sep 2026
+   run (0% for the cleanest engineer, 31.1 per 100 commits for the weakest) and beat every volume
+   metric. Needs a file-touch index across the window.
+3. **Human-review rate / self-merge rate** — merged with zero human approval. The governance
+   signal, and the explanation for several individual findings.
+4. **Cross-boundary review reach** — `reviews_given` is currently a flat count. Weight it by
+   whether the reviewed PR is outside the reviewer's home repo, and by the criticality of that
+   repo. A reviewer with 956 reviews at 9% cross-repo and average criticality 1.10 is not
+   multiplying at the same altitude as one at 93% cross-repo and 2.75.
+5. **Foundation share** — files a person created that others subsequently built on.
+
+`analysis/cohorts.py:DEFAULT_CRITICALITY` is sound and should be the single source for
+criticality weighting once (2)-(4) exist.
