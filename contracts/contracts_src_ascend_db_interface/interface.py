@@ -18,6 +18,11 @@
 
 #Row =  # sqlite3.Row - row factory for dict-like access to query results
 
+# Re-exported from the implementation rather than duplicated: a second copy of the
+# schema literal would drift, which is exactly how SCHEMA_VERSION ended up
+# documented as 2 while the code had moved to 3.
+from ascend.db import _SCHEMA_SQL  # noqa: F401
+SCHEMA_VERSION = 3
 from pathlib import Path
 from sqlite3 import Connection
 from sqlite3 import Row
@@ -57,7 +62,7 @@ def init_db(
     db_path: Path,
 ) -> Connection:
     """
-    Creates the database file (if needed), applies the schema if not present or outdated, and returns an open connection. Checks current schema version and only applies schema updates if current version is less than SCHEMA_VERSION (2). Creates parent directories if they don't exist.
+    Creates the database file (if needed), applies the schema if not present or outdated, and returns an open connection. Checks current schema version and only applies schema updates if current version is less than SCHEMA_VERSION (3). Creates parent directories if they don't exist.
 
     Preconditions:
       - db_path is a valid Path object
@@ -65,7 +70,7 @@ def init_db(
     Postconditions:
       - Database file exists at db_path
       - All parent directories of db_path exist
-      - Schema is at SCHEMA_VERSION (2)
+      - Schema is at SCHEMA_VERSION (3)
       - schema_version table has entry for SCHEMA_VERSION
       - All tables, triggers, and FTS5 virtual tables are created
       - Returns open connection with WAL mode and foreign keys enabled

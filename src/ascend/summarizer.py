@@ -55,6 +55,18 @@ class MeetingItemKind(str, Enum):
     win = "win"
 
 
+def content_must_be_nonempty(cls: type, v: str) -> str:
+    """Field validator for MeetingItemExtract.content — content must be non-empty.
+
+    Defined at module level because the interface contract requires it to be
+    importable by name; the model below delegates to it so there is one
+    implementation, not two.
+    """
+    if not v:
+        raise ValueError("content must be non-empty")
+    return v
+
+
 class MeetingItemExtract(BaseModel):
     kind: MeetingItemKind
     content: str
@@ -62,10 +74,8 @@ class MeetingItemExtract(BaseModel):
 
     @field_validator("content")
     @classmethod
-    def content_must_be_nonempty(cls, v: str) -> str:
-        if not v:
-            raise ValueError("content must be non-empty")
-        return v
+    def _validate_content(cls, v: str) -> str:
+        return content_must_be_nonempty(cls, v)
 
 
 def _truncate(text: str) -> str:

@@ -3,7 +3,7 @@
 # SQLite database layer for Ascend engineering management CLI. Provides connection management, schema initialization with versioning, and health check capabilities. Manages tables for teams, members, meetings, goals, performance snapshots, coaching entries, and schedules with full-text search support.
 
 # Module invariants:
-#   - SCHEMA_VERSION = 2
+#   - SCHEMA_VERSION = 3
 #   - WAL mode enabled for all connections
 #   - Foreign keys enabled for all connections
 #   - Row factory set to sqlite3.Row for all connections
@@ -13,6 +13,11 @@
 
 #Connection =  # sqlite3.Connection from standard library
 
+# Re-exported from the implementation rather than duplicated: a second copy of the
+# schema literal would drift, which is exactly how SCHEMA_VERSION ended up
+# documented as 2 while the code had moved to 3.
+from ascend.db import _SCHEMA_SQL  # noqa: F401
+SCHEMA_VERSION = 3
 from pathlib import Path
 from sqlite3 import Connection
 
@@ -51,7 +56,7 @@ def init_db(
     db_path: pathlib.Path,
 ) -> sqlite3.Connection:
     """
-    Create the database and apply the schema if needed. Creates parent directories, checks current schema version, and upgrades schema if current version is less than SCHEMA_VERSION (2). Returns an open connection.
+    Create the database and apply the schema if needed. Creates parent directories, checks current schema version, and upgrades schema if current version is less than SCHEMA_VERSION (3). Returns an open connection.
 
     Preconditions:
       - db_path is a valid Path object
@@ -59,7 +64,7 @@ def init_db(
     Postconditions:
       - Database file exists at db_path
       - Parent directories of db_path exist
-      - Schema version is SCHEMA_VERSION (2)
+      - Schema version is SCHEMA_VERSION (3)
       - All tables, triggers, and FTS5 virtual tables are created
       - Returns open connection with WAL mode and foreign keys enabled
       - Changes are committed to database
