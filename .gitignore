@@ -41,3 +41,6 @@ ascend-phase3/
 .pytest_cache/
 htmlcov/
 .coverage
+
+# Pact working state (generated, machine-local)
+.pact/
